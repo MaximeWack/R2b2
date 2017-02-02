@@ -4,9 +4,11 @@
 \alias{secure_db}
 \title{Secure the i2b2 databases}
 \usage{
-secure_db(name, pass, pass_length = 8)
+secure_db(host = "127.0.0.1", name, pass, pass_length = 8)
 }
 \arguments{
+\item{host}{Address of the host, by default 127.0.0.1}
+
 \item{name}{Name of the database admin account}
 
 \item{pass}{Password of the database admin account}
@@ -23,5 +25,10 @@ Secure the i2b2 databases
 Connect to the database using the admin account credentials, provided as name and pass,
 generate pass_length long passwords for each database
 and update the cells config with the new passwords.
+
+If executed on the VM, host is by default 127.0.0.1, which works with the pg_hba.conf
+settings in the README.
+The function can be used from a remote machine but you have to configure pg_hba.conf
+accordingly
 }
 

@@ -62,16 +62,22 @@ create_admin <- function(name = "i2b2admin", pass= NULL, pass_length = 8)
 #' Connect to the database using the admin account credentials, provided as name and pass,
 #' generate pass_length long passwords for each database
 #' and update the cells config with the new passwords.
+#' 
+#' If executed on the VM, host is by default 127.0.0.1, which works with the pg_hba.conf
+#' settings in the README.
+#' The function can be used from a remote machine but you have to configure pg_hba.conf
+#' accordingly
 #'
+#' @param host Address of the host, by default 127.0.0.1
 #' @param name Name of the database admin account
 #' @param pass Password of the database admin account
 #' @param pass_length Length of the generated passwords
 #' @return A vector for one statistic column
 #' @export
-secure_db <- function(name, pass, pass_length = 8)
+secure_db <- function(host = "127.0.0.1", name, pass, pass_length = 8)
 {
 # Connect to the db
-  con <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = "127.0.0.1", user = name, password = pass)
+  con <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host, user = name, password = pass)
 
 # Generate passwords
   accounts <- c("demodata", "hive", "imdata", "metadata", "pm", "workdata")
