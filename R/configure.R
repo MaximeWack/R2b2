@@ -1,3 +1,8 @@
+#' Set the permissions for the webclient and wildfly folders
+#'
+#' Set the permissions wildfly:wildfly +rwx and setgid to the webclient and wildfly folders
+#'
+#' @export
 set_permissions <- function()
 {
   system("chown wildfly:wildfly /var/www/html -R")
@@ -7,6 +12,20 @@ set_permissions <- function()
   system("chmod g+s /opt/wildfly-10.0.0.Final -R")
 }
 
+#' Create system and database admin accounts
+#'
+#' Create system and database admin accounts
+#'
+#' Create a system and database admin accounts
+#' The name of the account is i2b2admin by default
+#' The shared password can be provided, or randomly generated (length = 8 characters by default)
+#' The system account belongs in the users and wildfly groups
+#'
+#' @param name Name of the account
+#' @param pass An arbitrary password if provided, i2b2admin by default
+#' @param pass_length The length of the generated password, 8 characters by default
+#' @return The generated password
+#' @export
 create_admin <- function(name = "i2b2admin", pass= NULL, pass_length = 8)
 {
 # Generate a new password of default length 10
@@ -36,6 +55,19 @@ create_admin <- function(name = "i2b2admin", pass= NULL, pass_length = 8)
   pass
 }
 
+#' Secure the i2b2 databases
+#'
+#' Secure the i2b2 databases
+#'
+#' Connect to the database using the admin account credentials, provided as name and pass,
+#' generate pass_length long passwords for each database
+#' and update the cells config with the new passwords.
+#'
+#' @param name Name of the database admin account
+#' @param pass Password of the database admin account
+#' @param pass_length Length of the generated passwords
+#' @return A vector for one statistic column
+#' @export
 secure_db <- function(name, pass, pass_length = 8)
 {
 # Connect to the db
