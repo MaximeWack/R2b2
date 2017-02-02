@@ -17,8 +17,10 @@ Download and install the VM image from i2b2.org and run it inside VMWare.
 `yum install R openssl-devel libxml2-devel postgresql-devel postgresql91-devel libcurl-devel` to install R and necessary dependencies.
 
 Change the local host connection type in **pg_hba.conf** to md5:  
-`# TYPE   DATABASE  USER  ADDRESS       METHOD  
-host     all       all   127.0.0.1/32  md5`
+```
+# TYPE   DATABASE  USER  ADDRESS       METHOD  
+host     all       all   127.0.0.1/32  md5
+```
 
 # Installation
 
