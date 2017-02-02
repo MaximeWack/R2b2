@@ -6,3 +6,33 @@ set_permissions <- function()
   system("chmod g+s /var/www/html -R")
   system("chmod g+s /opt/wildfly-10.0.0.Final -R")
 }
+
+create_admin <- function(name = "i2b2admin", pass= NULL, pass_length = 8)
+{
+# Generate a new password of default length 10
+  if (is.null(pass))
+    pass <- create_password(pass_length)
+
+# Create the system user
+  system(str_c("useradd ", name, " -g users -G wildfly -m"))
+  system(str_c("echo \"", name, ":", pass, "\" | chpasswd"))
+  print(str_c(name, " system account created with password: ", pass))
+  
+# Connect to the db
+  con <- dbConnect(PostgreSQL(), user = "root", password = "demouser")
+  
+# Create the database user and its database
+  dbGetQuery(con, str_c("create user ", name, " with superuser createrole createdb password '", pass, "';"))
+  dbGetQuery(con, str_c("create database ", name, ";"))
+  print(str_c(name, " postgresql account created with password: ", pass))
+
+# Reset the root account password
+  dbGetQuery(con, str_c("alter user root password '", pass, "';"))
+  print(str_c("Changed password for user root to: ", pass))
+
+# Disconnect the db
+  dbDisconnect(con)
+
+  pass
+}
+
