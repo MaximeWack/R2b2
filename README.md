@@ -6,7 +6,7 @@ ETL and import data
 Tested on i2b2 VM 1.7.08b
 
 All the steps up to and including **Create an admin user** are to be executed as root, **inside the VM**.  
-The next steps can be carried with another user, as long as you provide the necessary credentials (primarily a database admin account)
+The next steps can be carried with another user, as long as you provide the necessary credentials (database admin account), and from a different machine (you'll have to configure the **pg_hba.conf** file accordingly)
 
 # Prerequisites
 
