@@ -59,7 +59,8 @@ secure_db <- function(name, pass, pass_length = 8)
     purrr::map(function(x)
         {
           stringr::str_c(path, x) %>%
-            read_file %>%
+            readLines %>%
+            stringr::str_c(collapse = "\n") %>%
             {
               config <- .
 
@@ -72,7 +73,7 @@ secure_db <- function(name, pass, pass_length = 8)
 
               config
             } %>%
-            write_file(str_c(path, x))
+              write(stringr::str_c(path, x))
         })
 
   # Disconnect the db
