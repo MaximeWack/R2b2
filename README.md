@@ -5,6 +5,9 @@ ETL and import data
 
 Tested on i2b2 VM 1.7.08b
 
+All the steps up to and including **Create an admin user** are to be executed as root, **inside the VM**.  
+The next steps can be carried with another user, as long as you provide the necessary credentials (primarily a database admin account)
+
 # Prerequisites
 
 Download and install the VM image from i2b2.org and run it inside VMWare.
@@ -22,8 +25,6 @@ Install with `devtools::install_github("maximewack/R2b2")`
 
 # Usage
 
-All the next steps are to be executed as root, **inside the VM**.
-
 ## Create an admin user
 
 By default, `create_admin` creates a **i2b2admin** system user, with a random generated password containing numbers and letters of all cases.  
@@ -35,6 +36,7 @@ An user with the same name, and their corresponding database are also created in
 You are still responsible for managing the root account and its password (default = demouser), and optionally  granting additional privileges to the admin user (such as *sudo* rights).
 
 The `set_permissions` function sets group owning, setgid and group rights +rwx to the webclient and wildfly folders so that the admin(s) can manage them.
+
 
 ## Securing the database
 
