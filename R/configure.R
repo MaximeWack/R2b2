@@ -36,3 +36,48 @@ create_admin <- function(name = "i2b2admin", pass= NULL, pass_length = 8)
   pass
 }
 
+secure_bdd <- function(name, pass, pass_length = 8)
+{
+# Connect to the db
+  con <- dbConnect(PostgreSQL(), user = name, password = pass)
+
+# Generate passwords
+  accounts <- c("demodata", "hive", "imdata", "metadata", "pm", "workdata")
+  passwords <- accounts %>% sapply(function(x){create_password(pass_length)})
+
+# Change db accounts passwords
+  accounts %>%
+  sapply(function(x)
+         {
+           dbGetQuery(con, str_c("alter user i2b2", x, " password '", passwords[x], "';"))
+         })
+
+  path <- "/opt/wildfly-10.0.0.Final/standalone/deployments/" 
+
+  # Modify cells config files accordingly
+  str_c(c("crc", "im", "ont", "pm", "work"), "-ds.xml") %>%
+    map(function(x)
+        {
+          str_c(path, x) %>%
+            read_file %>%
+            {
+              config <- .
+
+              for(acc in accounts)
+              {
+                config %>% 
+                  str_replace_all(str_c("<user-name>i2b2", acc, "</user-name>\n(\t*)<password>[^<]*</password>"),
+                                  str_c("<user-name>i2b2", acc, "</user-name>\n\\1<password>",passwords[acc],"</password>")) -> config
+              }
+
+              config
+            } %>%
+            write_file(str_c(path, x))
+        })
+
+  # Disconnect the db
+  dbDisconnect(con)
+
+  accounts %>%
+    walk(~print(str_c("Password for database user i2b2", .x, " set to: ", passwords[.x])))
+}
