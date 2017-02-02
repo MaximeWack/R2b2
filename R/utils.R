@@ -1,3 +1,12 @@
+#' Pipe operator
+#'
+#' @name %>%
+#' @rdname pipe
+#' @keywords internal
+#' @importFrom dplyr %>%
+#' @usage lhs \%>\% rhs
+NULL
+
 #' Generate a random password
 #'
 #' Generate a random alphanumeric password of any length
