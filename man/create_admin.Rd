@@ -25,4 +25,3 @@ The name of the account is i2b2admin by default
 The shared password can be provided, or randomly generated (length = 8 characters by default)
 The system account belongs in the users and wildfly groups
 }
-

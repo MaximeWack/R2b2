@@ -31,4 +31,3 @@ settings in the README.
 The function can be used from a remote machine but you have to configure pg_hba.conf
 accordingly
 }
-

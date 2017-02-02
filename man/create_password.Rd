@@ -18,4 +18,3 @@ Generate a random alphanumeric password of any length
 \details{
 Generate a random alphanumeric ([A-Za-z0-9]) password
 }
-

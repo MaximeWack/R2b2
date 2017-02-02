@@ -9,4 +9,3 @@ set_permissions()
 \description{
 Set the permissions wildfly:wildfly +rwx and setgid to the webclient and wildfly folders
 }
-
