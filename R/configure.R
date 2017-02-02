@@ -38,7 +38,7 @@ create_admin <- function(name = "i2b2admin", pass= NULL, pass_length = 8)
   print(stringr::str_c(name, " system account created with password: ", pass))
   
 # Connect to the db
-  con <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), user = "root", password = "demouser")
+  con <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = "127.0.0.1", user = "postgres", password = "demouser")
   
 # Create the database user and its database
   RPostgreSQL::dbGetQuery(con, stringr::str_c("create user ", name, " with superuser createrole createdb password '", pass, "';"))
@@ -46,8 +46,8 @@ create_admin <- function(name = "i2b2admin", pass= NULL, pass_length = 8)
   print(stringr::str_c(name, " postgresql account created with password: ", pass))
 
 # Reset the root account password
-  RPostgreSQL::dbGetQuery(con, stringr::str_c("alter user root password '", pass, "';"))
-  print(stringr::str_c("Changed password for user root to: ", pass))
+  RPostgreSQL::dbGetQuery(con, stringr::str_c("alter user postgres password '", pass, "';"))
+  print(stringr::str_c("Changed password for user postgres to: ", pass))
 
 # Disconnect the db
   RPostgreSQL::dbDisconnect(con)
@@ -71,7 +71,7 @@ create_admin <- function(name = "i2b2admin", pass= NULL, pass_length = 8)
 secure_db <- function(name, pass, pass_length = 8)
 {
 # Connect to the db
-  con <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), user = name, password = pass)
+  con <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = "127.0.0.1", user = name, password = pass)
 
 # Generate passwords
   accounts <- c("demodata", "hive", "imdata", "metadata", "pm", "workdata")
