@@ -36,7 +36,7 @@ create_admin <- function(name = "i2b2admin", pass= NULL, pass_length = 8)
   pass
 }
 
-secure_bdd <- function(name, pass, pass_length = 8)
+secure_db <- function(name, pass, pass_length = 8)
 {
 # Connect to the db
   con <- dbConnect(PostgreSQL(), user = name, password = pass)
