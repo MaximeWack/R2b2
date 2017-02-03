@@ -7,8 +7,11 @@ Tested on i2b2 VM 1.7.08b
 ----
 
 All the steps up to and including **Create and admin user** are to be carried as root, inside the VM.  
+<<<<<<< HEAD
 
 ----
+=======
+>>>>>>> 3f52d7f04dd33faf367d6882c1d4a29c0fdec2c5
 
 # Prerequisites
 
@@ -46,8 +49,11 @@ You are still responsible for managing the root account and its password (defaul
 ----
 
 The subsequent steps up to and including **set domain** can be executed using the created admin system user, inside the VM.  
+<<<<<<< HEAD
 
 ----
+=======
+>>>>>>> 3f52d7f04dd33faf367d6882c1d4a29c0fdec2c5
 
 ## Securing the database
 
@@ -58,6 +64,7 @@ All the databases have the default *demouser* password.
 
 You are still responsible for managing the access rights to the PostgreSQL database (listening addresses in $PSQL_HOME/data/postgresql.conf and access methods in $PSQL_HOME/data/pg_hba.conf) if you want to be able to access it remotely.
 
+<<<<<<< HEAD
 ## Set the domain
 
 `set_domain` takes a database admin credentials (name and pass) and a *domain_id* (the internal id) and *domain_name* (the name of the host on the webclient login page) and sets the corresponding columns in i2b2hive and i2b2pm, and configures the webclient to connect to this domain.
@@ -67,3 +74,8 @@ You are still responsible for managing the access rights to the PostgreSQL datab
 The next steps can be carried with another user, as long as you provide the necessary credentials (database admin account), and even from a different machine (you'll have to configure the **pg_hba.conf** and **postgresql.conf** files accordingly)
 
 ----
+=======
+----
+
+The next steps can be carried with another user, as long as you provide the necessary credentials (database admin account), and even from a different machine (you'll have to configure the **pg_hba.conf** and **postgresql.conf** files accordingly)
+>>>>>>> 3f52d7f04dd33faf367d6882c1d4a29c0fdec2c5
