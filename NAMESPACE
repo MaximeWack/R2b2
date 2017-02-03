@@ -2,5 +2,6 @@
 
 export(create_admin)
 export(secure_db)
+export(set_domain)
 export(set_permissions)
 importFrom(dplyr,"%>%")

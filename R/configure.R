@@ -86,7 +86,7 @@ secure_db <- function(name, pass, pass_length = 8)
 
   path <- "/opt/wildfly-10.0.0.Final/standalone/deployments/" 
 
-  # Modify cells config files accordingly
+  # Modify all passwords in all cells config files accordingly
   stringr::str_c(c("crc", "im", "ont", "pm", "work"), "-ds.xml") %>%
     purrr::map(function(x)
         {
@@ -113,4 +113,42 @@ secure_db <- function(name, pass, pass_length = 8)
 
   accounts %>%
     purrr::walk(~print(stringr::str_c("Password for database user i2b2", .x, " set to: ", passwords[.x])))
+}
+
+#' Set the domain
+#'
+#' Set the domain id and domain name of the instance
+#'
+#' Set the domain id and domain name in the databases
+#' and set the domain name in the webclient'
+#' 
+#' @param name Name of the database admin account
+#' @param pass Password of the database admin account
+#' @param domain_id The desired domain_id
+#' @param domain_name The desired domain_name
+#' @export
+set_domain <- function(name, pass, domain_id, domain_name)
+{
+# Connect to the db
+  hive <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = "127.0.0.1", dbname = "i2b2hive", user = name, password = pass)
+  pm   <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = "127.0.0.1", dbname = "i2b2pm",   user = name, password = pass)
+
+# Set the domain id to all cells in i2b2hive
+  c("crc", "im", "ont", "work") %>%
+    purrr::walk(~RPostgreSQL::dbGetQuery(hive, stringr::str_c("UPDATE ", .x, "_db_lookup SET c_domain_id = '", domain_id, "';")))
+
+# Set the domain id and name in pm_hive_data
+  RPostgreSQL::dbGetQuery(pm, stringr::str_c("UPDATE pm_hive_data SET domain_id = '", domain_id, "', domain_name = '", domain_name, "';"))
+
+# Set the domain name for the webclient
+  "/var/www/html/webclient/i2b2_config_data.js" %>%
+    readLines %>%
+    stringr::str_c(collapse = "\n") %>%
+    stringr::str_replace("domain: *\"[^\"]+\"", stringr::str_c("domain: \"", domain_name, "\"")) %>%
+    stringr::str_replace("name: *\"[^\"]+\"",   stringr::str_c("name: \"", domain_name, "\"")) %>%
+    write(file = "/var/www/html/webclient/i2b2_config_data.js")
+
+  # Disconnect the db
+  RPostgreSQL::dbDisconnect(hive)
+  RPostgreSQL::dbDisconnect(pm)
 }
