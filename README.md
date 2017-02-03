@@ -67,3 +67,7 @@ You are still responsible for managing the access rights to the PostgreSQL datab
 The next steps can be carried with another user, as long as you provide the necessary credentials (database admin account), and even from a different machine (you'll have to configure the **pg_hba.conf** and **postgresql.conf** files accordingly)
 
 ----
+
+## Set the project
+
+`set_project` takes a host address, a database admin credentials (name and pass) and a *project_id* (the internal id, also the project path. It must not contain spaces) and *project_name* (the name of the project displayed in the webclient) and sets the corresponding columns in i2b2hive and i2b2pm.
