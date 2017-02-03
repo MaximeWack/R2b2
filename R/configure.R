@@ -138,13 +138,13 @@ set_domain <- function(name, pass, domain_id, domain_name)
     purrr::walk(~RPostgreSQL::dbGetQuery(hive, stringr::str_c("UPDATE ", .x, "_db_lookup SET c_domain_id = '", domain_id, "';")))
 
 # Set the domain id and name in pm_hive_data
-  RPostgreSQL::dbGetQuery(pm, stringr::str_c("UPDATE pm_hive_data SET domain_id = '", domain_id, "', domain_name = '", domain_name, "';"))
+  RPostgreSQL::dbGetQuery(pm, stringr::str_c("UPDATE pm_hive_data SET domain_id = '", domain_id, "', domain_name = '", domain_id, "';"))
 
 # Set the domain name for the webclient
   "/var/www/html/webclient/i2b2_config_data.js" %>%
     readLines %>%
     stringr::str_c(collapse = "\n") %>%
-    stringr::str_replace("domain: *\"[^\"]+\"", stringr::str_c("domain: \"", domain_name, "\"")) %>%
+    stringr::str_replace("domain: *\"[^\"]+\"", stringr::str_c("domain: \"", domain_id, "\"")) %>%
     stringr::str_replace("name: *\"[^\"]+\"",   stringr::str_c("name: \"", domain_name, "\"")) %>%
     write(file = "/var/www/html/webclient/i2b2_config_data.js")
 
