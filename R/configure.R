@@ -152,3 +152,35 @@ set_domain <- function(name, pass, domain_id, domain_name)
   RPostgreSQL::dbDisconnect(hive)
   RPostgreSQL::dbDisconnect(pm)
 }
+
+#' Set the project
+#'
+#' Set the project id, project path and project name of the instance
+#'
+#' Set the project id, project path and project name in the databases
+#'
+#' @param host Address of the host, defaults to 127.0.0.1
+#' @param name Name of the database admin account
+#' @param pass Password of the database admin account
+#' @param project_id The desired project id
+#' @param project_name The desired project name
+#' @export
+set_project <- function(host = "127.0.0.1", name, pass, project_id, project_name)
+{
+# Connect to the db
+  hive <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host, dbname = "i2b2hive", user = name, password = pass)
+  pm   <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host, dbname = "i2b2pm",   user = name, password = pass)
+
+# Set the project id to all cells in i2b2hive
+  c("im", "ont", "work") %>%
+    purrr::walk(~RPostgreSQL::dbGetQuery(hive, stringr::str_c("UPDATE ", .x, "_db_lookup SET c_project_path = '", project_id, "/';")))
+  RPostgreSQL::dbGetQuery(hive, stringr::str_c("UPDATE crc_db_lookup SET c_project_path = '/", project_id, "/';"))
+
+# Set the project id and name in pm_hive_data
+  RPostgreSQL::dbGetQuery(pm, stringr::str_c("UPDATE pm_project_data SET project_id = '", project_id, "', project_name = '", project_name, "', project_path = '/", project_id, "';"))
+  RPostgreSQL::dbGetQuery(pm, stringr::str_c("UPDATE pm_project_user_roles SET project_id = '", project_id, "' WHERE (project_id = 'Demo');"))
+
+  # Disconnect the db
+  RPostgreSQL::dbDisconnect(hive)
+  RPostgreSQL::dbDisconnect(pm)
+}
