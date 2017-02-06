@@ -67,9 +67,8 @@ body <- function(service, ...)
 i2b2msg <- function(cellurl, msg_header, msg_body)
 {
   request <- stringr::str_c(msg_header, msg_body)
-  system(str_c("curl -H \"Content-Type: text/xml\" -X POST -d '", request , "' ", cellurl), intern = T) %>%
-    str_c(collapse = "") %>%
-    read_xml %>%
-    xml_node("message_body")
+  httr::POST(cellurl, body = request, httr::content_type("text/xml")) %>%
+    httr::content %>%
+    rvest::xml_node("message_body")
 }
 
