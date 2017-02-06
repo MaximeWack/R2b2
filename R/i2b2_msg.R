@@ -68,7 +68,7 @@ i2b2msg <- function(cellurl, msg_header, msg_body)
 {
   request <- stringr::str_c(msg_header, msg_body)
   httr::POST(cellurl, body = request, httr::content_type("text/xml")) %>%
-    httr::content %>%
+    httr::content() %>%
     rvest::xml_node("message_body")
 }
 
