@@ -12,5 +12,8 @@ Imports:
     dplyr,
     purrr,
     stringr,
-    RPostgreSQL
+    RPostgreSQL,
+    httr,
+    rvest,
+    xml2
 RoxygenNote: 6.0.0

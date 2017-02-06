@@ -1,6 +1,6 @@
 header <- function(domain, username, password)
 {
-str_c("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>",
+  stringr::str_c("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>",
 "<i2b2:request xmlns:i2b2=\"http://www.i2b2.org/xsd/hive/msg/1.1/\" xmlns:pm=\"http://www.i2b2.org/xsd/cell/pm/1.1/\">",
     "<message_header>",
         "<i2b2_version_compatible>1.1</i2b2_version_compatible>",
@@ -50,13 +50,13 @@ body <- function(service, ...)
     names(params) <- rep("", length(params))
   params <- ifelse(length(params) == 0, "",
          params %>%
-           map2_chr(names(params), function(param, name)
+           purrr::map2_chr(names(params), function(param, name)
                    {
                      ifelse(name == "", param,
-                     str_c("<", name, ">", param, "</", name, ">"))
+                     stringr::str_c("<", name, ">", param, "</", name, ">"))
                    }) %>%
-         str_c(collapse = ""))
-  str_c("<message_body>",
+         stringr::str_c(collapse = ""))
+  stringr::str_c("<message_body>",
         "<", service, ">",
         params,
         "</", service, ">",
@@ -66,7 +66,7 @@ body <- function(service, ...)
 
 i2b2msg <- function(cellurl, msg_header, msg_body)
 {
-  request <- str_c(msg_header, msg_body)
+  request <- stringr::str_c(msg_header, msg_body)
   system(str_c("curl -H \"Content-Type: text/xml\" -X POST -d '", request , "' ", cellurl), intern = T) %>%
     str_c(collapse = "") %>%
     read_xml %>%
