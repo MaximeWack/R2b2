@@ -1,74 +1,80 @@
-header <- function(domain, username, password)
+base_msg <- function()
 {
-  stringr::str_c("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>",
-"<i2b2:request xmlns:i2b2=\"http://www.i2b2.org/xsd/hive/msg/1.1/\" xmlns:pm=\"http://www.i2b2.org/xsd/cell/pm/1.1/\">",
-    "<message_header>",
-        "<i2b2_version_compatible>1.1</i2b2_version_compatible>",
-        "<hl7_version_compatible>2.4</hl7_version_compatible>",
-        "<sending_application>",
-            "<application_name>R2b2</application_name>",
-            "<application_version>0.0.9000</application_version>",
-        "</sending_application>",
-        "<sending_facility>",
-            "<facility_name>R</facility_name>",
-        "</sending_facility>",
-        "<receiving_application>",
-            "<application_name>R2b2</application_name>",
-            "<application_version>0.0.9000</application_version>",
-        "</receiving_application>",
-        "<receiving_facility>",
-            "<facility_name>R</facility_name>",
-        "</receiving_facility>",
-        "<datetime_of_message>", format(Sys.time(), "%FT%T%z"), "</datetime_of_message>",
-    "<security>",
-      "<domain>", domain, "</domain>",
-      "<username>", username, "</username>",
-      "<password>", password, "</password>",
-    "</security>",
-        "<message_control_id>",
-            "<message_num></message_num>",
-            "<instance_num>0</instance_num>",
-        "</message_control_id>",
-        "<processing_id>",
-            "<processing_id>P</processing_id>",
-            "<processing_mode>I</processing_mode>",
-        "</processing_id>",
-        "<accept_acknowledgement_type>AL</accept_acknowledgement_type>",
-        "<application_acknowledgement_type>AL</application_acknowledgement_type>",
-        "<country_code>US</country_code>",
-        "<project_id>@</project_id>",
-    "</message_header>",
-    "<request_header>",
-        "<result_waittime_ms>180000</result_waittime_ms>",
-    "</request_header>")
+  msg <- list()
+  msg$i2b2_request <- list()
+  attr(msg$i2b2_request, "xmlns:i2b2") <- "http://www.i2b2.org/xsd/hive/msg/1.1/"
+  attr(msg$i2b2_request, "xmlns:pm") <- "http://www.i2b2.org/xsd/cell/pm/1.1/"
+
+  msg
 }
 
-body <- function(service, ...)
+header <- function(msg, domain, username, password)
 {
-  params <- list(...)
-  if (is.null(names(params)))
-    names(params) <- rep("", length(params))
-  params <- ifelse(length(params) == 0, "",
-         params %>%
-           purrr::map2_chr(names(params), function(param, name)
-                   {
-                     ifelse(name == "", param,
-                     stringr::str_c("<", name, ">", param, "</", name, ">"))
-                   }) %>%
-         stringr::str_c(collapse = ""))
-  stringr::str_c("<message_body>",
-        "<", service, ">",
-        params,
-        "</", service, ">",
-        "</message_body>",
-        "</i2b2:request>")
+  mh <- list()
+  mh$i2b2_version_compatible <- list("1.1")
+  mh$hl7_version_compatible <- list("2.4")
+  mh$sending_application$application_name <- list("R2b2")
+  mh$sending_application$application_version <- list("0.0.9000")
+  mh$sending_facility$facility_name <- list("R")
+  mh$receiving_application$application_name <- list("R2b2")
+  mh$receiving_application$application_version <- list("0.0.9000")
+  mh$receiving_facility$facility_name <- list("R")
+  mh$datetime_of_message <- list(format(Sys.time(), "%FT%T%z"))
+  mh$security$domain <- list(domain)
+  mh$security$username <- list(username)
+  mh$security$password <- list(password)
+  mh$message_control_id$message_num  <- list()
+  mh$message_control_id$instance_num  <- list("0")
+  mh$processing_id$processing_id  <- list("P")
+  mh$processing_id$processing_mode  <- list("I")
+  mh$accept_acknowledgement_type <- list("AL")
+  mh$application_acknowledgement_type <- list("AL")
+  mh$country_code <- list("US")
+  mh$project_id <- list("@")
+
+  rh <- list()
+  rh$result_waittime_ms <- list("180000")
+
+  msg$i2b2_request$message_header <- mh
+  msg$i2b2_request$request_header <- rh
+
+  msg
 }
 
-i2b2msg <- function(cellurl, msg_header, msg_body)
+body <- function(msg, service, ..., attrib = NULL)
 {
-  request <- stringr::str_c(msg_header, msg_body)
+# Create param nodes
+  params <- list(...) %>% purrr::map(list)
+
+  mb <- list()
+  mb[[service]] <- params
+
+# Set attributes
+  if(!is.null(attrib))
+  {
+    names(attrib) %>%
+      purrr::map2(attrib, function(name, attrib) {attr(mb[[service]], name) <<- attrib})
+  }
+
+  msg$i2b2_request$message_body <- mb
+
+  msg
+}
+
+send_msg <- function(msg, cellurl)
+{
+  request <- msg %>%
+    xml2::as_xml_document() %>% 
+    as.character %>%
+    stringr::str_replace_all("i2b2_request", "i2b2:request")
+
   httr::POST(cellurl, body = request, httr::content_type("text/xml")) %>%
     httr::content() %>%
     rvest::xml_node("message_body")
 }
+
+# base_msg() %>%
+#   header("chru_nancy", "i2b2", "demouser") %>%
+#   body("pm:get_all_user") %>% as_xml_document %>% as.character %>% stringr::str_replace_all("i2b2_request", "i2b2:request")
+#   send_msg("http://127.0.0.1:9090/i2b2/services/PMService/getServices")
 
