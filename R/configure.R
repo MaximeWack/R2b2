@@ -21,29 +21,29 @@ set_permissions <- function()
 #' The shared password can be provided, or randomly generated (length = 8 characters by default)
 #' The system account belongs in the users and wildfly groups
 #'
-#' @param name Name of the account
+#' @param admin Name of the admin account to create
 #' @param pass An arbitrary password if provided, i2b2admin by default
 #' @param pass_length The length of the generated password, 8 characters by default
 #' @return The generated password
 #' @export
-create_admin <- function(name = "i2b2admin", pass= NULL, pass_length = 8)
+create_admin <- function(admin = "i2b2admin", pass= NULL, pass_length = 8)
 {
 # Generate a new password of default length 10
   if (is.null(pass))
     pass <- create_password(pass_length)
 
 # Create the system user
-  system(stringr::str_c("useradd ", name, " -g users -G wildfly -m"))
-  system(stringr::str_c("echo \"", name, ":", pass, "\" | chpasswd"))
-  print(stringr::str_c(name, " system account created with password: ", pass))
+  system(stringr::str_c("useradd ", admin, " -g users -G wildfly -m"))
+  system(stringr::str_c("echo \"", admin, ":", pass, "\" | chpasswd"))
+  print(stringr::str_c(admin, " system account created with password: ", pass))
   
 # Connect to the db
   con <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = "127.0.0.1", user = "postgres", password = "demouser")
   
 # Create the database user and its database
-  RPostgreSQL::dbGetQuery(con, stringr::str_c("create user ", name, " with superuser createrole createdb password '", pass, "';"))
-  RPostgreSQL::dbGetQuery(con, stringr::str_c("create database ", name, ";"))
-  print(stringr::str_c(name, " postgresql account created with password: ", pass))
+  RPostgreSQL::dbGetQuery(con, stringr::str_c("create user ", admin, " with superuser createrole createdb password '", pass, "';"))
+  RPostgreSQL::dbGetQuery(con, stringr::str_c("create database ", admin, ";"))
+  print(stringr::str_c(admin, " postgresql account created with password: ", pass))
 
 # Reset the root account password
   RPostgreSQL::dbGetQuery(con, stringr::str_c("alter user postgres password '", pass, "';"))
@@ -59,19 +59,19 @@ create_admin <- function(name = "i2b2admin", pass= NULL, pass_length = 8)
 #'
 #' Secure the i2b2 databases
 #'
-#' Connect to the database using the admin account credentials, provided as name and pass,
+#' Connect to the database using the admin account credentials, provided as admin and pass,
 #' generate pass_length long passwords for each database
 #' and update the cells config with the new passwords.
 #' 
-#' @param name Name of the database admin account
+#' @param admin Name of the database admin account
 #' @param pass Password of the database admin account
 #' @param pass_length Length of the generated passwords
 #' @return A vector for one statistic column
 #' @export
-secure_db <- function(name, pass, pass_length = 8)
+secure_db <- function(admin, pass, pass_length = 8)
 {
 # Connect to the db
-  con <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = "127.0.0.1", user = name, password = pass)
+  con <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = "127.0.0.1", user = admin, password = pass)
 
 # Generate passwords
   accounts <- c("demodata", "hive", "imdata", "metadata", "pm", "workdata")
@@ -122,16 +122,16 @@ secure_db <- function(name, pass, pass_length = 8)
 #' Set the domain id and domain name in the databases
 #' and set the domain name in the webclient'
 #' 
-#' @param name Name of the database admin account
+#' @param admin Name of the database admin account
 #' @param pass Password of the database admin account
 #' @param domain_id The desired domain_id
 #' @param domain_name The desired domain_name
 #' @export
-set_domain <- function(name, pass, domain_id, domain_name)
+set_domain <- function(admin, pass, domain_id, domain_name)
 {
 # Connect to the db
-  hive <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = "127.0.0.1", dbname = "i2b2hive", user = name, password = pass)
-  pm   <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = "127.0.0.1", dbname = "i2b2pm",   user = name, password = pass)
+  hive <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = "127.0.0.1", dbname = "i2b2hive", user = admin, password = pass)
+  pm   <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = "127.0.0.1", dbname = "i2b2pm",   user = admin, password = pass)
 
 # Set the domain id to all cells in i2b2hive
   c("crc", "im", "ont", "work") %>%
@@ -160,16 +160,16 @@ set_domain <- function(name, pass, domain_id, domain_name)
 #' Set the project id, project path and project name in the databases
 #'
 #' @param host Address of the host, defaults to 127.0.0.1
-#' @param name Name of the database admin account
+#' @param admin Name of the database admin account
 #' @param pass Password of the database admin account
 #' @param project_id The desired project id
 #' @param project_name The desired project name
 #' @export
-set_project <- function(host = "127.0.0.1", name, pass, project_id, project_name)
+set_project <- function(host = "localhost", admin, pass, project_id, project_name)
 {
 # Connect to the db
-  hive <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host, dbname = "i2b2hive", user = name, password = pass)
-  pm   <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host, dbname = "i2b2pm",   user = name, password = pass)
+  hive <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host, dbname = "i2b2hive", user = admin, password = pass)
+  pm   <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host, dbname = "i2b2pm",   user = admin, password = pass)
 
 # Set the project id to all cells in i2b2hive
   c("im", "ont", "work") %>%
