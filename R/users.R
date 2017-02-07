@@ -50,9 +50,11 @@ add_users <- function(domain, admin, pass, users, url = "http://localhost:9090/i
 
 delete_users <- function(host = "localhost", admin, pass, users)
 {
-  pm   <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2pm",   user = name, password = pass)
+  pm   <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2pm",   user = admin, password = pass)
 
   user <- users %>% stringr::str_c(collapse = "','") %>% stringr::str_c("'", . ,"'")
   RPostgreSQL::dbGetQuery(pm, stringr::str_c("DELETE FROM pm_user_data WHERE (user_id IN (", user, "));"))
   RPostgreSQL::dbGetQuery(pm, stringr::str_c("DELETE FROM pm_project_user_roles WHERE (user_id IN (", user, "));"))
+
+  RPostgreSQL::dbDisconnect(pm)
 }
