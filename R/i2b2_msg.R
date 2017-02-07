@@ -69,12 +69,5 @@ send_msg <- function(msg, cellurl)
     stringr::str_replace_all("i2b2_request", "i2b2:request")
 
   httr::POST(cellurl, body = request, httr::content_type("text/xml")) %>%
-    httr::content() %>%
-    rvest::xml_node("message_body")
+    httr::content()
 }
-
-# base_msg() %>%
-#   header("chru_nancy", "i2b2", "demouser") %>%
-#   body("pm:get_all_user") %>% as_xml_document %>% as.character %>% stringr::str_replace_all("i2b2_request", "i2b2:request")
-#   send_msg("http://127.0.0.1:9090/i2b2/services/PMService/getServices")
-
