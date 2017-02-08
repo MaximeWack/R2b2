@@ -61,3 +61,53 @@ add_ont <- function(host = "localhost", admin, pass, name, scheme, description)
 
   RPostgreSQL::dbDisconnect(metadata)
 }
+
+populate_ont <- function(host = "localhost", admin, pass, ont, name, scheme)
+{
+  metadata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2metadata", user = admin, password = pass)
+
+  ont <- ont %>% stringr::str_replace_all("'", "''")
+
+  df <- data.frame(c_fullname = ont, c_visualattributes = "LA", stringsAsFactors = F)
+
+  while (any(stringr::str_detect(ont, "\\\\")))
+  {
+    ont <- ont %>% stringr::str_replace("\\\\[^\\\\]+$", "") %>% unique
+    df <- df %>%
+      dplyr::bind_rows(data.frame(c_fullname = ont, c_visualattributes = "FA", stringsAsFactors = F))
+  }
+
+  df %>%
+    distinct() %>%
+    mutate(c_fullname = stringr::str_c("\\", name, "\\", c_fullname)) %>%
+    dplyr::bind_rows(data.frame(c_fullname = stringr::str_c("\\", name), c_visualattributes = "CA")) %>%
+    mutate(c_hlevel = stringr::str_count(c_fullname, "\\\\") - 1,
+           c_name = stringr::str_extract(c_fullname, "[^\\\\]+$"),
+           c_basecode = stringr::str_c(scheme, ":", c_name %>% stringr::str_extract("^.+? ") %>% stringr::str_trim()),
+           c_basecode = ifelse(is.na(c_basecode), "", c_basecode),
+           c_synonym_cd = "N",
+           c_facttablecolumn = "concept_cd",
+           c_tablename = "concept_dimension",
+           c_columnname = "concept_path",
+           c_columndatatype = "T",
+           c_operator = "LIKE",
+           c_tooltip = c_name,
+           m_applied_path = "@",
+           c_fullname = stringr::str_c(c_fullname, "\\"),
+           c_fullname = stringr::str_replace_all(c_fullname, "\\\\(.+?) [^\\\\]+", "\\\\\\1"),
+           c_dimcode = c_fullname,
+           update_date = format(Sys.Date(), "%d/%m/%Y")) -> df
+
+  columns <- stringr::str_c(names(df), collapse = ",")
+  total <- nrow(df)
+  current <- 0
+  df %>%
+    apply(1, function(oneline)
+          {
+            RPostgreSQL::dbGetQuery(metadata, stringr::str_c("INSERT INTO ", scheme, " (", columns, ") VALUES (", oneline %>% str_c("'", ., "'", collapse = ","), ");"))
+            current <<- current + 1
+            print(stringr::str_c(current, " / ", total))
+          })
+
+  RPostgreSQL::dbDisconnect(metadata)
+}
