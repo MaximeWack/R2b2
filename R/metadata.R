@@ -15,11 +15,11 @@ clear_metadata <- function(host = "localhost", admin, pass)
   RPostgreSQL::dbDisconnect(metadata)
 }
 
-add_ont <- function(host = "localhost", admin, pass, ont, name, scheme, description)
+add_ont <- function(host = "localhost", admin, pass, name, scheme, description)
 {
-  metadata   <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2metadata", user = admin, password = pass)
+  metadata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2metadata", user = admin, password = pass)
 
-  RPostgreSQL::dbGetQuery(metadata, stringr::str_c("INSERT OR  INTO schemes VALUES ('", scheme, ":', '", scheme, "', '", description, "');"))
+  RPostgreSQL::dbGetQuery(metadata, stringr::str_c("INSERT INTO schemes VALUES ('", scheme, ":', '", scheme, "', '", description, "');"))
 
   RPostgreSQL::dbGetQuery(metadata, stringr::str_c("INSERT INTO table_access VALUES ('", scheme, "', '", scheme, "', 'N', 0, '\\", name, "\\', '", name, "', 'N', 'CA', NULL, NULL, NULL, 'concept_cd', 'concept_dimension', 'concept_path', 'T', 'LIKE', '\\", name, "\\', NULL, '", description, "', NULL, NULL, NULL, NULL);"))
 
@@ -56,8 +56,6 @@ add_ont <- function(host = "localhost", admin, pass, ont, name, scheme, descript
   RPostgreSQL::dbGetQuery(metadata, stringr::str_c("CREATE INDEX META_EXCLUSION_", scheme, "_IDX ON ", scheme, "(M_EXCLUSION_CD);"))
   RPostgreSQL::dbGetQuery(metadata, stringr::str_c("CREATE INDEX META_HLEVEL_", scheme, "_IDX ON ", scheme, "(C_HLEVEL);"))
   RPostgreSQL::dbGetQuery(metadata, stringr::str_c("CREATE INDEX META_SYNONYM_", scheme, "_IDX ON ", scheme, "(C_SYNONYM_CD);"))
-
-  RPostgreSQL::dbGetQuery(metadata, stringr::str_c("INSERT INTO ", scheme, " VALUES (0, '\\", name, "\\', '", name, "', 'N', 'CA', NULL, NULL, NULL, 'concept_cd', 'concept_dimension', 'concept_path', 'T', 'LIKE', '\\", name, "\\', NULL, '", description, "', '@', '", format(Sys.Date(), "%d/%m/%Y"), "', NULL, NULL, NULL, NULL, NULL, NULL, NULL);"))
 
   RPostgreSQL::dbGetQuery(metadata, stringr::str_c("ALTER TABLE ", scheme, " OWNER TO i2b2metadata;"))
 
