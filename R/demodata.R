@@ -101,9 +101,21 @@ populate_concept <- function(host = "localhost", admin, pass, ont, modi, name, s
 
   data.frame(modi = modi) %>%
     mutate(name_char = modi %>% stringr::str_extract(" .*$") %>% stringr::str_trim(),
-           modifier_path = stringr::str_c("\\", c_name, "\\"),
+           modifier_path = stringr::str_c("\\", name_char, "\\"),
            modifier_cd = stringr::str_c(scheme, ":", modi %>% stringr::str_extract("^.+? ") %>% stringr::str_trim()),
-           update_date = format(Sys.Date(), "%d/%m/%Y")) -> df
+           update_date = format(Sys.Date(), "%d/%m/%Y")) %>%
+    select(-modi) -> df
+
+  columns <- stringr::str_c(names(df), collapse = ",")
+  total <- nrow(df)
+  current <- 0
+  df %>%
+    apply(1, function(oneline)
+          {
+            RPostgreSQL::dbGetQuery(demodata, stringr::str_c("INSERT INTO modifier_dimension  (", columns, ") VALUES (", oneline %>% str_c("'", ., "'", collapse = ","), ");"))
+            current <<- current + 1
+            print(stringr::str_c(current, " / ", total))
+          })
 
   RPostgreSQL::dbDisconnect(demodata)
 }
