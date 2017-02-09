@@ -25,7 +25,7 @@ clear_default_metadata <- function(host = "127.0.0.1", admin, pass)
   RPostgreSQL::dbGetQuery(metadata, "DELETE FROM table_access;")
 
 # Insert the 'empty' scheme
-  RPostgreSQL::dbGetQuery(metadata, "INSERT INTO schemes VALUES (NULL, 'None', 'No scheme');")
+  RPostgreSQL::dbGetQuery(metadata, "INSERT INTO schemes VALUES ('', 'None', 'No scheme');")
 
   RPostgreSQL::dbDisconnect(metadata)
 }
