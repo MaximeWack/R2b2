@@ -28,7 +28,7 @@ fresh_install <- function(admin, pass, domain_id, domain_name, project_id, proje
 
   set_project(host, admin, pass, project_id, project_name)
 
-  add_users(domain_id, "i2b2", "demouser", data.frame(id = admin, password = pass, name = admin, email = "", role = "ADMIN"))
+  add_users(domain_id, "i2b2", "demouser", data.frame(id = admin, password = pass, name = admin, email = "", role = "ADMIN", project = project_id))
 
   delete_users(host, admin, pass, c("i2b2", "demo"))
 
