@@ -212,9 +212,14 @@ populate_ont <- function(host = "localhost", admin, pass, ont, modi, name, schem
            c_columndatatype = "T",
            c_operator = "LIKE",
            c_tooltip = c_name,
-           m_applied_path = stringr::str_c(c_fullname, "%")) %>%
+           c_dimcode = c_fullname,
+           m_applied_path = stringr::str_c("\\", name, "\\%"),
+           update_date = format(Sys.Date(), "%d/%m/%Y")) %>%
   select(-modi) -> df
 
+  columns <- stringr::str_c(names(df), collapse = ",")
+  total <- nrow(df)
+  current <- 0
   df %>%
     apply(1, function(oneline)
           {
