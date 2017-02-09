@@ -70,41 +70,41 @@ populate_concept <- function(host = "127.0.0.1", admin, pass, ont, modi, name, s
 {
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
 
-# Sanitize the ontology
+  # Sanitize the ontology
   ont <- ont %>% stringr::str_replace_all("'", "''")
   modi <- modi %>% stringr::str_replace_all("'", "''")
 
-# Create the data frame holding the contents of the new table
+  # Create the data frame holding the contents of the new table
   data.frame(concept_path = ont, stringsAsFactors = F) %>%
-# Insert the name of the ontology at the root
-    mutate(concept_path = stringr::str_c("\\", name, "\\", concept_path)) %>%
-# Populate the other columns
-    mutate(name_char = stringr::str_extract(concept_path, "[^\\\\]+$"),
-           concept_cd = stringr::str_c(scheme, ":", name_char %>% stringr::str_extract("^.+? ") %>% stringr::str_trim()),
-           concept_cd = ifelse(is.na(concept_cd), "", concept_cd),
-           concept_path = stringr::str_c(concept_path, "\\"),
-# Use only codes to build shorter paths
-           concept_path = stringr::str_replace_all(concept_path, "\\\\(.+?) [^\\\\]+", "\\\\\\1"),
-           update_date = format(Sys.Date(), "%d/%m/%Y")) -> df
+    # Insert the name of the ontology at the root
+    dplyr::mutate(concept_path = stringr::str_c("\\", name, "\\", concept_path)) %>%
+    # Populate the other columns
+    dplyr::mutate(name_char = stringr::str_extract(concept_path, "[^\\\\]+$"),
+                  concept_cd = stringr::str_c(scheme, ":", name_char %>% stringr::str_extract("^.+? ") %>% stringr::str_trim()),
+                  concept_cd = ifelse(is.na(concept_cd), "", concept_cd),
+                  concept_path = stringr::str_c(concept_path, "\\"),
+                  # Use only codes to build shorter paths
+                  concept_path = stringr::str_replace_all(concept_path, "\\\\(.+?) [^\\\\]+", "\\\\\\1"),
+                  update_date = format(Sys.Date(), "%d/%m/%Y")) -> df
 
-# Push the dataframe into the new ontology table
-  columns <- stringr::str_c(names(df), collapse = ",")
-  total <- nrow(df)
-  current <- 0
-  df %>%
-    apply(1, function(oneline)
-          {
-            RPostgreSQL::dbGetQuery(demodata, stringr::str_c("INSERT INTO concept_dimension  (", columns, ") VALUES (", oneline %>% str_c("'", ., "'", collapse = ","), ");"))
-            current <<- current + 1
-            print(stringr::str_c(current, " / ", total))
-          })
+    # Push the dataframe into the new ontology table
+    columns <- stringr::str_c(names(df), collapse = ",")
+    total <- nrow(df)
+    current <- 0
+    df %>%
+      apply(1, function(oneline)
+            {
+              RPostgreSQL::dbGetQuery(demodata, stringr::str_c("INSERT INTO concept_dimension  (", columns, ") VALUES (", oneline %>% str_c("'", ., "'", collapse = ","), ");"))
+              current <<- current + 1
+              print(stringr::str_c(current, " / ", total))
+            })
 
-  data.frame(modi = modi) %>%
-    mutate(name_char = modi %>% stringr::str_extract(" .*$") %>% stringr::str_trim(),
-           modifier_path = stringr::str_c("\\", name_char, "\\"),
-           modifier_cd = stringr::str_c(scheme, ":", modi %>% stringr::str_extract("^.+? ") %>% stringr::str_trim()),
-           update_date = format(Sys.Date(), "%d/%m/%Y")) %>%
-    select(-modi) -> df
+    data.frame(modi = modi) %>%
+      dplyr::mutate(name_char = modi %>% stringr::str_extract(" .*$") %>% stringr::str_trim(),
+                    modifier_path = stringr::str_c("\\", name_char, "\\"),
+                    modifier_cd = stringr::str_c(scheme, ":", modi %>% stringr::str_extract("^.+? ") %>% stringr::str_trim()),
+                    update_date = format(Sys.Date(), "%d/%m/%Y")) %>%
+    dplyr::select(-modi) -> df
 
   columns <- stringr::str_c(names(df), collapse = ",")
   total <- nrow(df)
