@@ -1,3 +1,139 @@
+#' Clear the default code_lookup
+#'
+#' Clear the default codes in code_lookup
+#'
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass the password for the admin account
+#' @export
+clear_code_lookup <- function(host = "127.0.0.1", admin, pass)
+{
+  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
+
+  RPostgreSQL::dbGetQuery(demodata, "DELETE FROM code_lookup;")
+
+  RPostgreSQL::dbDisconnect(demodata)
+}
+
+#' Clear the default encounter mappings
+#'
+#' Clear the default mappings in encounter_mapping
+#'
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass the password for the admin account
+#' @export
+clear_encounter_mapping <- function(host = "127.0.0.1", admin, pass)
+{
+  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
+
+  RPostgreSQL::dbGetQuery(demodata, "DELETE FROM encounter_mapping;")
+
+  RPostgreSQL::dbDisconnect(demodata)
+}
+
+#' Clear the default observation facts
+#'
+#' Clear the default facts in observation_fact
+#'
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass the password for the admin account
+#' @export
+clear_observations <- function(host = "127.0.0.1", admin, pass)
+{
+  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
+
+  RPostgreSQL::dbGetQuery(demodata, "DELETE FROM observation_fact;")
+
+  RPostgreSQL::dbDisconnect(demodata)
+}
+
+#' Clear the default patients
+#'
+#' Clear the default patients in patient_dimension
+#'
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass the password for the admin account
+#' @export
+clear_patients <- function(host = "127.0.0.1", admin, pass)
+{
+  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
+
+  RPostgreSQL::dbGetQuery(demodata, "DELETE FROM patient_dimension;")
+
+  RPostgreSQL::dbDisconnect(demodata)
+}
+
+#' Clear the default patient mappings
+#'
+#' Clear the default mappings in patient_mapping
+#'
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass the password for the admin account
+#' @export
+clear_patient_mapping
+{
+  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
+
+  RPostgreSQL::dbGetQuery(demodata, "DELETE FROM patient_mapping;")
+
+  RPostgreSQL::dbDisconnect(demodata)
+}
+
+#' Clear the default providers
+#'
+#' Clear the default providers in provider_dimension
+#'
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass the password for the admin account
+#' @export
+clear_providers <- function(host = "127.0.0.1", admin, pass)
+{
+  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
+
+  RPostgreSQL::dbGetQuery(demodata, "DELETE FROM provider_dimension;")
+
+  RPostgreSQL::dbDisconnect(demodata)
+}
+
+#' Clear the default qt_breakdown_path
+#'
+#' Clear the default paths in qt_breakdown_path
+#'
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass the password for the admin account
+#' @export
+clear_breakdown <- function(host = "127.0.0.1", admin, pass)
+{
+  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
+
+  RPostgreSQL::dbGetQuery(demodata, "DELETE FROM qt_breakdown_path;")
+
+  RPostgreSQL::dbDisconnect(demodata)
+}
+
+#' Clear the default encounters
+#'
+#' Clear the default encounters in visit_dimension
+#'
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass the password for the admin account
+#' @export
+clear_encounter_dimension <- function(host = "127.0.0.1", admin, pass)
+{
+  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
+
+  RPostgreSQL::dbGetQuery(demodata, "DELETE FROM visit_dimension;")
+
+  RPostgreSQL::dbDisconnect(demodata)
+}
+
 #' Clear the default modifiers
 #'
 #' Clear the default concepts in concept_dimension
