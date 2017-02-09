@@ -6,7 +6,7 @@
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass the password for the admin account
 #' @export
-clear_modifier <- function(host = "localhost", admin, pass)
+clear_modifier <- function(host = "127.0.0.1", admin, pass)
 {
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
 
@@ -23,7 +23,7 @@ clear_modifier <- function(host = "localhost", admin, pass)
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass the password for the admin account
 #' @export
-clear_concept <- function(host = "localhost", admin, pass)
+clear_concept <- function(host = "127.0.0.1", admin, pass)
 {
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
 
@@ -41,7 +41,7 @@ clear_concept <- function(host = "localhost", admin, pass)
 #' @param pass the password for the admin account
 #' @param scheme The scheme to delete from the concepts
 #' @export
-delete_concept <- function(host = "localhost", admin, pass, scheme)
+delete_concept <- function(host = "127.0.0.1", admin, pass, scheme)
 {
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
 
@@ -66,7 +66,7 @@ delete_concept <- function(host = "localhost", admin, pass, scheme)
 #' @param name The name of the new ontology
 #' @param scheme The scheme to use for this ontology
 #' @export
-populate_concept <- function(host = "localhost", admin, pass, ont, modi, name, scheme)
+populate_concept <- function(host = "127.0.0.1", admin, pass, ont, modi, name, scheme)
 {
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
 

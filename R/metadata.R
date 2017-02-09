@@ -10,7 +10,7 @@
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass the password for the admin account
 #' @export
-clear_default_metadata <- function(host = "localhost", admin, pass)
+clear_default_metadata <- function(host = "127.0.0.1", admin, pass)
 {
   metadata   <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2metadata", user = admin, password = pass)
 
@@ -43,7 +43,7 @@ clear_default_metadata <- function(host = "localhost", admin, pass)
 #' @param pass the password for the admin account
 #' @param scheme The scheme to use for this ontology
 #' @export
-delete_ont<- function(host = "localhost", admin, pass, scheme)
+delete_ont<- function(host = "127.0.0.1", admin, pass, scheme)
 {
   metadata   <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2metadata", user = admin, password = pass)
 
@@ -69,7 +69,7 @@ delete_ont<- function(host = "localhost", admin, pass, scheme)
 #' @param scheme The scheme to use for this ontology
 #' @param description The description of the scheme
 #' @export
-add_ont <- function(host = "localhost", admin, pass, name, scheme, description)
+add_ont <- function(host = "127.0.0.1", admin, pass, name, scheme, description)
 {
   metadata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2metadata", user = admin, password = pass)
 
@@ -143,7 +143,7 @@ add_ont <- function(host = "localhost", admin, pass, name, scheme, description)
 #' @param name The name of the new ontology
 #' @param scheme The scheme to use for this ontology
 #' @export
-populate_ont <- function(host = "localhost", admin, pass, ont, modi, name, scheme)
+populate_ont <- function(host = "127.0.0.1", admin, pass, ont, modi, name, scheme)
 {
   metadata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2metadata", user = admin, password = pass)
 

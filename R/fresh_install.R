@@ -18,7 +18,7 @@
 #' @export
 fresh_install <- function(admin, pass, domain_id, domain_name, project_id, project_name)
 {
-  host <- "localhost"
+  host <- "127.0.0.1"
 
   set_permissions()
 

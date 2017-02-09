@@ -14,7 +14,7 @@
 #' @param ont The ontology to insert
 #' @param modi The modifiers to insert
 #' @export
-add_ontology <- function(host = "localhost", admin, pass, name, scheme, description, ont, modi)
+add_ontology <- function(host = "127.0.0.1", admin, pass, name, scheme, description, ont, modi)
 {
   add_ont(host, admin, pass, name, scheme, description)
 

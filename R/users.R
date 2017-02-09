@@ -12,7 +12,7 @@
 #' @param url The URL of the i2b2 cell to communicate with
 #' @return The XML return message as an httr::content() object
 #' @export
-add_user <- function(domain, admin, pass, id, name, email, password, url = "http://localhost:9090/i2b2/services/PMService/getServices")
+add_user <- function(domain, admin, pass, id, name, email, password, url = "http://127.0.0.1:9090/i2b2/services/PMService/getServices")
 {
   base_msg() %>%
     add_header(domain, admin, pass) %>%
@@ -33,7 +33,7 @@ add_user <- function(domain, admin, pass, id, name, email, password, url = "http
 #' @param url The URL of the i2b2 cell to communicate with
 #' @return The XML return message as an httr::content() object
 #' @export
-add_user_roles <- function(domain, admin, pass, id, project, roles, url = "http://localhost:9090/i2b2/services/PMService/getServices")
+add_user_roles <- function(domain, admin, pass, id, project, roles, url = "http://127.0.0.1:9090/i2b2/services/PMService/getServices")
 {
   roles %>%
     purrr::walk(function(role)
@@ -70,7 +70,7 @@ add_user_roles <- function(domain, admin, pass, id, project, roles, url = "http:
 #' @param url The URL of the i2b2 cell to communicate with
 #' @return The XML return message as an httr::content() object
 #' @export
-add_users <- function(domain, admin, pass, users, url = "http://localhost:9090/i2b2/services/PMService/getServices")
+add_users <- function(domain, admin, pass, users, url = "http://127.0.0.1:9090/i2b2/services/PMService/getServices")
 {
   apply(users, 1, function(user)
         {
@@ -109,7 +109,7 @@ add_users <- function(domain, admin, pass, users, url = "http://localhost:9090/i
 #' @param pass The password for the database admin
 #' @param users A character vector of user ids
 #' @export
-delete_users <- function(host = "localhost", admin, pass, users)
+delete_users <- function(host = "127.0.0.1", admin, pass, users)
 {
   pm   <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2pm",   user = admin, password = pass)
 

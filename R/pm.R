@@ -48,7 +48,7 @@ set_domain <- function(admin, pass, domain_id, domain_name)
 #' @param project_id The desired project id
 #' @param project_name The desired project name
 #' @export
-set_project <- function(host = "localhost", admin, pass, project_id, project_name)
+set_project <- function(host = "127.0.0.1", admin, pass, project_id, project_name)
 {
 # Connect to the db
   hive <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host, dbname = "i2b2hive", user = admin, password = pass)
