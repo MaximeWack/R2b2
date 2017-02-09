@@ -63,6 +63,7 @@ body <- function(msg, service, ..., attrib = NULL)
 
 send_msg <- function(msg, cellurl)
 {
+# Correct the base tag
   request <- msg %>%
     xml2::as_xml_document() %>% 
     as.character %>%
