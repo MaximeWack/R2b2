@@ -30,6 +30,30 @@ clear_default_metadata <- function(host = "localhost", admin, pass)
   RPostgreSQL::dbDisconnect(metadata)
 }
 
+#' Delete an ontology from metadata
+#'
+#' Delete an existing ontology from metadata
+#'
+#' Delete the corresponding table
+#' Delete the scheme in schemes table
+#' Delete the entry in table_acess
+#'
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass the password for the admin account
+#' @param scheme The scheme to use for this ontology
+#' @export
+delete_ont<- function(host = "localhost", admin, pass, scheme)
+{
+  metadata   <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2metadata", user = admin, password = pass)
+
+  RPostgreSQL::dbGetQuery(metadata, stringr::str_c("DROP TABLE ", scheme, ";"))
+  RPostgreSQL::dbGetQuery(metadata, stringr::str_c("DELETE FROM table_access WHERE (c_table_cd = '", scheme, "');"))
+  RPostgreSQL::dbGetQuery(metadata, stringr::str_c("DELETE FROM schemes WHERE (c_name = '", scheme, "');"))
+
+  RPostgreSQL::dbDisconnect(metadata)
+}
+
 #' Add an ontology to metadata
 #'
 #' Add an empty ontology space
