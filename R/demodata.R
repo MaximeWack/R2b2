@@ -1,3 +1,20 @@
+#' Clear the default modifiers
+#'
+#' Clear the default concepts in concept_dimension
+#'
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass the password for the admin account
+#' @export
+clear_modifier <- function(host = "localhost", admin, pass)
+{
+  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
+
+  RPostgreSQL::dbGetQuery(demodata, "DELETE FROM modifier_dimension;")
+
+  RPostgreSQL::dbDisconnect(demodata)
+}
+
 #' Clear the default concepts
 #'
 #' Clear the default concepts in concept_dimension
