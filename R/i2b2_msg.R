@@ -1,3 +1,11 @@
+#' Create base XML message
+#'
+#' Create the base XML message
+#'
+#' Creates the base XML message as an R list
+#'
+#' @return The base msg list object
+#' @export
 base_msg <- function()
 {
   msg <- list()
@@ -8,7 +16,20 @@ base_msg <- function()
   msg
 }
 
-header <- function(msg, domain, username, password)
+#' Add the header to the message
+#'
+#' Add the header to the XML message
+#'
+#' Add the header to the XML base message created by base_msg
+#' base_msg can be piped into add_header
+#'
+#' @param msg The XML message to add the header to
+#' @param domain The name of the domain to interact with
+#' @param username The username to connect with
+#' @param password The password for the user
+#' @return The XML message list object
+#' @export
+add_header <- function(msg, domain, username, password)
 {
   mh <- list()
   mh$i2b2_version_compatible <- list("1.1")
@@ -41,7 +62,20 @@ header <- function(msg, domain, username, password)
   msg
 }
 
-body <- function(msg, service, ..., attrib = NULL)
+#' Add the body to the message
+#'
+#' Add the body to the XML message
+#'
+#' Add the body to the XML message created by base_msg and passed through add_header
+#' base_msg can be piped into add_header and then into add_body to build a message
+#'
+#' @param msg The XML message to add the body to
+#' @param service The service to request in the body message
+#' @param attrib A list of XML attributes to add to the service tag
+#' @param ... Optionnaly named tags to add inside the body, with their value
+#' @return The XML message list object
+#' @export
+add_body <- function(msg, service, ..., attrib = NULL)
 {
 # Create param nodes
   params <- list(...) %>% purrr::map(list)
@@ -61,6 +95,17 @@ body <- function(msg, service, ..., attrib = NULL)
   msg
 }
 
+#' Send the message
+#'
+#' Send the XML message to an i2b2 cell
+#'
+#' Send the XML message built by base_msg %>% add_header %>% add_body
+#' to the specified cellurl
+#'
+#' @param msg The XML message as an R list
+#' @param cellurl The URL of the i2b2 cell to communicate with
+#' @return The XML return message as an httr::content() object
+#' @export
 send_msg <- function(msg, cellurl)
 {
 # Correct the base tag
