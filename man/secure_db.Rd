@@ -4,10 +4,10 @@
 \alias{secure_db}
 \title{Secure the i2b2 databases}
 \usage{
-secure_db(name, pass, pass_length = 8)
+secure_db(admin, pass, pass_length = 8)
 }
 \arguments{
-\item{name}{Name of the database admin account}
+\item{admin}{Name of the database admin account}
 
 \item{pass}{Password of the database admin account}
 
@@ -20,7 +20,7 @@ A vector for one statistic column
 Secure the i2b2 databases
 }
 \details{
-Connect to the database using the admin account credentials, provided as name and pass,
+Connect to the database using the admin account credentials, provided as admin and pass,
 generate pass_length long passwords for each database
 and update the cells config with the new passwords.
 }

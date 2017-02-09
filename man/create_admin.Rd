@@ -4,10 +4,10 @@
 \alias{create_admin}
 \title{Create system and database admin accounts}
 \usage{
-create_admin(name = "i2b2admin", pass = NULL, pass_length = 8)
+create_admin(admin = "i2b2admin", pass = NULL, pass_length = 8)
 }
 \arguments{
-\item{name}{Name of the account}
+\item{admin}{Name of the admin account to create}
 
 \item{pass}{An arbitrary password if provided, i2b2admin by default}
 

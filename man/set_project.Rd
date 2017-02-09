@@ -4,12 +4,12 @@
 \alias{set_project}
 \title{Set the project}
 \usage{
-set_project(host = "127.0.0.1", name, pass, project_id, project_name)
+set_project(host = "localhost", admin, pass, project_id, project_name)
 }
 \arguments{
 \item{host}{Address of the host, defaults to 127.0.0.1}
 
-\item{name}{Name of the database admin account}
+\item{admin}{Name of the database admin account}
 
 \item{pass}{Password of the database admin account}
 

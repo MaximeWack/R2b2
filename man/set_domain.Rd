@@ -4,10 +4,10 @@
 \alias{set_domain}
 \title{Set the domain}
 \usage{
-set_domain(name, pass, domain_id, domain_name)
+set_domain(admin, pass, domain_id, domain_name)
 }
 \arguments{
-\item{name}{Name of the database admin account}
+\item{admin}{Name of the database admin account}
 
 \item{pass}{Password of the database admin account}
 
