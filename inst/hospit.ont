@@ -1,0 +1,6 @@
+age_hospit Age à l'hospitalisation
+dates Dates\\entree Date d'entrée
+dates Dates\\sortie Date de sortie
+dates Dates\\duree Durée de séjour
+type Type de séjour\\hospit Hospitalisation
+type Type de séjour\\consult Consultation
