@@ -4,7 +4,7 @@
 \alias{clear_modifier}
 \title{Clear the default modifiers}
 \usage{
-clear_modifier(host = "localhost", admin, pass)
+clear_modifier(host = "127.0.0.1", admin, pass)
 }
 \arguments{
 \item{host}{The host to connect to}

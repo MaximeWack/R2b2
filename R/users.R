@@ -3,7 +3,7 @@
 #' Add an i2b2 user to the instance
 #'
 #' @param domain The name of the domain to interact with
-#' @param username The username to connect with
+#' @param admin The username to connect with
 #' @param pass The password for the user
 #' @param id The id (no spaces, unique) of the new user
 #' @param name The full name of the new user
@@ -25,7 +25,7 @@ add_user <- function(domain, admin, pass, id, name, email, password, url = "http
 #' Add roles to an i2b2 user
 #'
 #' @param domain The name of the domain to interact with
-#' @param username The username to connect with
+#' @param admin The username to connect with
 #' @param pass The password for the user
 #' @param id The id (no spaces, unique) of the new user
 #' @param project The project to add the user role to
@@ -64,7 +64,7 @@ add_user_roles <- function(domain, admin, pass, id, project, roles, url = "http:
 #' Any DATA_* role gives USER and roles down from the DATA_* role given to the project
 #'
 #' @param domain The name of the domain to interact with
-#' @param username The username to connect with
+#' @param admin The username to connect with
 #' @param pass The password for the user
 #' @param users The dataframe containing the users to add
 #' @param url The URL of the i2b2 cell to communicate with

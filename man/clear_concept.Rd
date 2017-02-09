@@ -4,7 +4,7 @@
 \alias{clear_concept}
 \title{Clear the default concepts}
 \usage{
-clear_concept(host = "localhost", admin, pass)
+clear_concept(host = "127.0.0.1", admin, pass)
 }
 \arguments{
 \item{host}{The host to connect to}

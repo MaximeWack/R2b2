@@ -4,7 +4,7 @@
 \alias{add_ont}
 \title{Add an ontology to metadata}
 \usage{
-add_ont(host = "localhost", admin, pass, name, scheme, description)
+add_ont(host = "127.0.0.1", admin, pass, name, scheme, description)
 }
 \arguments{
 \item{host}{The host to connect to}

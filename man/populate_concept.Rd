@@ -4,7 +4,7 @@
 \alias{populate_concept}
 \title{Populate the concept_dimension}
 \usage{
-populate_concept(host = "localhost", admin, pass, ont, modi, name, scheme)
+populate_concept(host = "127.0.0.1", admin, pass, ont, modi, name, scheme)
 }
 \arguments{
 \item{host}{The host to connect to}

@@ -4,7 +4,7 @@
 \alias{set_project}
 \title{Set the project}
 \usage{
-set_project(host = "localhost", admin, pass, project_id, project_name)
+set_project(host = "127.0.0.1", admin, pass, project_id, project_name)
 }
 \arguments{
 \item{host}{Address of the host, defaults to 127.0.0.1}

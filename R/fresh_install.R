@@ -8,7 +8,6 @@
 #' Delete the default users
 #' Clear the metadata database, and the *_dimension tables in demodata
 #'
-#' @param host The host to connect to
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass the password for the admin account
 #' @param domain_id The desired domain_id

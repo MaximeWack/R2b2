@@ -4,7 +4,7 @@
 \alias{delete_ont}
 \title{Delete an ontology from metadata}
 \usage{
-delete_ont(host = "localhost", admin, pass, scheme)
+delete_ont(host = "127.0.0.1", admin, pass, scheme)
 }
 \arguments{
 \item{host}{The host to connect to}

@@ -194,7 +194,7 @@ populate_ont <- function(host = "127.0.0.1", admin, pass, ont, modi, name, schem
     df %>%
       apply(1, function(oneline)
             {
-              RPostgreSQL::dbGetQuery(metadata, stringr::str_c("INSERT INTO ", scheme, " (", columns, ") VALUES (", oneline %>% str_c("'", ., "'", collapse = ","), ");"))
+              RPostgreSQL::dbGetQuery(metadata, stringr::str_c("INSERT INTO ", scheme, " (", columns, ") VALUES (", oneline %>% stringr::str_c("'", ., "'", collapse = ","), ");"))
               current <<- current + 1
               print(stringr::str_c(current, " / ", total))
             })
@@ -223,7 +223,7 @@ populate_ont <- function(host = "127.0.0.1", admin, pass, ont, modi, name, schem
   df %>%
     apply(1, function(oneline)
           {
-            RPostgreSQL::dbGetQuery(metadata, stringr::str_c("INSERT INTO ", scheme, " (", columns, ") VALUES (", oneline %>% str_c("'", ., "'", collapse = ","), ");"))
+            RPostgreSQL::dbGetQuery(metadata, stringr::str_c("INSERT INTO ", scheme, " (", columns, ") VALUES (", oneline %>% stringr::str_c("'", ., "'", collapse = ","), ");"))
             current <<- current + 1
             print(stringr::str_c(current, " / ", total))
           })

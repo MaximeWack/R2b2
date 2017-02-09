@@ -18,8 +18,6 @@ fresh_install(admin, pass, domain_id, domain_name, project_id, project_name)
 \item{project_id}{The desired project id}
 
 \item{project_name}{The desired project name}
-
-\item{host}{The host to connect to}
 }
 \description{
 Make a fresh install from the base VM

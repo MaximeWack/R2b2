@@ -4,7 +4,7 @@
 \alias{delete_users}
 \title{Delete users}
 \usage{
-delete_users(host = "localhost", admin, pass, users)
+delete_users(host = "127.0.0.1", admin, pass, users)
 }
 \arguments{
 \item{host}{The host to connect to}

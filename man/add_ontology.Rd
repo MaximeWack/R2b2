@@ -4,7 +4,7 @@
 \alias{add_ontology}
 \title{Add an ontology to i2b2}
 \usage{
-add_ontology(host = "localhost", admin, pass, name, scheme, description, ont,
+add_ontology(host = "127.0.0.1", admin, pass, name, scheme, description, ont,
   modi)
 }
 \arguments{

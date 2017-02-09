@@ -5,7 +5,7 @@ Authors@R: person("Maxime", "Wack", email = "maximewack@free.fr", role = c("aut"
 Description: Manage, ETL and import data in i2b2
 Depends:
     R (>= 3.3.2)
-License: GPL-3.0
+License: file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports:

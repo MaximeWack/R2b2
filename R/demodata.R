@@ -94,7 +94,7 @@ populate_concept <- function(host = "127.0.0.1", admin, pass, ont, modi, name, s
     df %>%
       apply(1, function(oneline)
             {
-              RPostgreSQL::dbGetQuery(demodata, stringr::str_c("INSERT INTO concept_dimension  (", columns, ") VALUES (", oneline %>% str_c("'", ., "'", collapse = ","), ");"))
+              RPostgreSQL::dbGetQuery(demodata, stringr::str_c("INSERT INTO concept_dimension  (", columns, ") VALUES (", oneline %>% stringr::str_c("'", ., "'", collapse = ","), ");"))
               current <<- current + 1
               print(stringr::str_c(current, " / ", total))
             })
@@ -112,7 +112,7 @@ populate_concept <- function(host = "127.0.0.1", admin, pass, ont, modi, name, s
   df %>%
     apply(1, function(oneline)
           {
-            RPostgreSQL::dbGetQuery(demodata, stringr::str_c("INSERT INTO modifier_dimension  (", columns, ") VALUES (", oneline %>% str_c("'", ., "'", collapse = ","), ");"))
+            RPostgreSQL::dbGetQuery(demodata, stringr::str_c("INSERT INTO modifier_dimension  (", columns, ") VALUES (", oneline %>% stringr::str_c("'", ., "'", collapse = ","), ");"))
             current <<- current + 1
             print(stringr::str_c(current, " / ", total))
           })

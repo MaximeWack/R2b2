@@ -5,18 +5,18 @@
 \title{Add multiple users}
 \usage{
 add_users(domain, admin, pass, users,
-  url = "http://localhost:9090/i2b2/services/PMService/getServices")
+  url = "http://127.0.0.1:9090/i2b2/services/PMService/getServices")
 }
 \arguments{
 \item{domain}{The name of the domain to interact with}
+
+\item{admin}{The username to connect with}
 
 \item{pass}{The password for the user}
 
 \item{users}{The dataframe containing the users to add}
 
 \item{url}{The URL of the i2b2 cell to communicate with}
-
-\item{username}{The username to connect with}
 }
 \value{
 The XML return message as an httr::content() object

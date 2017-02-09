@@ -4,7 +4,7 @@
 \alias{delete_concept}
 \title{Delete concepts}
 \usage{
-delete_concept(host = "localhost", admin, pass, scheme)
+delete_concept(host = "127.0.0.1", admin, pass, scheme)
 }
 \arguments{
 \item{host}{The host to connect to}
