@@ -5,7 +5,7 @@
 \title{Add an ontology to i2b2}
 \usage{
 add_ontology(host = "127.0.0.1", admin, pass, name, scheme, description, ont,
-  modi)
+  modi = NULL)
 }
 \arguments{
 \item{host}{The host to connect to}
