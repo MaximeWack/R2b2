@@ -1,3 +1,34 @@
+#' Clear the default demodata tables
+#'
+#' Clear the default demodata tables
+#'
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass the password for the admin account
+#' @export
+clear_default_demodata <- function(host = "127.0.0.1", admin, pass)
+{
+  clear_concept(host, admin, pass)
+
+  clear_modifier(host, admin, pass)
+
+  clear_code_lookup(host, admin, pass)
+
+  clear_encounter_mapping(host, admin, pass)
+
+  clear_encounter_dimension(host, admin, pass)
+
+  clear_patients(host, admin, pass)
+
+  clear_breakdown(host, admin, pass)
+
+  clear_providers(host, admin, pass)
+
+  clear_observations(host, admin, pass)
+
+  clear_patient_mapping(host, admin, pass)
+}
+
 #' Clear the default code_lookup
 #'
 #' Clear the default codes in code_lookup
@@ -74,7 +105,7 @@ clear_patients <- function(host = "127.0.0.1", admin, pass)
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass the password for the admin account
 #' @export
-clear_patient_mapping
+clear_patient_mapping <- function(host = "127.0.0.1", admin, pass)
 {
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
 

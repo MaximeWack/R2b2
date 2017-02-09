@@ -33,23 +33,5 @@ fresh_install <- function(admin, pass, domain_id, domain_name, project_id, proje
 
   clear_default_metadata(host, admin, pass)
 
-  clear_concept(host, admin, pass)
-
-  clear_modifier(host, admin, pass)
-
-  clear_code_lookup(host, admin, pass)
-
-  clear_encounter_mapping(host, admin, pass)
-
-  clear_encounter_dimension(host, admin, pass)
-
-  clear_patients(host, admin, pass)
-
-  clear_breakdown(host, admin, pass)
-
-  clear_providers(host, admin, pass)
-
-  clear_observations(host, admin, pass)
-
-  clear_patient_mapping(host, admin, pass)
+  clear_default_demodata(host, admin, pass)
 }
