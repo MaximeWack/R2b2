@@ -31,6 +31,8 @@ fresh_install <- function(admin, pass, domain_id, domain_name, project_id, proje
 
   delete_users(host, admin, pass, c("i2b2", "demo"))
 
+  clear_webclient()
+
   clear_default_metadata(host, admin, pass)
 
   clear_default_demodata(host, admin, pass)

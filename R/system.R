@@ -1,3 +1,18 @@
+#' Clear the default credentials in the webclient
+#'
+#' Clear the default credentials in the webclient
+#'
+#' @export
+clear_webclient <- function()
+{
+  "/var/www/html/webclient/js-i2b2/i2b2_ui_config.js" %>%
+    readLines %>%
+    stringr::str_c(collapse = "\n") %>%
+    stringr::str_replace("demo", "") %>%
+    stringr::str_replace("demouser", "") %>%
+    write("/var/www/html/webclient/js-i2b2/i2b2_ui_config.js")
+}
+
 #' Set the permissions for the webclient and wildfly folders
 #'
 #' Set the permissions wildfly:wildfly +rwx and setgid to the webclient and wildfly folders
