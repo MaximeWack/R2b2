@@ -130,20 +130,26 @@ add_ont <- function(host = "localhost", admin, pass, name, scheme, description)
 #' with their respective path, in the form
 #' code_level1 label_level1/code_level2 label_level2/.../code_leaf label_leaf
 #' The function rebuilds the folders automatically
+#' 
+#' modi is a character vector containing the modifiers, in the form
+#' code_modi label_modi
+#' The modifiers apply on all the ontology
 #'
 #' @param host The host to connect to
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass the password for the admin account
 #' @param ont The ontology to insert
+#' @param modi The modifiers to insert
 #' @param name The name of the new ontology
 #' @param scheme The scheme to use for this ontology
 #' @export
-populate_ont <- function(host = "localhost", admin, pass, ont, name, scheme)
+populate_ont <- function(host = "localhost", admin, pass, ont, modi, name, scheme)
 {
   metadata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2metadata", user = admin, password = pass)
 
 # Sanitize the ontology
   ont <- ont %>% stringr::str_replace_all("'", "''")
+  modi <- modi %>% stringr::str_replace_all("'", "''")
 
 # Create the data frame holding the contents of the new table, starting with leaves
   df <- data.frame(c_fullname = ont, c_visualattributes = "LA", stringsAsFactors = F)
@@ -185,6 +191,30 @@ populate_ont <- function(host = "localhost", admin, pass, ont, name, scheme)
   columns <- stringr::str_c(names(df), collapse = ",")
   total <- nrow(df)
   current <- 0
+  df %>%
+    apply(1, function(oneline)
+          {
+            RPostgreSQL::dbGetQuery(metadata, stringr::str_c("INSERT INTO ", scheme, " (", columns, ") VALUES (", oneline %>% str_c("'", ., "'", collapse = ","), ");"))
+            current <<- current + 1
+            print(stringr::str_c(current, " / ", total))
+          })
+
+  data.frame(modi = modi, stringsAsFactors = F) %>%
+    mutate(c_hlevel = 1,
+           c_name = modi %>% stringr::str_extract(" .*$") %>% stringr::str_trim(),
+           c_fullname = stringr::str_c("\\", c_name, "\\"),
+           c_synonym_cd = "N",
+           c_visualattributes = "RA",
+           c_basecode = stringr::str_c(scheme, ":", modi %>% stringr::str_extract("^.+? ") %>% stringr::str_trim()),
+           c_facttablecolumn = "modifier_cd",
+           c_tablename = "modifier_dimension",
+           c_columnname = "modifier_path",
+           c_columndatatype = "T",
+           c_operator = "LIKE",
+           c_tooltip = c_name,
+           m_applied_path = stringr::str_c(c_fullname, "%")) %>%
+  select(-modi) -> df
+
   df %>%
     apply(1, function(oneline)
           {
