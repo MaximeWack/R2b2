@@ -131,7 +131,7 @@ populate_ont <- function(host = "127.0.0.1", admin, pass, ont, modi = NULL, name
   df <- data.frame(c_fullname = ont, c_visualattributes = "LA", stringsAsFactors = F)
 
   # Delete root leaves
-  ont <- ont %>% purrr::keep(~stringr::str_detect("\\\\"))
+  ont <- ont %>% purrr::keep(~stringr::str_detect(., "\\\\"))
 
   # Add the folders by 'deconstructing' the paths
   while (any(stringr::str_detect(ont, "\\\\")))
