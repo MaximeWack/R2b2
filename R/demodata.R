@@ -199,6 +199,24 @@ clear_concept <- function(host = "127.0.0.1", admin, pass)
   RPostgreSQL::dbDisconnect(demodata)
 }
 
+#' Delete modifiers
+#'
+#' Delete modifiers from modifier_dimension
+#'
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass the password for the admin account
+#' @param scheme The scheme to delete from the concepts
+#' @export
+delete_modifier <- function(host = "127.0.0.1", admin, pass, scheme)
+{
+  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
+
+  RPostgreSQL::dbGetQuery(demodata, stringr::str_c("DELETE FROM modifier_dimension WHERE (modifier_cd LIKE '", scheme, ":%');"))
+
+  RPostgreSQL::dbDisconnect(demodata)
+}
+
 #' Delete concepts
 #'
 #' Delete concepts from concept_dimension

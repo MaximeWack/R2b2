@@ -41,4 +41,6 @@ delete_ontology <- function(host = "127.0.0.1", admin, pass, scheme)
   delete_ont(host, admin, pass, scheme)
 
   delete_concept(host, admin, pass, scheme)
+
+  delete_modifier(host, admin, pass, scheme)
 }
