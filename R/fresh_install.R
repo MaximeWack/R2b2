@@ -36,4 +36,6 @@ fresh_install <- function(admin, pass, domain_id, domain_name, project_id, proje
   clear_default_metadata(host, admin, pass)
 
   clear_default_demodata(host, admin, pass)
+
+  clear_default_imdata(host, admin, pass)
 }
