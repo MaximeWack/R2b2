@@ -23,7 +23,7 @@ add_ontology <- function(host = "127.0.0.1", admin, pass, name, scheme, descript
   populate_concept(host, admin, pass, ont, modi, name, scheme)
 }
 
-#' Delete an ontology from metadata
+#' Delete an ontology from i2b2
 #'
 #' Delete an existing ontology from metadata
 #'
@@ -38,11 +38,7 @@ add_ontology <- function(host = "127.0.0.1", admin, pass, name, scheme, descript
 #' @export
 delete_ontology <- function(host = "127.0.0.1", admin, pass, scheme)
 {
-  metadata   <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2metadata", user = admin, password = pass)
+  delete_ont(host, admin, pass, scheme)
 
-  RPostgreSQL::dbGetQuery(metadata, stringr::str_c("DROP TABLE ", scheme, ";"))
-  RPostgreSQL::dbGetQuery(metadata, stringr::str_c("DELETE FROM table_access WHERE (c_table_cd = '", scheme, "');"))
-  RPostgreSQL::dbGetQuery(metadata, stringr::str_c("DELETE FROM schemes WHERE (c_name = '", scheme, "');"))
-
-  RPostgreSQL::dbDisconnect(metadata)
+  delete_concept(host, admin, pass, scheme)
 }
