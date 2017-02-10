@@ -104,7 +104,7 @@ add_ont <- function(host = "127.0.0.1", admin, pass, name, scheme, description)
 #' Populate an ontology table
 #' ont is a character vector containing all the leaves of the ontology
 #' with their respective path, in the form
-#' code_level1 label_level1/code_level2 label_level2/.../code_leaf label_leaf
+#' code_level1 label_level1\code_level2 label_level2\...\code_leaf label_leaf
 #' The function rebuilds the folders automatically
 #' 
 #' modi is a character vector containing the modifiers, in the form
@@ -129,6 +129,9 @@ populate_ont <- function(host = "127.0.0.1", admin, pass, ont, modi = NULL, name
 
   # Create the data frame holding the contents of the new table, starting with leaves
   df <- data.frame(c_fullname = ont, c_visualattributes = "LA", stringsAsFactors = F)
+
+  # Delete root leaves
+  ont <- ont %>% purrr::keep(~stringr::str_detect("\\\\"))
 
   # Add the folders by 'deconstructing' the paths
   while (any(stringr::str_detect(ont, "\\\\")))
