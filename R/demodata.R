@@ -212,7 +212,7 @@ delete_concept <- function(host = "127.0.0.1", admin, pass, scheme)
 {
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
 
-  RPostgreSQL::dbGetQuery(demodata, stringr::str_c("DELETE FROM concept_dimension WHERE (concept_cd LIKE '", scheme, ":%';"))
+  RPostgreSQL::dbGetQuery(demodata, stringr::str_c("DELETE FROM concept_dimension WHERE (concept_cd LIKE '", scheme, ":%');"))
 
   RPostgreSQL::dbDisconnect(demodata)
 }
