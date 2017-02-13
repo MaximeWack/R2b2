@@ -188,19 +188,10 @@ populate_ont <- function(host = "127.0.0.1", admin, pass, ont, modi = NULL, name
                   # Use only codes to build shorter paths
                   c_fullname = stringr::str_replace_all(c_fullname, "\\\\(.+?) [^\\\\]+", "\\\\\\1"),
                   c_dimcode = c_fullname,
-                  update_date = format(Sys.Date(), "%d/%m/%Y")) -> df
+                  update_date = format(Sys.Date(), "%m/%d/%Y")) -> df
 
     # Push the dataframe into the new ontology table
-    columns <- stringr::str_c(names(df), collapse = ",")
-    total <- nrow(df)
-    current <- 0
-    df %>%
-      apply(1, function(oneline)
-            {
-              RPostgreSQL::dbGetQuery(metadata, stringr::str_c("INSERT INTO ", scheme, " (", columns, ") VALUES (", oneline %>% stringr::str_c("'", ., "'", collapse = ","), ");"))
-              current <<- current + 1
-              print(stringr::str_c(current, " / ", total))
-            })
+    dbPush(metadata, scheme, df)
 
     data.frame(modi = modi, stringsAsFactors = F) %>%
       dplyr::mutate(c_hlevel = 1,
@@ -217,19 +208,12 @@ populate_ont <- function(host = "127.0.0.1", admin, pass, ont, modi = NULL, name
                     c_tooltip = c_name,
                     c_dimcode = c_fullname,
                     m_applied_path = stringr::str_c("\\", name, "\\%"),
-                    update_date = format(Sys.Date(), "%d/%m/%Y")) %>%
+                    update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
     dplyr::select(-modi) -> df
 
-  columns <- stringr::str_c(names(df), collapse = ",")
-  total <- nrow(df)
-  current <- 0
-  df %>%
-    apply(1, function(oneline)
-          {
-            RPostgreSQL::dbGetQuery(metadata, stringr::str_c("INSERT INTO ", scheme, " (", columns, ") VALUES (", oneline %>% stringr::str_c("'", ., "'", collapse = ","), ");"))
-            current <<- current + 1
-            print(stringr::str_c(current, " / ", total))
-          })
+    # Push the dataframe into the new ontology table
+    dbPush(metadata, scheme, df)
+
 
   RPostgreSQL::dbDisconnect(metadata)
 }

@@ -273,16 +273,7 @@ populate_concept <- function(host = "127.0.0.1", admin, pass, ont, modi, name, s
                   update_date = format(Sys.Date(), "%d/%m/%Y")) -> df
 
     # Push the dataframe into the new ontology table
-    columns <- stringr::str_c(names(df), collapse = ",")
-    total <- nrow(df)
-    current <- 0
-    df %>%
-      apply(1, function(oneline)
-            {
-              RPostgreSQL::dbGetQuery(demodata, stringr::str_c("INSERT INTO concept_dimension  (", columns, ") VALUES (", oneline %>% stringr::str_c("'", ., "'", collapse = ","), ");"))
-              current <<- current + 1
-              print(stringr::str_c(current, " / ", total))
-            })
+    dbPush(demodata, concept_dimension, df)
 
     data.frame(modi = modi) %>%
       dplyr::mutate(name_char = modi %>% stringr::str_extract(" .*$") %>% stringr::str_trim(),
@@ -291,16 +282,8 @@ populate_concept <- function(host = "127.0.0.1", admin, pass, ont, modi, name, s
                     update_date = format(Sys.Date(), "%d/%m/%Y")) %>%
     dplyr::select(-modi) -> df
 
-  columns <- stringr::str_c(names(df), collapse = ",")
-  total <- nrow(df)
-  current <- 0
-  df %>%
-    apply(1, function(oneline)
-          {
-            RPostgreSQL::dbGetQuery(demodata, stringr::str_c("INSERT INTO modifier_dimension  (", columns, ") VALUES (", oneline %>% stringr::str_c("'", ., "'", collapse = ","), ");"))
-            current <<- current + 1
-            print(stringr::str_c(current, " / ", total))
-          })
+  # Push the dataframe into the new ontology table
+  dbPush(demodata, concept_dimension, df)
 
   RPostgreSQL::dbDisconnect(demodata)
 }
