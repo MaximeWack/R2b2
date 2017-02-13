@@ -81,3 +81,23 @@ clear_project_sites <- function(host, admin, pass)
 
   RPostgreSQL::dbDisconnect(imdata)
 }
+
+add_patients <- function(host, admin, pass, patients)
+{
+  imdata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2imdata", user = admin, password = pass)
+
+  dplyr::src_postgres("i2b2imdata", host, user = admin, password = pass) %>%
+    dplyr::tbl("im_mpi_mapping") %>%
+    dplyr::select(global_id, lcl_site, lcl_id) %>%
+    dplyr::collect(n = Inf) -> existing
+
+  new_id_start <- ifelse(nrow(existing) == 0, 100000001, existing$global_id %>% as.numeric %>% max + 1)
+
+  data.frame(lcl_id = as.character(patients)) %>%
+    dplyr::anti_join(existing) -> unknown_patients
+
+  unknown_patients$global_id <- seq(new_id_start, length.out = nrow(unknown_patients))
+
+
+  RPostgreSQL::dbDisconnect(imdata)
+}
