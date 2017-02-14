@@ -270,7 +270,7 @@ populate_concept <- function(host = "127.0.0.1", admin, pass, ont, modi, name, s
                   concept_path = stringr::str_c(concept_path, "\\"),
                   # Use only codes to build shorter paths
                   concept_path = stringr::str_replace_all(concept_path, "\\\\(.+?) [^\\\\]+", "\\\\\\1"),
-                  update_date = format(Sys.Date(), "%d/%m/%Y")) -> df
+                  update_date = format(Sys.Date(), "%m/%d/%Y")) -> df
 
     # Push the dataframe into the new ontology table
     dbPush(demodata, concept_dimension, df)
@@ -279,7 +279,7 @@ populate_concept <- function(host = "127.0.0.1", admin, pass, ont, modi, name, s
       dplyr::mutate(name_char = modi %>% stringr::str_extract(" .*$") %>% stringr::str_trim(),
                     modifier_path = stringr::str_c("\\", name_char, "\\"),
                     modifier_cd = stringr::str_c(scheme, ":", modi %>% stringr::str_extract("^.+? ") %>% stringr::str_trim()),
-                    update_date = format(Sys.Date(), "%d/%m/%Y")) %>%
+                    update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
     dplyr::select(-modi) -> df
 
   # Push the dataframe into the new ontology table
