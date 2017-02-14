@@ -1,8 +1,8 @@
 Package: R2b2
-Title: R package to manage an i2b2 instance and import data.
+Title: R package to manage an i2b2 instance and import data
 Version: 0.0.0.9000
 Authors@R: person("Maxime", "Wack", email = "maximewack@free.fr", role = c("aut", "cre"))
-Description: Manage, ETL and import data in i2b2
+Description: Manage, ETL and import data in i2b2.
 Depends:
     R (>= 3.3.2)
 License: file LICENSE

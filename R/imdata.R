@@ -82,7 +82,18 @@ clear_project_sites <- function(host, admin, pass)
   RPostgreSQL::dbDisconnect(imdata)
 }
 
-add_patients <- function(host, admin, pass, patients)
+#' Add patients to the IM cell
+#'
+#' Add patients to the IM cell, generate new encrypted IDs,
+#' and create a project site if needed
+#'
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass The password for the admin account
+#' @param patients A vector of patients IDs to insert
+#' @param project The project to add the patients to
+#' @export
+add_patients <- function(host, admin, pass, patients, project)
 {
   imdata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2imdata", user = admin, password = pass)
 
@@ -94,10 +105,33 @@ add_patients <- function(host, admin, pass, patients)
   new_id_start <- ifelse(nrow(existing) == 0, 100000001, existing$global_id %>% as.numeric %>% max + 1)
 
   data.frame(lcl_id = as.character(patients)) %>%
-    dplyr::anti_join(existing) -> unknown_patients
+    dplyr::anti_join(existing) %>%
+    dplyr::mutate(global_id = seq(new_id_start, length.out = nrow(.))) -> new_patients
 
-  unknown_patients$global_id <- seq(new_id_start, length.out = nrow(unknown_patients))
+  new_patients %>%
+    dplyr::mutate(lcl_site = project,
+                  lcl_status  = "A",
+                  update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+  dbPush(con = imdata, table = "im_mpi_mapping", .)
 
+  new_patients %>%
+    dplyr::mutate(global_status = "A",
+                  update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+    dplyr::select(- lcl_id) %>%
+  dbPush(con = imdata, table = "im_mpi_demographics", .)
+
+  data.frame(project_id = project,
+             lcl_site = project,
+             project_status = "A",
+             update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+  dbPush(con = imdata, table = "im_project_sites", .)
+
+  new_patients %>%
+    dplyr::mutate(project_id = project,
+                  patient_project_status = "A",
+                  update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+    dplyr::select(- lcl_id) %>%
+  dbPush(con = imdata, table = "im_project_patients", .)
 
   RPostgreSQL::dbDisconnect(imdata)
 }
