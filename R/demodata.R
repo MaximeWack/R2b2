@@ -287,3 +287,68 @@ populate_concept <- function(host = "127.0.0.1", admin, pass, ont, modi, name, s
 
   RPostgreSQL::dbDisconnect(demodata)
 }
+
+#' Add patients to the CRC cell
+#'
+#' Add patients to the CRC cell, generate new encrypted IDs,
+#' and create a project site if needed
+#'
+#' The patients dataframe must contain the following columns:
+#' - patient_ide: the original patient ID
+#' - birthdate: as a Date object
+#' - deathdate
+#' - gender (F or M)
+#'
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass The password for the admin account
+#' @param patients A dataframe of patients
+#' @param project The project to add the patients to
+#' @export
+add_patients_demodata <- function(host, admin, pass, patients, project)
+{
+  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
+
+  dplyr::src_postgres("i2b2demodata", host, user = admin, password = pass) %>%
+    dplyr::tbl("patient_mapping") %>%
+    dplyr::select(patient_ide,patient_ide_source, patient_num) %>%
+    dplyr::collect(n = Inf) -> existing
+
+  new_id_start <- ifelse(nrow(existing) == 0, 100000001, existing$patient_num %>% as.numeric %>% max + 1)
+
+  data.frame(patient_ide = as.character(patients$patient_ide), stringsAsFactors = F) %>%
+    dplyr::anti_join(existing) %>%
+    dplyr::mutate(patient_num = seq(new_id_start, length.out = nrow(.))) -> new_patients
+
+  new_patients %>%
+    dplyr::mutate(patient_ide_source = project,
+                  patient_num = as.character(patient_num),
+                  patient_ide_status  = "A",
+                  project_id = project,
+                  update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+  dbPush(con = demodata, table = "patient_mapping", .)
+
+  new_patients %>%
+    dplyr::mutate(patient_ide_source = "HIVE",
+                  patient_num = as.character(patient_num),
+                  patient_ide = as.character(patient_num),
+                  patient_ide_status  = "A",
+                  project_id = project,
+                  update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+  dbPush(con = demodata, table = "patient_mapping", .)
+
+  patients %>%
+    dplyr::mutate(patient_ide = patient_ide %>% as.character) %>%
+    dplyr::right_join(new_patients) %>%
+    dplyr::mutate(birth_date = ifelse(is.na(birthdate), "", format(birthdate, format = "%m/%d/%Y %H:%M:%S")),
+           death_date = ifelse(is.na(deathdate), NA, format(deathdate, format = "%m/%d/%Y %H:%M:%S")),
+           vital_status_cd = ifelse(is.na(deathdate), "", "S"),
+           sex_cd = gender,
+           age_in_years_num = ifelse(is.na(deathdate), floor(as.numeric(Sys.Date() - birthdate)/365.25), floor(as.numeric(deathdate - birthdate)/365.25)),
+           patient_num = as.character(patient_num),
+           update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+    dplyr::select(-patient_ide, -birthdate, -deathdate, -gender) %>%
+    dbPush(con = demodata, table = "patient_dimension", .)
+
+  RPostgreSQL::dbDisconnect(imdata)
+}

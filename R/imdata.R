@@ -93,7 +93,7 @@ clear_project_sites <- function(host, admin, pass)
 #' @param patients A vector of patients IDs to insert
 #' @param project The project to add the patients to
 #' @export
-add_patients <- function(host, admin, pass, patients, project)
+add_patients_imdata <- function(host, admin, pass, patients, project)
 {
   imdata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2imdata", user = admin, password = pass)
 
