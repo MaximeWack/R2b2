@@ -309,17 +309,20 @@ add_patients_demodata <- function(host, admin, pass, patients, project)
 {
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
 
+# Get the existing patient mappings
   dplyr::src_postgres("i2b2demodata", host, user = admin, password = pass) %>%
     dplyr::tbl("patient_mapping") %>%
     dplyr::select(patient_ide,patient_ide_source, patient_num) %>%
     dplyr::collect(n = Inf) -> existing
 
+# Create the new patient mappings
   new_id_start <- ifelse(nrow(existing) == 0, 100000001, existing$patient_num %>% as.numeric %>% max + 1)
 
   data.frame(patient_ide = as.character(patients$patient_ide), stringsAsFactors = F) %>%
     dplyr::anti_join(existing) %>%
     dplyr::mutate(patient_num = seq(new_id_start, length.out = nrow(.))) -> new_patients
 
+# Push the new patient mappings
   new_patients %>%
     dplyr::mutate(patient_ide_source = project,
                   patient_num = as.character(patient_num),
@@ -328,6 +331,7 @@ add_patients_demodata <- function(host, admin, pass, patients, project)
                   update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
   dbPush(con = demodata, table = "patient_mapping", .)
 
+# Push the new patient mappings for HIVE
   new_patients %>%
     dplyr::mutate(patient_ide_source = "HIVE",
                   patient_num = as.character(patient_num),
@@ -337,6 +341,7 @@ add_patients_demodata <- function(host, admin, pass, patients, project)
                   update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
   dbPush(con = demodata, table = "patient_mapping", .)
 
+# Push the new patient dimension
   patients %>%
     dplyr::mutate(patient_ide = patient_ide %>% as.character) %>%
     dplyr::right_join(new_patients) %>%
