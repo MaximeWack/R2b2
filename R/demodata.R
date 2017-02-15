@@ -350,5 +350,40 @@ add_patients_demodata <- function(host, admin, pass, patients, project)
     dplyr::select(-patient_ide, -birthdate, -deathdate, -gender) %>%
     dbPush(con = demodata, table = "patient_dimension", .)
 
-  RPostgreSQL::dbDisconnect(imdata)
+  RPostgreSQL::dbDisconnect(demodata)
+}
+
+add_encounters <- function(host, admin, pass, encounters, project)
+{
+  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
+
+  dplyr::src_postgres("i2b2demodata", host, user = admin, password = pass) %>%
+    dplyr::tbl("encounter_mapping") %>%
+    dplyr::select(encounter_ide, encounter_num, patient_ide) %>%
+    dplyr::collect(n = Inf) -> existing
+
+  new_id_start <- ifelse(nrow(existing) == 0, 100000001, existing$encounter_num %>% as.numeric %>% max + 1)
+
+  data.frame(encounter_ide = as.character(patients$encounter_ide), stringsAsFactors = F) %>%
+    dplyr::anti_join(existing) %>%
+    dplyr::mutate(encounter_num = seq(new_id_start, length.out = nrow(.))) -> new_encounters
+
+  new_encounters %>%
+    dplyr::mutate(encounter_ide_source = project,
+                  encounter_num = as.character(encounter_num),
+                  encounter_ide_status  = "A",
+                  project_id = project,
+                  update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+  dbPush(con = demodata, table = "encounter_mapping", .)
+
+  new_patients %>%
+    dplyr::mutate(encounter_ide_source = "HIVE",
+                  encounter_num = as.character(encounter_num),
+                  encounter_ide = as.character(encounter_num),
+                  encounter_ide_status  = "A",
+                  project_id = project,
+                  update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+  dbPush(con = demodata, table = "encounter_mapping", .)
+
+  RPostgreSQL::dbDisconnect(demodata)
 }
