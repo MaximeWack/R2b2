@@ -142,8 +142,9 @@ add_ont <- function(host = "127.0.0.1", admin, pass, name, scheme, description)
 #' @param modi The modifiers to insert
 #' @param name The name of the new ontology
 #' @param scheme The scheme to use for this ontology
+#' @param include_code Whether to include the code in the label or not
 #' @export
-populate_ont <- function(host = "127.0.0.1", admin, pass, ont, modi = NULL, name, scheme)
+populate_ont <- function(host = "127.0.0.1", admin, pass, ont, modi = NULL, name, scheme, include_code = T)
 {
   metadata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2metadata", user = admin, password = pass)
 
@@ -174,6 +175,7 @@ populate_ont <- function(host = "127.0.0.1", admin, pass, ont, modi = NULL, name
     # Populate the other columns
     dplyr::mutate(c_hlevel = stringr::str_count(c_fullname, "\\\\") - 1,
                   c_name = stringr::str_extract(c_fullname, "[^\\\\]+$"),
+                  c_name = ifelse(include_code, c_name, stringr::str_extract(c_name, " .*$") %>% stringr::str_trim()),
                   c_basecode = stringr::str_c(scheme, ":", c_name %>% stringr::str_extract("^.+? ") %>% stringr::str_trim()),
                   c_basecode = ifelse(is.na(c_basecode), "", c_basecode),
                   c_synonym_cd = "N",

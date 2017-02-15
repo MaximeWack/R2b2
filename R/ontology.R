@@ -13,12 +13,13 @@
 #' @param description The description of the scheme
 #' @param ont The ontology to insert
 #' @param modi The modifiers to insert
+#' @param include_code Whether to include the code in the label or not
 #' @export
-add_ontology <- function(host = "127.0.0.1", admin, pass, name, scheme, description, ont, modi = NULL)
+add_ontology <- function(host = "127.0.0.1", admin, pass, name, scheme, description, ont, modi = NULL, include_code = T)
 {
   add_ont(host, admin, pass, name, scheme, description)
 
-  populate_ont(host, admin, pass, ont, modi, name, scheme)
+  populate_ont(host, admin, pass, ont, modi, name, scheme, include_code)
 
   populate_concept(host, admin, pass, ont, modi, name, scheme)
 }
