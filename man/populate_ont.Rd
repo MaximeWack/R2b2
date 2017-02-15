@@ -5,7 +5,7 @@
 \title{Populate an empty ontology table}
 \usage{
 populate_ont(host = "127.0.0.1", admin, pass, ont, modi = NULL, name,
-  scheme)
+  scheme, include_code = T)
 }
 \arguments{
 \item{host}{The host to connect to}
@@ -21,6 +21,8 @@ populate_ont(host = "127.0.0.1", admin, pass, ont, modi = NULL, name,
 \item{name}{The name of the new ontology}
 
 \item{scheme}{The scheme to use for this ontology}
+
+\item{include_code}{Whether to include the code in the label or not}
 }
 \description{
 Populate an empty ontology table

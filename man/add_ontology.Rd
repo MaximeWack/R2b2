@@ -5,7 +5,7 @@
 \title{Add an ontology to i2b2}
 \usage{
 add_ontology(host = "127.0.0.1", admin, pass, name, scheme, description, ont,
-  modi = NULL)
+  modi = NULL, include_code = T)
 }
 \arguments{
 \item{host}{The host to connect to}
@@ -23,6 +23,8 @@ add_ontology(host = "127.0.0.1", admin, pass, name, scheme, description, ont,
 \item{ont}{The ontology to insert}
 
 \item{modi}{The modifiers to insert}
+
+\item{include_code}{Whether to include the code in the label or not}
 }
 \description{
 Add an ontology into i2b2
