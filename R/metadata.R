@@ -175,7 +175,6 @@ populate_ont <- function(host = "127.0.0.1", admin, pass, ont, modi = NULL, name
     # Populate the other columns
     dplyr::mutate(c_hlevel = stringr::str_count(c_fullname, "\\\\") - 1,
                   c_name = stringr::str_extract(c_fullname, "[^\\\\]+$"),
-                  c_name = ifelse(include_code, c_name, stringr::str_extract(c_name, " .*$") %>% stringr::str_trim()),
                   c_basecode = stringr::str_c(scheme, ":", c_name %>% stringr::str_extract("^.+? ") %>% stringr::str_trim()),
                   c_basecode = ifelse(is.na(c_basecode), "", c_basecode),
                   c_synonym_cd = "N",
@@ -192,29 +191,35 @@ populate_ont <- function(host = "127.0.0.1", admin, pass, ont, modi = NULL, name
                   c_dimcode = c_fullname,
                   update_date = format(Sys.Date(), "%m/%d/%Y")) -> df
 
-    # Push the dataframe into the new ontology table
-    dbPush(metadata, scheme, df)
-
-    data.frame(modi = modi, stringsAsFactors = F) %>%
-      dplyr::mutate(c_hlevel = 1,
-                    c_name = modi %>% stringr::str_extract(" .*$") %>% stringr::str_trim(),
-                    c_fullname = stringr::str_c("\\", c_name, "\\"),
-                    c_synonym_cd = "N",
-                    c_visualattributes = "RA",
-                    c_basecode = stringr::str_c(scheme, ":", modi %>% stringr::str_extract("^.+? ") %>% stringr::str_trim()),
-                    c_facttablecolumn = "modifier_cd",
-                    c_tablename = "modifier_dimension",
-                    c_columnname = "modifier_path",
-                    c_columndatatype = "T",
-                    c_operator = "LIKE",
-                    c_tooltip = c_name,
-                    c_dimcode = c_fullname,
-                    m_applied_path = stringr::str_c("\\", name, "\\%"),
-                    update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
-    dplyr::select(-modi) -> df
+    if (!include_code)
+      df$c_name <- stringr::str_extract(c_name, " .*$") %>% stringr::str_trim()
 
     # Push the dataframe into the new ontology table
     dbPush(metadata, scheme, df)
+
+    if (length(modi) > 0)
+    {
+      data.frame(modi = modi, stringsAsFactors = F) %>%
+        dplyr::mutate(c_hlevel = 1,
+                      c_name = modi %>% stringr::str_extract(" .*$") %>% stringr::str_trim(),
+                      c_fullname = stringr::str_c("\\", c_name, "\\"),
+                      c_synonym_cd = "N",
+                      c_visualattributes = "RA",
+                      c_basecode = stringr::str_c(scheme, ":", modi %>% stringr::str_extract("^.+? ") %>% stringr::str_trim()),
+                      c_facttablecolumn = "modifier_cd",
+                      c_tablename = "modifier_dimension",
+                      c_columnname = "modifier_path",
+                      c_columndatatype = "T",
+                      c_operator = "LIKE",
+                      c_tooltip = c_name,
+                      c_dimcode = c_fullname,
+                      m_applied_path = stringr::str_c("\\", name, "\\%"),
+                      update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+      dplyr::select(-modi) -> df
+
+    # Push the dataframe into the new ontology table
+    dbPush(metadata, scheme, df)
+    }
 
 
   RPostgreSQL::dbDisconnect(metadata)

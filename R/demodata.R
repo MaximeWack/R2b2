@@ -270,20 +270,21 @@ populate_concept <- function(host = "127.0.0.1", admin, pass, ont, modi, name, s
                   concept_path = stringr::str_c(concept_path, "\\"),
                   # Use only codes to build shorter paths
                   concept_path = stringr::str_replace_all(concept_path, "\\\\(.+?) [^\\\\]+", "\\\\\\1"),
-                  update_date = format(Sys.Date(), "%m/%d/%Y")) -> df
-
+                  update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
     # Push the dataframe into the new ontology table
-    dbPush(demodata, concept_dimension, df)
+    dbPush(con = demodata, table = "concept_dimension", .)
 
+  if (length(modi) > 0)
+  {
     data.frame(modi = modi) %>%
       dplyr::mutate(name_char = modi %>% stringr::str_extract(" .*$") %>% stringr::str_trim(),
                     modifier_path = stringr::str_c("\\", name_char, "\\"),
                     modifier_cd = stringr::str_c(scheme, ":", modi %>% stringr::str_extract("^.+? ") %>% stringr::str_trim()),
                     update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
-    dplyr::select(-modi) -> df
-
-  # Push the dataframe into the new ontology table
-  dbPush(demodata, concept_dimension, df)
+    dplyr::select(-modi) %>%
+    # Push the dataframe into the new ontology table
+    dbPush(con = demodata, table = "concept_dimension", .)
+  }
 
   RPostgreSQL::dbDisconnect(demodata)
 }
@@ -323,7 +324,7 @@ populate_provider <- function(host = "127.0.0.1", admin, pass, ont, name, scheme
                   provider_path = stringr::str_replace_all(provider_path, "\\\\(.+?) [^\\\\]+", "\\\\\\1"),
                   update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
     # Push the dataframe into the new ontology table
-    dbPush(demodata, provider_dimension, .)
+    dbPush(con = demodata, table = "provider_dimension", .)
 
   RPostgreSQL::dbDisconnect(demodata)
 }
@@ -432,5 +433,3 @@ add_encounters <- function(host, admin, pass, encounters, project)
 
   RPostgreSQL::dbDisconnect(demodata)
 }
-
-
