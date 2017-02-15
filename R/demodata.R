@@ -288,6 +288,46 @@ populate_concept <- function(host = "127.0.0.1", admin, pass, ont, modi, name, s
   RPostgreSQL::dbDisconnect(demodata)
 }
 
+#' Populate the provider_dimension
+#'
+#' Populate the provider_dimension with new providers
+#'
+#' ont is a character vector containing all the leaves of the ontology
+#' with their respective path, in the form
+#' code_level1 label_level1/code_level2 label_level2/.../code_leaf label_leaf
+#'
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass the password for the admin account
+#' @param ont The ontology to insert
+#' @param name The name of the new ontology
+#' @param scheme The scheme to use for this ontology
+#' @export
+populate_provider <- function(host = "127.0.0.1", admin, pass, ont, name, scheme)
+{
+  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
+
+  # Sanitize the ontology
+  ont <- ont %>% stringr::str_replace_all("'", "''")
+
+  # Create the data frame holding the contents of the new table
+  data.frame(provider_path = ont, stringsAsFactors = F) %>%
+    # Insert the name of the ontology at the root
+    dplyr::mutate(provider_path = stringr::str_c("\\", name, "\\", concept_path)) %>%
+    # Populate the other columns
+    dplyr::mutate(name_char = stringr::str_extract(provider_path, "[^\\\\]+$"),
+                  provider_id = stringr::str_c(scheme, ":", name_char %>% stringr::str_extract("^.+? ") %>% stringr::str_trim()),
+                  provider_id = ifelse(is.na(provider_id), "", provider_id),
+                  provider_path = stringr::str_c(provider_path, "\\"),
+                  # Use only codes to build shorter paths
+                  provider_path = stringr::str_replace_all(provider_path, "\\\\(.+?) [^\\\\]+", "\\\\\\1"),
+                  update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+    # Push the dataframe into the new ontology table
+    dbPush(demodata, provider_dimension, .)
+
+  RPostgreSQL::dbDisconnect(demodata)
+}
+
 #' Add patients to the CRC cell
 #'
 #' Add patients to the CRC cell, generate new encrypted IDs,
@@ -392,3 +432,5 @@ add_encounters <- function(host, admin, pass, encounters, project)
 
   RPostgreSQL::dbDisconnect(demodata)
 }
+
+
