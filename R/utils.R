@@ -31,7 +31,11 @@ dbPush <- function(con, table, df)
     df %>%
       apply(1, function(oneline)
             {
-              oneline %>% stringr::str_c("'", ., "'", collapse = ",") %>% stringr::str_c("(", ., ")")
+              oneline[is.na(oneline)] <- "NULL"
+              oneline %>%
+                stringr::str_c("'", ., "'", collapse = ",") %>% 
+                stringr::str_c("(", ., ")") %>%
+                stringr::str_replace("'NULL'", "NULL")
             }) %>%
     stringr::str_c(collapse = ",") %>%
     stringr::str_c("INSERT INTO ", table, " (", columns, ") VALUES ", ., ";") %>%
