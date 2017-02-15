@@ -192,7 +192,7 @@ populate_ont <- function(host = "127.0.0.1", admin, pass, ont, modi = NULL, name
                   update_date = format(Sys.Date(), "%m/%d/%Y")) -> df
 
     if (!include_code)
-      df$c_name <- stringr::str_extract(c_name, " .*$") %>% stringr::str_trim()
+      df$c_name[df$c_hlevel > 0] <- df$c_name[df$c_hlevel > 0] %>% stringr::str_extract(" .*$") %>% stringr::str_trim()
 
     # Push the dataframe into the new ontology table
     dbPush(metadata, scheme, df)
