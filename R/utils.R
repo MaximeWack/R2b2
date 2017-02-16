@@ -41,3 +41,25 @@ dbPush <- function(con, table, df)
     stringr::str_c("INSERT INTO ", table, " (", columns, ") VALUES ", ., ";") %>%
     RPostgreSQL::dbGetQuery(conn = con, .)
 }
+
+#' Udpdate a dataframe into a database table
+#'
+#' @param con Database connection
+#' @param table Table in the database in which to push the dataframe
+#' @param df Dataframe to update into the database
+#' @param PK Character vector of the primary key(s)
+dbUpdate <- function(con, table, df, PK)
+{
+    df %>%
+      apply(1, function(oneline)
+            {
+              oneline[is.na(oneline)] <- "NULL"
+              stringr::str_c(names(oneline), " = '", oneline, "'", collapse = ",") %>%
+              stringr::str_replace("'NULL'", "NULL") -> set
+
+              stringr::str_c(PK, " = '", oneline[PK], "'", collapse = " AND ") -> where
+
+              stringr::str_c("UPDATE ", table, " SET ", set, " WHERE ", where, ";") %>%
+              RPostgreSQL::dbGetQuery(conn = con, .)
+            })
+}
