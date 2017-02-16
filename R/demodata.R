@@ -396,6 +396,21 @@ add_patients_demodata <- function(host, admin, pass, patients, project)
     dplyr::select(-patient_ide, -birthdate, -deathdate, -gender) %>%
     dbPush(con = demodata, table = "patient_dimension", .)
 
+# Update the existing patients
+  patients %>%
+    dplyr::mutate(patient_ide = patient_ide %>% as.character) %>%
+    dplyr::left_join(existing) %>%
+    dplyr::mutate(birth_date = ifelse(is.na(birthdate), "", format(birthdate, format = "%m/%d/%Y %H:%M:%S")),
+           death_date = ifelse(is.na(deathdate), NA, format(deathdate, format = "%m/%d/%Y %H:%M:%S")),
+           vital_status_cd = ifelse(is.na(deathdate), "", "S"),
+           sex_cd = gender,
+           age_in_years_num = ifelse(is.na(deathdate), floor(as.numeric(Sys.Date() - birthdate)/365.25), floor(as.numeric(deathdate - birthdate)/365.25)),
+           patient_num = as.character(patient_num),
+           update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+    dplyr::select(-patient_ide, -birthdate, -deathdate, -gender, -patient_ide_source) %>%
+    dbUpdate(con = demodata, table = "patient_dimension", ., "patient_num")
+
+
   RPostgreSQL::dbDisconnect(demodata)
 }
 
