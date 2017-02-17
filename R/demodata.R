@@ -546,4 +546,41 @@ add_encounters <- function(host, admin, pass, encounters, project, patient_mappi
     purrr::dmap(as.character)
 }
 
+add_observations <- function(host, admin, pass, observations, patient_mapping, encounter_mapping)
+{
+  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
+
+  observations %>%
+    dplyr::mutate(encounter_ide = encounter_ide %>% as.character) %>%
+    dplyr::left_join(patient_mapping) %>%
+    dplyr::left_join(encounter_mapping) %>%
+    dplyr::select(-patient_ide, -encounter_ide) -> observations
+
+  src_postgres("i2b2demodata", host, user = admin, password = pass) %>%
+    tbl("observation_fact") %>%
+    filter(encounter_num %in% observations$encounter_num &
+           patient_num %in% observations$patient_num &
+           concept_cd %in% observations$concept_cd &
+           provider_id %in% observations$provider_id &
+           start_date %in% observations$start_date &
+           modifier_cd %in% observations$modifier_cd) %>%
+    select(encounter_num, patient_num, concept_cd, provider_id, start_date, modifier_cd) -> existing
+
+  observations %>%
+    anti_join(existing) -> new_observations
+
+  observations %>%
+    left_join(existing) -> old_observations
+
+  new_observations %>%
+    mutate(start_date = ifelse(is.na(startdate), "", format(startdate, format = "%m/%d/%Y %H:%M:%S")),
+           update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+  dbPush(con = demodata, table = "observation_fact", .)
+
+  old_observations %>%
+    mutate(start_date = ifelse(is.na(startdate), "", format(startdate, format = "%m/%d/%Y %H:%M:%S")),
+           update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+  dbUpdate(con = demodata, table = "observation_fact", ., c("encounter_num", "patient_num", "concept_cd", "start_date"))
+
+  RPostgreSQL::dbDisconnect(demodata)
 }
