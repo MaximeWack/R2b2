@@ -29,7 +29,7 @@ Add encounters to the CRC cell, generate new encrypted IDs
 The encounters dataframe must contain the following columns:
 - encounter_ide: the original encounter ID
 - patient_ide: the original patient ID
-- startdate: the start date of the encounter
-- enddate: the end date of the encounter
+- startdate: the start date of the encounter, as Date object
+- enddate: the end date of the encounter, as Date object
 - inout: I or O if inpatient or outpatient
 }

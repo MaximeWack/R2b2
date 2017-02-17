@@ -27,6 +27,6 @@ Add patients to the CRC cell, generate new encrypted IDs,
 The patients dataframe must contain the following columns:
 - patient_ide: the original patient ID
 - birthdate: as a Date object
-- deathdate
+- deathdate: as a Date object
 - gender (F or M)
 }
