@@ -425,7 +425,8 @@ add_patients_demodata <- function(host, admin, pass, patients, project)
               dplyr::inner_join(existing, by = "patient_ide") %>%
               dplyr::select(patient_ide, patient_num)) %>%
     dplyr::mutate(patient_num = patient_num %>% as.character) %>%
-    dplyr::distinct
+    dplyr::distinct %>%
+    purrr::dmap(as.character)
 }
 
 #' Add encounters to the CRC cell
@@ -541,5 +542,8 @@ add_encounters <- function(host, admin, pass, encounters, project, patient_mappi
               dplyr::inner_join(existing, by = "encounter_ide") %>%
               dplyr::select(encounter_ide, encounter_num)) %>%
     dplyr::mutate(encounter_num = encounter_num %>% as.character) %>%
-    dplyr::distinct
+    dplyr::distinct() %>%
+    purrr::dmap(as.character)
+}
+
 }
