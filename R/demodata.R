@@ -419,13 +419,13 @@ add_patients_demodata <- function(host, admin, pass, patients, project)
   RPostgreSQL::dbDisconnect(demodata)
 
   patients %>%
-    inner_join(new_patients, by = "patient_ide") %>%
-    select(patient_ide, patient_num) %>%
-    bind_rows(patients %>%
-              inner_join(existing, by = "patient_ide") %>%
-              select(patient_ide, patient_num)) %>%
-    mutate(patient_num = patient_num %>% as.character) %>%
-    distinct
+    dplyr::inner_join(new_patients, by = "patient_ide") %>%
+    dplyr::select(patient_ide, patient_num) %>%
+    dplyr::bind_rows(patients %>%
+              dplyr::inner_join(existing, by = "patient_ide") %>%
+              dplyr::select(patient_ide, patient_num)) %>%
+    dplyr::mutate(patient_num = patient_num %>% as.character) %>%
+    dplyr::distinct
 }
 
 add_encounters <- function(host, admin, pass, encounters, project)
