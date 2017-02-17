@@ -363,24 +363,30 @@ add_patients_demodata <- function(host, admin, pass, patients, project)
     dplyr::anti_join(existing) %>%
     dplyr::mutate(patient_num = seq(new_id_start, length.out = nrow(.))) -> new_patients
 
-# Push the new patient mappings
-  new_patients %>%
-    dplyr::mutate(patient_ide_source = project,
-                  patient_num = as.character(patient_num),
-                  patient_ide_status  = "A",
-                  project_id = project,
-                  update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
-  dbPush(con = demodata, table = "patient_mapping", .)
+  # Push the new patient mappings
+  if (nrow(new_patients) > 0)
+  {
+    new_patients %>%
+      dplyr::mutate(patient_ide_source = project,
+                    patient_num = as.character(patient_num),
+                    patient_ide_status  = "A",
+                    project_id = project,
+                    update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+    dbPush(con = demodata, table = "patient_mapping", .)
+  }
 
-# Push the new patient mappings for HIVE
-  new_patients %>%
-    dplyr::mutate(patient_ide_source = "HIVE",
-                  patient_num = as.character(patient_num),
-                  patient_ide = as.character(patient_num),
-                  patient_ide_status  = "A",
-                  project_id = project,
-                  update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
-  dbPush(con = demodata, table = "patient_mapping", .)
+  # Push the new patient mappings for HIVE
+  if (nrow(new_patients) > 0)
+  {
+    new_patients %>%
+      dplyr::mutate(patient_ide_source = "HIVE",
+                    patient_num = as.character(patient_num),
+                    patient_ide = as.character(patient_num),
+                    patient_ide_status  = "A",
+                    project_id = project,
+                    update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+    dbPush(con = demodata, table = "patient_mapping", .)
+  }
 
 # Push the new patient dimension
   patients %>%
