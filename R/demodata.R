@@ -335,8 +335,8 @@ populate_provider <- function(host = "127.0.0.1", admin, pass, ont, name, scheme
 #'
 #' The patients dataframe must contain the following columns:
 #' - patient_ide: the original patient ID
-#' - birthdate: as a Date object
-#' - deathdate: as a Date object
+#' - birth_date: as a Date object
+#' - death_date: as a Date object
 #' - gender (F or M)
 #'
 #' @param host The host to connect to
@@ -392,28 +392,28 @@ add_patients_demodata <- function(host, admin, pass, patients, project)
   patients %>%
     dplyr::mutate(patient_ide = patient_ide %>% as.character) %>%
     dplyr::right_join(new_patients) %>%
-    dplyr::mutate(birth_date = ifelse(is.na(birthdate), "", format(birthdate, format = "%m/%d/%Y %H:%M:%S")),
-           death_date = ifelse(is.na(deathdate), NA, format(deathdate, format = "%m/%d/%Y %H:%M:%S")),
-           vital_status_cd = ifelse(is.na(deathdate), "", "S"),
+    dplyr::mutate(birth_date = ifelse(is.na(birth_date), "", format(birth_date, format = "%m/%d/%Y %H:%M:%S")),
+           death_date = ifelse(is.na(death_date), NA, format(death_date, format = "%m/%d/%Y %H:%M:%S")),
+           vital_status_cd = ifelse(is.na(death_date), "", "S"),
            sex_cd = gender,
-           age_in_years_num = ifelse(is.na(deathdate), floor(as.numeric(Sys.Date() - birthdate)/365.25), floor(as.numeric(deathdate - birthdate)/365.25)),
+           age_in_years_num = ifelse(is.na(death_date), floor(as.numeric(Sys.Date() - birth_date)/365.25), floor(as.numeric(death_date - birth_date)/365.25)),
            patient_num = as.character(patient_num),
            update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
-    dplyr::select(-patient_ide, -birthdate, -deathdate, -gender) %>%
+    dplyr::select(-patient_ide, -gender) %>%
     dbPush(con = demodata, table = "patient_dimension", .)
 
 # Update the existing patients in patient_dimension
   patients %>%
     dplyr::mutate(patient_ide = patient_ide %>% as.character) %>%
     dplyr::inner_join(existing) %>%
-    dplyr::mutate(birth_date = ifelse(is.na(birthdate), "", format(birthdate, format = "%m/%d/%Y %H:%M:%S")),
-           death_date = ifelse(is.na(deathdate), NA, format(deathdate, format = "%m/%d/%Y %H:%M:%S")),
-           vital_status_cd = ifelse(is.na(deathdate), "", "S"),
+    dplyr::mutate(birth_date = ifelse(is.na(birth_date), "", format(birth_date, format = "%m/%d/%Y %H:%M:%S")),
+           death_date = ifelse(is.na(death_date), NA, format(death_date, format = "%m/%d/%Y %H:%M:%S")),
+           vital_status_cd = ifelse(is.na(death_date), "", "S"),
            sex_cd = gender,
-           age_in_years_num = ifelse(is.na(deathdate), floor(as.numeric(Sys.Date() - birthdate)/365.25), floor(as.numeric(deathdate - birthdate)/365.25)),
+           age_in_years_num = ifelse(is.na(death_date), floor(as.numeric(Sys.Date() - birth_date)/365.25), floor(as.numeric(death_date - birth_date)/365.25)),
            patient_num = as.character(patient_num),
            update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
-    dplyr::select(-patient_ide, -birthdate, -deathdate, -gender, -patient_ide_source) %>%
+    dplyr::select(-patient_ide, -gender, -patient_ide_source) %>%
     dbUpdate(con = demodata, table = "patient_dimension", ., "patient_num")
 
   RPostgreSQL::dbDisconnect(demodata)
@@ -436,8 +436,8 @@ add_patients_demodata <- function(host, admin, pass, patients, project)
 #' The encounters dataframe must contain the following columns:
 #' - encounter_ide: the original encounter ID
 #' - patient_ide: the original patient ID
-#' - startdate: the start date of the encounter, as Date object
-#' - enddate: the end date of the encounter, as Date object
+#' - start_date: the start date of the encounter, as Date object
+#' - end_date: the end date of the encounter, as Date object
 #' - inout: I or O if inpatient or outpatient
 #'
 #' @param host The host to connect to
@@ -466,7 +466,7 @@ add_encounters <- function(host, admin, pass, encounters, project, patient_mappi
     dplyr::anti_join(existing, by = "encounter_ide") %>%
     dplyr::mutate(encounter_num = seq(new_id_start, length.out = nrow(.))) %>%
     dplyr::left_join(patient_mapping) %>%
-    dplyr::select(-patient_ide, -startdate, -enddate, -inout) -> new_encounters
+    dplyr::select(-patient_ide, -start_date, -end_date, -inout) -> new_encounters
 
   # Push the new encounter mappings
   if (nrow(new_encounters) > 0)
@@ -503,15 +503,15 @@ add_encounters <- function(host, admin, pass, encounters, project, patient_mappi
   encounters %>%
     dplyr::mutate(encounter_ide = encounter_ide %>% as.character) %>%
     dplyr::right_join(new_encounters) %>%
-    dplyr::mutate(start_date = ifelse(is.na(startdate), "", format(startdate, format = "%m/%d/%Y %H:%M:%S")),
-           end_date = ifelse(is.na(enddate), NA, format(enddate, format = "%m/%d/%Y %H:%M:%S")),
-           active_status_cd = ifelse(is.na(enddate), "O", ""),
+    dplyr::mutate(start_date = ifelse(is.na(start_date), "", format(start_date, format = "%m/%d/%Y %H:%M:%S")),
+           end_date = ifelse(is.na(end_date), NA, format(end_date, format = "%m/%d/%Y %H:%M:%S")),
+           active_status_cd = ifelse(is.na(end_date), "O", ""),
            inout_cd = inout,
-           length_of_stay = ifelse(is.na(enddate), floor(as.numeric(Sys.Date() - startdate)), floor(as.numeric(enddate - startdate))),
+           length_of_stay = ifelse(is.na(end_date), floor(as.numeric(Sys.Date() - start_date)), floor(as.numeric(end_date - start_date))),
            encounter_num = as.character(encounter_num),
            patient_num = as.character(patient_num),
            update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
-    dplyr::select(-encounter_ide, -patient_ide, -startdate, -enddate, -inout) %>%
+    dplyr::select(-encounter_ide, -patient_ide, -end_date, -inout) %>%
     dbPush(con = demodata, table = "visit_dimension", .)
 
 # Update the existing encounters in visit_dimension
@@ -520,15 +520,15 @@ add_encounters <- function(host, admin, pass, encounters, project, patient_mappi
     dplyr::select(-patient_ide) %>%
     dplyr::mutate(encounter_ide = encounter_ide %>% as.character) %>%
     dplyr::inner_join(existing, by = "encounter_ide") %>%
-    dplyr::mutate(start_date = ifelse(is.na(startdate), "", format(startdate, format = "%m/%d/%Y %H:%M:%S")),
-           end_date = ifelse(is.na(enddate), NA, format(enddate, format = "%m/%d/%Y %H:%M:%S")),
-           active_status_cd = ifelse(is.na(enddate), "O", ""),
+    dplyr::mutate(start_date = ifelse(is.na(start_date), "", format(start_date, format = "%m/%d/%Y %H:%M:%S")),
+           end_date = ifelse(is.na(end_date), NA, format(end_date, format = "%m/%d/%Y %H:%M:%S")),
+           active_status_cd = ifelse(is.na(end_date), "O", ""),
            inout_cd = inout,
-           length_of_stay = ifelse(is.na(enddate), floor(as.numeric(Sys.Date() - startdate)), floor(as.numeric(enddate - startdate))),
+           length_of_stay = ifelse(is.na(end_date), floor(as.numeric(Sys.Date() - start_date)), floor(as.numeric(end_date - start_date))),
            encounter_num = as.character(encounter_num),
            patient_num = as.character(patient_num),
            update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
-    dplyr::select(-encounter_ide, -patient_ide, -startdate, -enddate, -inout) %>%
+    dplyr::select(-encounter_ide, -patient_ide, -inout) %>%
     dbUpdate(con = demodata, table = "visit_dimension", ., "encounter_num")
 
   RPostgreSQL::dbDisconnect(demodata)
@@ -573,12 +573,12 @@ add_observations <- function(host, admin, pass, observations, patient_mapping, e
     left_join(existing) -> old_observations
 
   new_observations %>%
-    mutate(start_date = ifelse(is.na(startdate), "", format(startdate, format = "%m/%d/%Y %H:%M:%S")),
+    mutate(start_date = ifelse(is.na(start_date), "", format(start_date, format = "%m/%d/%Y %H:%M:%S")),
            update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
   dbPush(con = demodata, table = "observation_fact", .)
 
   old_observations %>%
-    mutate(start_date = ifelse(is.na(startdate), "", format(startdate, format = "%m/%d/%Y %H:%M:%S")),
+    mutate(start_date = ifelse(is.na(start_date), "", format(start_date, format = "%m/%d/%Y %H:%M:%S")),
            update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
   dbUpdate(con = demodata, table = "observation_fact", ., c("encounter_num", "patient_num", "concept_cd", "start_date"))
 
