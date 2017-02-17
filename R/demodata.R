@@ -336,7 +336,7 @@ populate_provider <- function(host = "127.0.0.1", admin, pass, ont, name, scheme
 #' The patients dataframe must contain the following columns:
 #' - patient_ide: the original patient ID
 #' - birthdate: as a Date object
-#' - deathdate
+#' - deathdate: as a Date object
 #' - gender (F or M)
 #'
 #' @param host The host to connect to
@@ -435,8 +435,8 @@ add_patients_demodata <- function(host, admin, pass, patients, project)
 #' The encounters dataframe must contain the following columns:
 #' - encounter_ide: the original encounter ID
 #' - patient_ide: the original patient ID
-#' - startdate: the start date of the encounter
-#' - enddate: the end date of the encounter
+#' - startdate: the start date of the encounter, as Date object
+#' - enddate: the end date of the encounter, as Date object
 #' - inout: I or O if inpatient or outpatient
 #'
 #' @param host The host to connect to
