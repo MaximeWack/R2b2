@@ -447,18 +447,35 @@ add_encounters <- function(host, admin, pass, encounters, project)
     dplyr::select(-patient_ide, -startdate, -enddate, -inout) -> new_encounters
 
                   encounter_ide_status  = "A",
-                  project_id = project,
-                  update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
-  dbPush(con = demodata, table = "encounter_mapping", .)
+  if (nrow(new_encounters) > 0)
+  {
+    new_encounters %>%
+      dplyr::mutate(encounter_ide_source = project,
+                    encounter_num = as.character(encounter_num),
+                    patient_num = as.character(patient_num),
+                    encounter_ide_status  = "A",
+                    project_id = project,
+                    patient_ide_source = "HIVE",
+                    update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+      dplyr::rename(patient_ide = patient_num) %>%
+    dbPush(con = demodata, table = "encounter_mapping", .)
+  }
 
-  new_patients %>%
-    dplyr::mutate(encounter_ide_source = "HIVE",
-                  encounter_num = as.character(encounter_num),
-                  encounter_ide = as.character(encounter_num),
-                  encounter_ide_status  = "A",
-                  project_id = project,
-                  update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
-  dbPush(con = demodata, table = "encounter_mapping", .)
+  if (nrow(new_encounters) > 0)
+  {
+    new_encounters %>%
+      dplyr::mutate(encounter_ide_source = "HIVE",
+                    encounter_num = as.character(encounter_num),
+                    encounter_ide = as.character(encounter_num),
+                    patient_num = as.character(patient_num),
+                    encounter_ide_status  = "A",
+                    project_id = project,
+                    patient_ide_source = "HIVE",
+                    update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+      dplyr::rename(patient_ide = patient_num) %>%
+    dbPush(con = demodata, table = "encounter_mapping", .)
+  }
+
 
   RPostgreSQL::dbDisconnect(demodata)
 }
