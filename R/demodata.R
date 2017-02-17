@@ -405,7 +405,7 @@ add_patients_demodata <- function(host, admin, pass, patients, project)
 # Update the existing patients in patient_dimension
   patients %>%
     dplyr::mutate(patient_ide = patient_ide %>% as.character) %>%
-    dplyr::left_join(existing) %>%
+    dplyr::inner_join(existing) %>%
     dplyr::mutate(birth_date = ifelse(is.na(birthdate), "", format(birthdate, format = "%m/%d/%Y %H:%M:%S")),
            death_date = ifelse(is.na(deathdate), NA, format(deathdate, format = "%m/%d/%Y %H:%M:%S")),
            vital_status_cd = ifelse(is.na(deathdate), "", "S"),
