@@ -439,13 +439,13 @@ add_encounters <- function(host, admin, pass, encounters, project)
 
   new_id_start <- ifelse(nrow(existing) == 0, 100000001, existing$encounter_num %>% as.numeric %>% max + 1)
 
-  data.frame(encounter_ide = as.character(patients$encounter_ide), stringsAsFactors = F) %>%
-    dplyr::anti_join(existing) %>%
-    dplyr::mutate(encounter_num = seq(new_id_start, length.out = nrow(.))) -> new_encounters
+  encounters %>%
+    dplyr::mutate(encounter_ide = encounter_ide %>% as.character) %>%
+    dplyr::anti_join(existing, by = "encounter_ide") %>%
+    dplyr::mutate(encounter_num = seq(new_id_start, length.out = nrow(.))) %>%
+    dplyr::left_join(patient_mapping) %>%
+    dplyr::select(-patient_ide, -startdate, -enddate, -inout) -> new_encounters
 
-  new_encounters %>%
-    dplyr::mutate(encounter_ide_source = project,
-                  encounter_num = as.character(encounter_num),
                   encounter_ide_status  = "A",
                   project_id = project,
                   update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
