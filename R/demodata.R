@@ -428,15 +428,36 @@ add_patients_demodata <- function(host, admin, pass, patients, project)
     dplyr::distinct
 }
 
-add_encounters <- function(host, admin, pass, encounters, project)
+#' Add encounters to the CRC cell
+#'
+#' Add encounters to the CRC cell, generate new encrypted IDs
+#'
+#' The encounters dataframe must contain the following columns:
+#' - encounter_ide: the original encounter ID
+#' - patient_ide: the original patient ID
+#' - startdate: the start date of the encounter
+#' - enddate: the end date of the encounter
+#' - inout: I or O if inpatient or outpatient
+#'
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass The password for the admin account
+#' @param encounters A dataframe of patients
+#' @param project The project to add the patients to
+#' @param patient_mapping The patient mapping table for the patients
+#' @return An encounter mapping dataframe for the encounters
+#' @export
+add_encounters <- function(host, admin, pass, encounters, project, patient_mapping)
 {
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
 
+# Get existing encounters
   dplyr::src_postgres("i2b2demodata", host, user = admin, password = pass) %>%
     dplyr::tbl("encounter_mapping") %>%
     dplyr::select(encounter_ide, encounter_num, patient_ide) %>%
     dplyr::collect(n = Inf) -> existing
 
+# Create the new encounter mappings
   new_id_start <- ifelse(nrow(existing) == 0, 100000001, existing$encounter_num %>% as.numeric %>% max + 1)
 
   encounters %>%
@@ -446,7 +467,7 @@ add_encounters <- function(host, admin, pass, encounters, project)
     dplyr::left_join(patient_mapping) %>%
     dplyr::select(-patient_ide, -startdate, -enddate, -inout) -> new_encounters
 
-                  encounter_ide_status  = "A",
+  # Push the new encounter mappings
   if (nrow(new_encounters) > 0)
   {
     new_encounters %>%
@@ -461,6 +482,7 @@ add_encounters <- function(host, admin, pass, encounters, project)
     dbPush(con = demodata, table = "encounter_mapping", .)
   }
 
+  # Push the new encounter mappings
   if (nrow(new_encounters) > 0)
   {
     new_encounters %>%
@@ -476,6 +498,7 @@ add_encounters <- function(host, admin, pass, encounters, project)
     dbPush(con = demodata, table = "encounter_mapping", .)
   }
 
+# Push the new encounters in visit_dimension
   encounters %>%
     dplyr::mutate(encounter_ide = encounter_ide %>% as.character) %>%
     dplyr::right_join(new_encounters) %>%
@@ -490,6 +513,7 @@ add_encounters <- function(host, admin, pass, encounters, project)
     dplyr::select(-encounter_ide, -patient_ide, -startdate, -enddate, -inout) %>%
     dbPush(con = demodata, table = "visit_dimension", .)
 
+# Update the existing encounters in visit_dimension
   encounters %>%
     dplyr::left_join(patient_mapping) %>%
     dplyr::select(-patient_ide) %>%
