@@ -507,4 +507,15 @@ add_encounters <- function(host, admin, pass, encounters, project)
     dbUpdate(con = demodata, table = "visit_dimension", ., "encounter_num")
 
   RPostgreSQL::dbDisconnect(demodata)
+
+  encounters %>%
+    dplyr::mutate(encounter_ide = encounter_ide %>% as.character) %>%
+    dplyr::inner_join(new_encounters, by = "encounter_ide") %>%
+    dplyr::select(encounter_ide, encounter_num) %>%
+    dplyr::bind_rows(encounters %>%
+              dplyr::mutate(encounter_ide = encounter_ide %>% as.character) %>%
+              dplyr::inner_join(existing, by = "encounter_ide") %>%
+              dplyr::select(encounter_ide, encounter_num)) %>%
+    dplyr::mutate(encounter_num = encounter_num %>% as.character) %>%
+    dplyr::distinct
 }
