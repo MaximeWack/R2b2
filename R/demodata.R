@@ -332,7 +332,6 @@ populate_provider <- function(host = "127.0.0.1", admin, pass, ont, name, scheme
 #' Add patients to the CRC cell
 #'
 #' Add patients to the CRC cell, generate new encrypted IDs,
-#' and create a project site if needed
 #'
 #' The patients dataframe must contain the following columns:
 #' - patient_ide: the original patient ID
@@ -345,6 +344,7 @@ populate_provider <- function(host = "127.0.0.1", admin, pass, ont, name, scheme
 #' @param pass The password for the admin account
 #' @param patients A dataframe of patients
 #' @param project The project to add the patients to
+#' @return A patient mapping dataframe for the patients
 #' @export
 add_patients_demodata <- function(host, admin, pass, patients, project)
 {
@@ -388,7 +388,7 @@ add_patients_demodata <- function(host, admin, pass, patients, project)
     dbPush(con = demodata, table = "patient_mapping", .)
   }
 
-# Push the new patient dimension
+# Push the new patients in patient_dimension
   patients %>%
     dplyr::mutate(patient_ide = patient_ide %>% as.character) %>%
     dplyr::right_join(new_patients) %>%
@@ -402,7 +402,7 @@ add_patients_demodata <- function(host, admin, pass, patients, project)
     dplyr::select(-patient_ide, -birthdate, -deathdate, -gender) %>%
     dbPush(con = demodata, table = "patient_dimension", .)
 
-# Update the existing patients
+# Update the existing patients in patient_dimension
   patients %>%
     dplyr::mutate(patient_ide = patient_ide %>% as.character) %>%
     dplyr::left_join(existing) %>%
@@ -416,8 +416,16 @@ add_patients_demodata <- function(host, admin, pass, patients, project)
     dplyr::select(-patient_ide, -birthdate, -deathdate, -gender, -patient_ide_source) %>%
     dbUpdate(con = demodata, table = "patient_dimension", ., "patient_num")
 
-
   RPostgreSQL::dbDisconnect(demodata)
+
+  patients %>%
+    inner_join(new_patients, by = "patient_ide") %>%
+    select(patient_ide, patient_num) %>%
+    bind_rows(patients %>%
+              inner_join(existing, by = "patient_ide") %>%
+              select(patient_ide, patient_num)) %>%
+    mutate(patient_num = patient_num %>% as.character) %>%
+    distinct
 }
 
 add_encounters <- function(host, admin, pass, encounters, project)

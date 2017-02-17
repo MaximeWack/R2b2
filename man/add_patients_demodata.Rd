@@ -17,9 +17,11 @@ add_patients_demodata(host, admin, pass, patients, project)
 
 \item{project}{The project to add the patients to}
 }
+\value{
+A patient mapping dataframe for the patients
+}
 \description{
 Add patients to the CRC cell, generate new encrypted IDs,
-and create a project site if needed
 }
 \details{
 The patients dataframe must contain the following columns:
