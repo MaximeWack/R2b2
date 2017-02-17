@@ -476,6 +476,35 @@ add_encounters <- function(host, admin, pass, encounters, project)
     dbPush(con = demodata, table = "encounter_mapping", .)
   }
 
+  encounters %>%
+    dplyr::mutate(encounter_ide = encounter_ide %>% as.character) %>%
+    dplyr::right_join(new_encounters) %>%
+    dplyr::mutate(start_date = ifelse(is.na(startdate), "", format(startdate, format = "%m/%d/%Y %H:%M:%S")),
+           end_date = ifelse(is.na(enddate), NA, format(enddate, format = "%m/%d/%Y %H:%M:%S")),
+           active_status_cd = ifelse(is.na(enddate), "O", ""),
+           inout_cd = inout,
+           length_of_stay = ifelse(is.na(enddate), floor(as.numeric(Sys.Date() - startdate)), floor(as.numeric(enddate - startdate))),
+           encounter_num = as.character(encounter_num),
+           patient_num = as.character(patient_num),
+           update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+    dplyr::select(-encounter_ide, -patient_ide, -startdate, -enddate, -inout) %>%
+    dbPush(con = demodata, table = "visit_dimension", .)
+
+  encounters %>%
+    dplyr::left_join(patient_mapping) %>%
+    dplyr::select(-patient_ide) %>%
+    dplyr::mutate(encounter_ide = encounter_ide %>% as.character) %>%
+    dplyr::inner_join(existing, by = "encounter_ide") %>%
+    dplyr::mutate(start_date = ifelse(is.na(startdate), "", format(startdate, format = "%m/%d/%Y %H:%M:%S")),
+           end_date = ifelse(is.na(enddate), NA, format(enddate, format = "%m/%d/%Y %H:%M:%S")),
+           active_status_cd = ifelse(is.na(enddate), "O", ""),
+           inout_cd = inout,
+           length_of_stay = ifelse(is.na(enddate), floor(as.numeric(Sys.Date() - startdate)), floor(as.numeric(enddate - startdate))),
+           encounter_num = as.character(encounter_num),
+           patient_num = as.character(patient_num),
+           update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+    dplyr::select(-encounter_ide, -patient_ide, -startdate, -enddate, -inout) %>%
+    dbUpdate(con = demodata, table = "visit_dimension", ., "encounter_num")
 
   RPostgreSQL::dbDisconnect(demodata)
 }
