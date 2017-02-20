@@ -283,7 +283,7 @@ populate_concept <- function(host = "127.0.0.1", admin, pass, ont, modi, name, s
                     update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
     dplyr::select(-modi) %>%
     # Push the dataframe into the new ontology table
-    dbPush(con = demodata, table = "concept_dimension", .)
+    dbPush(con = demodata, table = "modifier_dimension", .)
   }
 
   RPostgreSQL::dbDisconnect(demodata)
@@ -306,6 +306,8 @@ populate_concept <- function(host = "127.0.0.1", admin, pass, ont, modi, name, s
 #' @export
 populate_provider <- function(host = "127.0.0.1", admin, pass, ont, name, scheme)
 {
+  options(scipen = 999)
+
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
 
   # Sanitize the ontology
@@ -314,7 +316,7 @@ populate_provider <- function(host = "127.0.0.1", admin, pass, ont, name, scheme
   # Create the data frame holding the contents of the new table
   data.frame(provider_path = ont, stringsAsFactors = F) %>%
     # Insert the name of the ontology at the root
-    dplyr::mutate(provider_path = stringr::str_c("\\", name, "\\", concept_path)) %>%
+    dplyr::mutate(provider_path = stringr::str_c("\\", name, "\\", provider_path)) %>%
     # Populate the other columns
     dplyr::mutate(name_char = stringr::str_extract(provider_path, "[^\\\\]+$"),
                   provider_id = stringr::str_c(scheme, ":", name_char %>% stringr::str_extract("^.+? ") %>% stringr::str_trim()),
@@ -348,6 +350,8 @@ populate_provider <- function(host = "127.0.0.1", admin, pass, ont, name, scheme
 #' @export
 add_patients_demodata <- function(host, admin, pass, patients, project)
 {
+  options(scipen = 999)
+
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
 
 # Get the existing patient mappings
@@ -461,6 +465,8 @@ add_patients_demodata <- function(host, admin, pass, patients, project)
 #' @export
 add_encounters <- function(host, admin, pass, encounters, project, patient_mapping)
 {
+  options(scipen = 999)
+
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
 
 # Get existing encounters
@@ -566,6 +572,8 @@ add_encounters <- function(host, admin, pass, encounters, project, patient_mappi
 
 add_observations <- function(host, admin, pass, observations, patient_mapping, encounter_mapping)
 {
+  options(scipen = 999)
+
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
 
   observations %>%
@@ -582,13 +590,17 @@ add_observations <- function(host, admin, pass, observations, patient_mapping, e
            provider_id %in% observations$provider_id &
            start_date %in% observations$start_date &
            modifier_cd %in% observations$modifier_cd) %>%
-    select(encounter_num, patient_num, concept_cd, provider_id, start_date, modifier_cd) -> existing
+    select(encounter_num, patient_num, concept_cd, provider_id, start_date, modifier_cd) %>%
+    collect(n = Inf) -> existing
+
+  if (nrow(existing) == 0)
+    existing <- data.frame(encounter_num = character(0), patient_num = character(0), concept_cd = character(0), provider_id = character(0), start_date = as.Date(character(0)), modifier_cd = character(0))
 
   observations %>%
     anti_join(existing) -> new_observations
 
   observations %>%
-    left_join(existing) -> old_observations
+    inner_join(existing) -> old_observations
 
   new_observations %>%
     mutate(start_date = ifelse(is.na(start_date), "", format(start_date, format = "%m/%d/%Y %H:%M:%S")),

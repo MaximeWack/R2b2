@@ -95,6 +95,8 @@ clear_project_sites <- function(host, admin, pass)
 #' @export
 add_patients_imdata <- function(host, admin, pass, patients, project)
 {
+  options(scipen = 999)
+
   imdata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2imdata", user = admin, password = pass)
 
 # Get the existing patient mappings
