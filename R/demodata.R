@@ -360,12 +360,18 @@ add_patients_demodata <- function(host, admin, pass, patients, project)
     dplyr::select(patient_ide,patient_ide_source, patient_num) %>%
     dplyr::collect(n = Inf) -> existing
 
+  if (nrow(existing) == 0)
+    existing <- data.frame(patient_ide = character(0), patient_num = character(0))
+
 # Create the new patient mappings
   new_id_start <- ifelse(nrow(existing) == 0, 100000001, existing$patient_num %>% as.numeric %>% max + 1)
 
   data.frame(patient_ide = as.character(patients$patient_ide), stringsAsFactors = F) %>%
-    try(dplyr::anti_join(existing)) %>%
+    dplyr::anti_join(existing) %>%
     dplyr::mutate(patient_num = seq(new_id_start, length.out = nrow(.))) -> new_patients
+
+  if (nrow(new_patients) == 0)
+    new_patients = data.frame(patient_ide = character(0), patient_num = character(0))
 
   # Push the new patient mappings
   if (nrow(new_patients) > 0)
@@ -428,11 +434,6 @@ add_patients_demodata <- function(host, admin, pass, patients, project)
 
   RPostgreSQL::dbDisconnect(demodata)
 
-  if (nrow(new_patients) == 0)
-    new_patients = data.frame(patient_ide = character(0), patient_num = character(0))
-
-  if (nrow(existing) == 0)
-    existing = data.frame(patient_ide = character(0), patient_num = character(0))
 
   patients %>%
     dplyr::select(patient_ide) %>%
@@ -478,12 +479,18 @@ add_encounters <- function(host, admin, pass, encounters, project, patient_mappi
 # Create the new encounter mappings
   new_id_start <- ifelse(nrow(existing) == 0, 100000001, existing$encounter_num %>% as.numeric %>% max + 1)
 
+  if (nrow(existing) == 0)
+    existing = data.frame(encounter_ide = character(0), encounter_num = character(0), patient_num = character(0))
+
   encounters %>%
     dplyr::mutate(encounter_ide = encounter_ide %>% as.character) %>%
-    try(dplyr::anti_join(existing, by = "encounter_ide")) %>%
+    dplyr::anti_join(existing, by = "encounter_ide") %>%
     dplyr::mutate(encounter_num = seq(new_id_start, length.out = nrow(.))) %>%
     dplyr::left_join(patient_mapping) %>%
     dplyr::select(-patient_ide, -start_date, -end_date, -inout) -> new_encounters
+
+  if (nrow(new_encounters) == 0)
+    new_encounters = data.frame(encounter_ide = character(0), ecnounter_num = character(0), patient_num = character(0))
 
   # Push the new encounter mappings
   if (nrow(new_encounters) > 0)
@@ -550,12 +557,6 @@ add_encounters <- function(host, admin, pass, encounters, project, patient_mappi
   }
 
   RPostgreSQL::dbDisconnect(demodata)
-
-  if (nrow(new_encounters) == 0)
-    new_encounters = data.frame(encounter_ide = character(0), ecnounter_num = character(0), patient_num = character(0))
-
-  if (nrow(existing) == 0)
-    existing = data.frame(encounter_ide = character(0), encounter_num = character(0), patient_num = character(0))
 
   encounters %>%
     dplyr::mutate(encounter_ide = encounter_ide %>% as.character) %>%
