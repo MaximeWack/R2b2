@@ -67,17 +67,16 @@ delete_ont<- function(host = "127.0.0.1", admin, pass, scheme)
 #' @param pass the password for the admin account
 #' @param name The name of the new ontology
 #' @param scheme The scheme to use for this ontology
-#' @param description The description of the scheme
 #' @export
-add_ont <- function(host = "127.0.0.1", admin, pass, name, scheme, description)
+add_ont <- function(host = "127.0.0.1", admin, pass, name, scheme)
 {
   metadata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2metadata", user = admin, password = pass)
 
   # Insert the new scheme
-  RPostgreSQL::dbGetQuery(metadata, stringr::str_c("INSERT INTO schemes VALUES ('", scheme, ":', '", scheme, "', '", description, "');"))
+  RPostgreSQL::dbGetQuery(metadata, stringr::str_c("INSERT INTO schemes VALUES ('", scheme, ":', '", scheme, "');"))
 
   # Insert the table_acess entry
-  RPostgreSQL::dbGetQuery(metadata, stringr::str_c("INSERT INTO table_access VALUES ('", scheme, "', '", scheme, "', 'N', 0, '\\", name, "\\', '", name, "', 'N', 'FA', NULL, NULL, NULL, 'concept_cd', 'concept_dimension', 'concept_path', 'T', 'LIKE', '\\", name, "\\', NULL, '", description, "', NULL, NULL, NULL, NULL);"))
+  RPostgreSQL::dbGetQuery(metadata, stringr::str_c("INSERT INTO table_access VALUES ('", scheme, "', '", scheme, "', 'N', 0, '\\", name, "\\', '", name, "', 'N', 'FA', NULL, NULL, NULL, 'concept_cd', 'concept_dimension', 'concept_path', 'T', 'LIKE', '\\", name, "\\', NULL, NULL, NULL, NULL, NULL, NULL);"))
 
   # Create the new table
   RPostgreSQL::dbGetQuery(metadata, stringr::str_c("CREATE TABLE ", scheme, " (

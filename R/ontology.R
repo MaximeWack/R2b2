@@ -10,14 +10,13 @@
 #' @param pass the password for the admin account
 #' @param name The name of the new ontology
 #' @param scheme The scheme to use for this ontology
-#' @param description The description of the scheme
 #' @param ont The ontology to insert
 #' @param modi The modifiers to insert
 #' @param include_code Whether to include the code in the label or not
 #' @export
-add_ontology <- function(host = "127.0.0.1", admin, pass, name, scheme, description, ont, modi = NULL, include_code = T)
+add_ontology <- function(host = "127.0.0.1", admin, pass, name, scheme, ont, modi = NULL, include_code = T)
 {
-  add_ont(host, admin, pass, name, scheme, description)
+  add_ont(host, admin, pass, name, scheme)
 
   populate_ont(host, admin, pass, ont, modi, name, scheme, include_code)
 
