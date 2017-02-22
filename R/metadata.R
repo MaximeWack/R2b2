@@ -77,7 +77,7 @@ add_ont <- function(host = "127.0.0.1", admin, pass, name, scheme, description)
   RPostgreSQL::dbGetQuery(metadata, stringr::str_c("INSERT INTO schemes VALUES ('", scheme, ":', '", scheme, "', '", description, "');"))
 
   # Insert the table_acess entry
-  RPostgreSQL::dbGetQuery(metadata, stringr::str_c("INSERT INTO table_access VALUES ('", scheme, "', '", scheme, "', 'N', 0, '\\", name, "\\', '", name, "', 'N', 'CA', NULL, NULL, NULL, 'concept_cd', 'concept_dimension', 'concept_path', 'T', 'LIKE', '\\", name, "\\', NULL, '", description, "', NULL, NULL, NULL, NULL);"))
+  RPostgreSQL::dbGetQuery(metadata, stringr::str_c("INSERT INTO table_access VALUES ('", scheme, "', '", scheme, "', 'N', 0, '\\", name, "\\', '", name, "', 'N', 'FA', NULL, NULL, NULL, 'concept_cd', 'concept_dimension', 'concept_path', 'T', 'LIKE', '\\", name, "\\', NULL, '", description, "', NULL, NULL, NULL, NULL);"))
 
   # Create the new table
   RPostgreSQL::dbGetQuery(metadata, stringr::str_c("CREATE TABLE ", scheme, " (
@@ -171,7 +171,7 @@ populate_ont <- function(host = "127.0.0.1", admin, pass, ont, modi = NULL, name
     dplyr::distinct() %>%
     # Insert the name of the ontology at the root
     dplyr::mutate(c_fullname = stringr::str_c("\\", name, "\\", c_fullname)) %>%
-    dplyr::bind_rows(data.frame(c_fullname = stringr::str_c("\\", name), c_visualattributes = "CA")) %>%
+    dplyr::bind_rows(data.frame(c_fullname = stringr::str_c("\\", name), c_visualattributes = "FA")) %>%
     # Populate the other columns
     dplyr::mutate(c_hlevel = stringr::str_count(c_fullname, "\\\\") - 1,
                   c_name = stringr::str_extract(c_fullname, "[^\\\\]+$"),
