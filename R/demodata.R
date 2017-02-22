@@ -614,3 +614,11 @@ add_observations <- function(host, admin, pass, observations, patient_mapping, e
 
   RPostgreSQL::dbDisconnect(demodata)
 }
+
+rebuild_indexes_demodata <- function(host, admin, pass)
+{
+  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
+
+  RPostgreSQL::dbGetQuery(demodata, "REINDEX DATABASE i2b2demodata;")
+  RPostgreSQL::dbDisconnect(demodata)
+}
