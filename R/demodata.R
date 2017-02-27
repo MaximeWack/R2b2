@@ -613,13 +613,18 @@ add_observations <- function(host, admin, pass, observations, patient_mapping, e
            start_date %in% observations$start_date &
            modifier_cd %in% observations$modifier_cd) %>%
     dplyr::select(encounter_num, patient_num, concept_cd, provider_id, start_date, modifier_cd) %>%
-    dplyr::collect(n = Inf) %>%
+    dplyr::collect(n = Inf) -> existing
+
+  if (nrow(existing) == 0)
+  {
+    existing <- data.frame(encounter_num = character(0), patient_num = character(0), concept_cd = character(0), provider_id = character(0), start_date = as.Date(character(0)), modifier_cd = character(0))
+  } else
+  {
+    existing %>%
     dplyr::mutate(start_date = as.Date(start_date),
            patient_num = as.character(patient_num),
            encounter_num = as.character(encounter_num)) -> existing
-
-  if (nrow(existing) == 0)
-    existing <- data.frame(encounter_num = character(0), patient_num = character(0), concept_cd = character(0), provider_id = character(0), start_date = as.Date(character(0)), modifier_cd = character(0))
+  }
 
   observations %>%
     dplyr::anti_join(existing) -> new_observations
