@@ -583,17 +583,17 @@ add_observations <- function(host, admin, pass, observations, patient_mapping, e
     dplyr::left_join(encounter_mapping) %>%
     dplyr::select(-patient_ide, -encounter_ide) -> observations
 
-  src_postgres("i2b2demodata", host, user = admin, password = pass) %>%
-    tbl("observation_fact") %>%
-    filter(encounter_num %in% observations$encounter_num &
+  dplyr::src_postgres("i2b2demodata", host, user = admin, password = pass) %>%
+    dplyr::tbl("observation_fact") %>%
+    dplyr::filter(encounter_num %in% observations$encounter_num &
            patient_num %in% observations$patient_num &
            concept_cd %in% observations$concept_cd &
            provider_id %in% observations$provider_id &
            start_date %in% observations$start_date &
            modifier_cd %in% observations$modifier_cd) %>%
-    select(encounter_num, patient_num, concept_cd, provider_id, start_date, modifier_cd) %>%
-    collect(n = Inf) %>%
-    mutate(start_date = as.Date(start_date),
+    dplyr::select(encounter_num, patient_num, concept_cd, provider_id, start_date, modifier_cd) %>%
+    dplyr::collect(n = Inf) %>%
+    dplyr::mutate(start_date = as.Date(start_date),
            patient_num = as.character(patient_num),
            encounter_num = as.character(encounter_num)) -> existing
 
@@ -601,18 +601,18 @@ add_observations <- function(host, admin, pass, observations, patient_mapping, e
     existing <- data.frame(encounter_num = character(0), patient_num = character(0), concept_cd = character(0), provider_id = character(0), start_date = as.Date(character(0)), modifier_cd = character(0))
 
   observations %>%
-    anti_join(existing) -> new_observations
+    dplyr::anti_join(existing) -> new_observations
 
   observations %>%
-    inner_join(existing) -> old_observations
+    dplyr::inner_join(existing) -> old_observations
 
   new_observations %>%
-    mutate(start_date = ifelse(is.na(start_date), "", format(start_date, format = "%m/%d/%Y %H:%M:%S")),
+    dplyr::mutate(start_date = ifelse(is.na(start_date), "", format(start_date, format = "%m/%d/%Y %H:%M:%S")),
            update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
   dbPush(con = demodata, table = "observation_fact", .)
 
   old_observations %>%
-    mutate(start_date = ifelse(is.na(start_date), "", format(start_date, format = "%m/%d/%Y %H:%M:%S")),
+    dplyr::mutate(start_date = ifelse(is.na(start_date), "", format(start_date, format = "%m/%d/%Y %H:%M:%S")),
            update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
   dbUpdate(con = demodata, table = "observation_fact", ., c("encounter_num", "patient_num", "concept_cd", "start_date"))
 
