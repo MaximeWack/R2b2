@@ -461,7 +461,7 @@ add_patients_demodata <- function(host, admin, pass, patients, project)
 #' @param pass The password for the admin account
 #' @param encounters A dataframe of patients
 #' @param project The project to add the patients to
-#' @param patient_mapping The patient mapping table for the patients
+#' @param patient_mapping The patient mapping table
 #' @return An encounter mapping dataframe for the encounters
 #' @export
 add_encounters <- function(host, admin, pass, encounters, project, patient_mapping)
@@ -571,6 +571,27 @@ add_encounters <- function(host, admin, pass, encounters, project, patient_mappi
     purrr::dmap(as.character)
 }
 
+#' Add observations to the CRC cell
+#'
+#' Add observations to the CRC cell
+#'
+#' The observations dataframe must contain the following columns:
+#' - encounter_ide: the original encounter ID
+#' - patient_ide: the original patient ID
+#' - start_date: the start date of the encounter, as Date object
+#' - concept_cd: the concept to insert
+#' - provider_id: the provider
+#' - modifier_cd: optionnal modifier for the concept
+#' Other observation fact columns can optionnaly be included, 
+#' such as end_date, valtype_cd, tval_char, nval_num, valueflag_cd, units_cd, etc.
+#'
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass The password for the admin account
+#' @param observations A dataframe of observation facts
+#' @param patient_mapping The patient mapping table
+#' @param encounter_mapping The encounter mapping table
+#' @export
 add_observations <- function(host, admin, pass, observations, patient_mapping, encounter_mapping)
 {
   options(scipen = 999)
@@ -619,6 +640,14 @@ add_observations <- function(host, admin, pass, observations, patient_mapping, e
   RPostgreSQL::dbDisconnect(demodata)
 }
 
+#' Rebuild the indexes
+#'
+#' Rebuild the indexes in i2b2demodata
+#'
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass The password for the admin account
+#' @export
 rebuild_indexes_demodata <- function(host, admin, pass)
 {
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)

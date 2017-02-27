@@ -17,7 +17,7 @@ add_encounters(host, admin, pass, encounters, project, patient_mapping)
 
 \item{project}{The project to add the patients to}
 
-\item{patient_mapping}{The patient mapping table for the patients}
+\item{patient_mapping}{The patient mapping table}
 }
 \value{
 An encounter mapping dataframe for the encounters
@@ -29,7 +29,7 @@ Add encounters to the CRC cell, generate new encrypted IDs
 The encounters dataframe must contain the following columns:
 - encounter_ide: the original encounter ID
 - patient_ide: the original patient ID
-- startdate: the start date of the encounter, as Date object
-- enddate: the end date of the encounter, as Date object
+- start_date: the start date of the encounter, as Date object
+- end_date: the end date of the encounter, as Date object
 - inout: I or O if inpatient or outpatient
 }

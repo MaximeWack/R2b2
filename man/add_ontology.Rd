@@ -4,7 +4,7 @@
 \alias{add_ontology}
 \title{Add an ontology to i2b2}
 \usage{
-add_ontology(host = "127.0.0.1", admin, pass, name, scheme, description, ont,
+add_ontology(host = "127.0.0.1", admin, pass, name, scheme, ont,
   modi = NULL, include_code = T)
 }
 \arguments{
@@ -17,8 +17,6 @@ add_ontology(host = "127.0.0.1", admin, pass, name, scheme, description, ont,
 \item{name}{The name of the new ontology}
 
 \item{scheme}{The scheme to use for this ontology}
-
-\item{description}{The description of the scheme}
 
 \item{ont}{The ontology to insert}
 
