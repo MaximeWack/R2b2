@@ -4,7 +4,7 @@
 \alias{clear_default_imdata}
 \title{Clear the default imdata tables}
 \usage{
-clear_default_imdata(host = "127.0.0.1", admin, pass)
+clear_default_imdata(host, admin, pass)
 }
 \arguments{
 \item{host}{The host to connect to}

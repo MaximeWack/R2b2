@@ -4,7 +4,7 @@
 \alias{clear_default_metadata}
 \title{Clear the default metadata tables}
 \usage{
-clear_default_metadata(host = "127.0.0.1", admin, pass)
+clear_default_metadata(host, admin, pass)
 }
 \arguments{
 \item{host}{The host to connect to}

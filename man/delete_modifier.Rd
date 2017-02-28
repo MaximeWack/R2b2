@@ -4,7 +4,7 @@
 \alias{delete_modifier}
 \title{Delete modifiers}
 \usage{
-delete_modifier(host = "127.0.0.1", admin, pass, scheme)
+delete_modifier(host, admin, pass, scheme)
 }
 \arguments{
 \item{host}{The host to connect to}

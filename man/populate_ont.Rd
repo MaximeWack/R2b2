@@ -4,8 +4,8 @@
 \alias{populate_ont}
 \title{Populate an empty ontology table}
 \usage{
-populate_ont(host = "127.0.0.1", admin, pass, ont, modi = NULL, name,
-  scheme, include_code = T)
+populate_ont(host, admin, pass, ont, modi = NULL, name, scheme,
+  include_code = T)
 }
 \arguments{
 \item{host}{The host to connect to}

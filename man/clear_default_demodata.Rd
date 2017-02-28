@@ -4,7 +4,7 @@
 \alias{clear_default_demodata}
 \title{Clear the default demodata tables}
 \usage{
-clear_default_demodata(host = "127.0.0.1", admin, pass)
+clear_default_demodata(host, admin, pass)
 }
 \arguments{
 \item{host}{The host to connect to}

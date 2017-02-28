@@ -4,7 +4,7 @@
 \alias{populate_provider}
 \title{Populate the provider_dimension}
 \usage{
-populate_provider(host = "127.0.0.1", admin, pass, ont, name, scheme)
+populate_provider(host, admin, pass, ont, name, scheme)
 }
 \arguments{
 \item{host}{The host to connect to}
