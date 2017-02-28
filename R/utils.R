@@ -44,11 +44,11 @@ dbPush <- function(df, con, table)
 
 #' Udpdate a dataframe into a database table
 #'
+#' @param df Dataframe to update into the database
 #' @param con Database connection
 #' @param table Table in the database in which to push the dataframe
-#' @param df Dataframe to update into the database
 #' @param PK Character vector of the primary key(s)
-dbUpdate <- function(con, table, df, PK)
+dbUpdate <- function(df, con, table, PK)
 {
     df %>%
       apply(1, function(oneline)

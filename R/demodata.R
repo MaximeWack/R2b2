@@ -242,7 +242,7 @@ add_patients_demodata <- function(host, admin, pass, patients, project)
                     patient_num = as.character(patient_num),
                     update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
       dplyr::select(-patient_ide, -gender, -patient_ide_source) %>%
-      dbUpdate(con = demodata, table = "patient_dimension", ., "patient_num")
+      dbUpdate(demodata, "patient_dimension", "patient_num")
   }
 
   RPostgreSQL::dbDisconnect(demodata)
@@ -366,7 +366,7 @@ add_encounters <- function(host, admin, pass, encounters, project, patient_mappi
                     update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
       dplyr::select(-encounter_ide, -patient_ide, -inout) %>%
       purrr::dmap(as.character) %>%
-      dbUpdate(con = demodata, table = "visit_dimension", ., "encounter_num")
+      dbUpdate(demodata, "visit_dimension", "encounter_num")
   }
 
   RPostgreSQL::dbDisconnect(demodata)
@@ -453,7 +453,7 @@ add_observations <- function(host, admin, pass, observations, patient_mapping, e
   old_observations %>%
     dplyr::mutate(start_date = ifelse(is.na(start_date), "", format(start_date, format = "%m/%d/%Y %H:%M:%S")),
            update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
-  dbUpdate(con = demodata, table = "observation_fact", ., c("encounter_num", "patient_num", "concept_cd", "start_date"))
+  dbUpdate(demodata, "observation_fact", c("encounter_num", "patient_num", "concept_cd", "start_date"))
 
   RPostgreSQL::dbDisconnect(demodata)
 }
