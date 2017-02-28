@@ -21,8 +21,8 @@ clear_default_metadata <- function(host = "127.0.0.1", admin, pass)
   RPostgreSQL::dbGetQuery(metadata, "DROP TABLE icd10_icd9;")
 
   # Empty schemes and table_acess
-  RPostgreSQL::dbGetQuery(metadata, "DELETE FROM schemes;")
-  RPostgreSQL::dbGetQuery(metadata, "DELETE FROM table_access;")
+  c("schemes", "table_access") %>%
+    purrr::walk(~clear_table("i2b2metadata", .x, host, admin, pass))
 
   # Insert the 'empty' scheme
   RPostgreSQL::dbGetQuery(metadata, "INSERT INTO schemes VALUES ('', 'None', 'No scheme');")
