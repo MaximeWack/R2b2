@@ -10,7 +10,7 @@
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass the password for the admin account
 #' @export
-clear_default_metadata <- function(host = "127.0.0.1", admin, pass)
+clear_default_metadata <- function(host, admin, pass)
 {
   metadata   <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2metadata", user = admin, password = pass)
 
@@ -43,7 +43,7 @@ clear_default_metadata <- function(host = "127.0.0.1", admin, pass)
 #' @param pass the password for the admin account
 #' @param scheme The scheme to use for this ontology
 #' @export
-delete_ont<- function(host = "127.0.0.1", admin, pass, scheme)
+delete_ont<- function(host, admin, pass, scheme)
 {
   metadata   <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2metadata", user = admin, password = pass)
 
@@ -68,7 +68,7 @@ delete_ont<- function(host = "127.0.0.1", admin, pass, scheme)
 #' @param name The name of the new ontology
 #' @param scheme The scheme to use for this ontology
 #' @export
-add_ont <- function(host = "127.0.0.1", admin, pass, name, scheme)
+add_ont <- function(host, admin, pass, name, scheme)
 {
   metadata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2metadata", user = admin, password = pass)
 
@@ -143,7 +143,7 @@ add_ont <- function(host = "127.0.0.1", admin, pass, name, scheme)
 #' @param scheme The scheme to use for this ontology
 #' @param include_code Whether to include the code in the label or not
 #' @export
-populate_ont <- function(host = "127.0.0.1", admin, pass, ont, modi = NULL, name, scheme, include_code = T)
+populate_ont <- function(host, admin, pass, ont, modi = NULL, name, scheme, include_code = T)
 {
   metadata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2metadata", user = admin, password = pass)
 

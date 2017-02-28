@@ -6,7 +6,7 @@
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass the password for the admin account
 #' @export
-clear_default_imdata <- function(host = "127.0.0.1", admin, pass)
+clear_default_imdata <- function(host, admin, pass)
 {
   c("im_mpi_demographics", "im_mpi_mapping", "im_project_patients", "im_project_sites") %>%
     purrr::walk(~clear_table("i2b2imdata", .x, host, admin, pass))

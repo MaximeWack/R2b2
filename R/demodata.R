@@ -6,7 +6,7 @@
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass the password for the admin account
 #' @export
-clear_default_demodata <- function(host = "127.0.0.1", admin, pass)
+clear_default_demodata <- function(host, admin, pass)
 {
   c("code_lookup", "concept_dimension", "modifier_dimension", "encounter_mapping", "visit_dimension", "patient_dimension", "patient_mapping", "qt_breakdown_path", "provider_dimension", "observation_fact") %>%
     purrr::walk(~clear_table("i2b2demodata", .x, host, admin, pass))
@@ -21,7 +21,7 @@ clear_default_demodata <- function(host = "127.0.0.1", admin, pass)
 #' @param pass the password for the admin account
 #' @param scheme The scheme to delete from the concepts
 #' @export
-delete_modifier <- function(host = "127.0.0.1", admin, pass, scheme)
+delete_modifier <- function(host, admin, pass, scheme)
 {
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
 
@@ -39,7 +39,7 @@ delete_modifier <- function(host = "127.0.0.1", admin, pass, scheme)
 #' @param pass the password for the admin account
 #' @param scheme The scheme to delete from the concepts
 #' @export
-delete_concept <- function(host = "127.0.0.1", admin, pass, scheme)
+delete_concept <- function(host, admin, pass, scheme)
 {
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
 
@@ -64,7 +64,7 @@ delete_concept <- function(host = "127.0.0.1", admin, pass, scheme)
 #' @param name The name of the new ontology
 #' @param scheme The scheme to use for this ontology
 #' @export
-populate_concept <- function(host = "127.0.0.1", admin, pass, ont, modi, name, scheme)
+populate_concept <- function(host, admin, pass, ont, modi, name, scheme)
 {
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
 
@@ -117,7 +117,7 @@ populate_concept <- function(host = "127.0.0.1", admin, pass, ont, modi, name, s
 #' @param name The name of the new ontology
 #' @param scheme The scheme to use for this ontology
 #' @export
-populate_provider <- function(host = "127.0.0.1", admin, pass, ont, name, scheme)
+populate_provider <- function(host, admin, pass, ont, name, scheme)
 {
   options(scipen = 999)
 
