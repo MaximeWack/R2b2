@@ -63,3 +63,22 @@ dbUpdate <- function(con, table, df, PK)
               RPostgreSQL::dbGetQuery(conn = con, .)
             })
 }
+
+#' Clear a database table
+#'
+#' Clear a database table
+#'
+#' @param db Name of the database
+#' @param table Name of the table
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass the password for the admin account
+#' @export
+clear_table <- function(db, table, host, admin, pass)
+{
+  con <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = db, user = admin, password = pass)
+
+  RPostgreSQL::dbGetQuery(con, stringr::str_c("DELETE FROM ", table, ";"))
+
+  RPostgreSQL::dbDisconnect(con)
+}
