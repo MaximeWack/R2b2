@@ -85,7 +85,7 @@ populate_concept <- function(host, admin, pass, ont, modi, name, scheme)
                   concept_path = stringr::str_replace_all(concept_path, "\\\\(.+?) [^\\\\]+", "\\\\\\1"),
                   update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
     # Push the dataframe into the new ontology table
-    dbPush(con = demodata, table = "concept_dimension", .)
+    dbPush(demodata, "concept_dimension")
 
   if (length(modi) > 0)
   {
@@ -96,7 +96,7 @@ populate_concept <- function(host, admin, pass, ont, modi, name, scheme)
                     update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
     dplyr::select(-modi) %>%
     # Push the dataframe into the new ontology table
-    dbPush(con = demodata, table = "modifier_dimension", .)
+    dbPush(demodata, "modifier_dimension")
   }
 
   RPostgreSQL::dbDisconnect(demodata)
@@ -139,7 +139,7 @@ populate_provider <- function(host, admin, pass, ont, name, scheme)
                   provider_path = stringr::str_replace_all(provider_path, "\\\\(.+?) [^\\\\]+", "\\\\\\1"),
                   update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
     # Push the dataframe into the new ontology table
-    dbPush(con = demodata, table = "provider_dimension", .)
+    dbPush(demodata, "provider_dimension")
 
   RPostgreSQL::dbDisconnect(demodata)
 }
@@ -195,7 +195,7 @@ add_patients_demodata <- function(host, admin, pass, patients, project)
                     patient_ide_status  = "A",
                     project_id = project,
                     update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
-    dbPush(con = demodata, table = "patient_mapping", .)
+    dbPush(demodata, "patient_mapping")
   }
 
   # Push the new patient mappings for HIVE
@@ -208,7 +208,7 @@ add_patients_demodata <- function(host, admin, pass, patients, project)
                     patient_ide_status  = "A",
                     project_id = project,
                     update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
-    dbPush(con = demodata, table = "patient_mapping", .)
+    dbPush(demodata, "patient_mapping")
   }
 
   # Push the new patients in patient_dimension
@@ -225,7 +225,7 @@ add_patients_demodata <- function(host, admin, pass, patients, project)
                     patient_num = as.character(patient_num),
                     update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
       dplyr::select(-patient_ide, -gender) %>%
-      dbPush(con = demodata, table = "patient_dimension", .)
+      dbPush(demodata, "patient_dimension")
   }
 
   # Update the existing patients in patient_dimension
@@ -316,7 +316,7 @@ add_encounters <- function(host, admin, pass, encounters, project, patient_mappi
                     update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
       dplyr::rename(patient_ide = patient_num) %>%
       purrr::dmap(as.character) %>%
-    dbPush(con = demodata, table = "encounter_mapping", .)
+    dbPush(demodata, "encounter_mapping")
   }
 
   # Push the new encounter mappings
@@ -330,7 +330,7 @@ add_encounters <- function(host, admin, pass, encounters, project, patient_mappi
                     update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
       dplyr::rename(patient_ide = patient_num) %>%
       purrr::dmap(as.character) %>%
-    dbPush(con = demodata, table = "encounter_mapping", .)
+    dbPush(demodata, "encounter_mapping")
   }
 
   # Push the new encounters in visit_dimension
@@ -347,7 +347,7 @@ add_encounters <- function(host, admin, pass, encounters, project, patient_mappi
                     update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
       dplyr::select(-encounter_ide, -patient_ide, -inout) %>%
       purrr::dmap(as.character) %>%
-      dbPush(con = demodata, table = "visit_dimension", .)
+      dbPush(demodata, "visit_dimension")
   }
 
   # Update the existing encounters in visit_dimension
@@ -448,7 +448,7 @@ add_observations <- function(host, admin, pass, observations, patient_mapping, e
   new_observations %>%
     dplyr::mutate(start_date = ifelse(is.na(start_date), "", format(start_date, format = "%m/%d/%Y %H:%M:%S")),
            update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
-  dbPush(con = demodata, table = "observation_fact", .)
+  dbPush(demodata, "observation_fact")
 
   old_observations %>%
     dplyr::mutate(start_date = ifelse(is.na(start_date), "", format(start_date, format = "%m/%d/%Y %H:%M:%S")),

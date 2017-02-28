@@ -22,10 +22,10 @@ create_password <- function(length = 8)
 
 #' Push a dataframe into a database table
 #'
+#' @param df Dataframe to push into the database
 #' @param con Database connection
 #' @param table Table in the database in which to push the dataframe
-#' @param df Dataframe to push into the database
-dbPush <- function(con, table, df)
+dbPush <- function(df, con, table)
 {
     columns <- stringr::str_c(names(df), collapse = ",")
     df %>%

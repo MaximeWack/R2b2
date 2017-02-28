@@ -194,7 +194,7 @@ populate_ont <- function(host, admin, pass, ont, modi = NULL, name, scheme, incl
       df$c_name[df$c_hlevel > 0] <- df$c_name[df$c_hlevel > 0] %>% stringr::str_extract(" .*$") %>% stringr::str_trim()
 
     # Push the dataframe into the new ontology table
-    dbPush(metadata, scheme, df)
+    dbPush(df, metadata, scheme)
 
     if (length(modi) > 0)
     {
@@ -217,7 +217,7 @@ populate_ont <- function(host, admin, pass, ont, modi = NULL, name, scheme, incl
       dplyr::select(-modi) -> df
 
     # Push the dataframe into the new ontology table
-    dbPush(metadata, scheme, df)
+    dbPush(df, metadata, scheme)
     }
 
 

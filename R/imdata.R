@@ -47,21 +47,21 @@ add_patients_imdata <- function(host, admin, pass, patients, project)
     dplyr::mutate(lcl_site = project,
                   lcl_status  = "A",
                   update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
-  dbPush(con = imdata, table = "im_mpi_mapping", .)
+  dbPush(imdata, "im_mpi_mapping")
 
 # Push the new patient demographics
   new_patients %>%
     dplyr::mutate(global_status = "A",
                   update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
     dplyr::select(- lcl_id) %>%
-  dbPush(con = imdata, table = "im_mpi_demographics", .)
+  dbPush(imdata, "im_mpi_demographics")
 
 # Push the new project sites
   data.frame(project_id = project,
              lcl_site = project,
              project_status = "A",
              update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
-  dbPush(con = imdata, table = "im_project_sites", .)
+  dbPush(imdata, "im_project_sites")
 
 # Push the new project patients
   new_patients %>%
@@ -69,7 +69,7 @@ add_patients_imdata <- function(host, admin, pass, patients, project)
                   patient_project_status = "A",
                   update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
     dplyr::select(- lcl_id) %>%
-  dbPush(con = imdata, table = "im_project_patients", .)
+  dbPush(imdata, "im_project_patients")
 
   RPostgreSQL::dbDisconnect(imdata)
 }
