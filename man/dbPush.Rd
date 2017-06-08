@@ -4,14 +4,14 @@
 \alias{dbPush}
 \title{Push a dataframe into a database table}
 \usage{
-dbPush(con, table, df)
+dbPush(df, con, table)
 }
 \arguments{
+\item{df}{Dataframe to push into the database}
+
 \item{con}{Database connection}
 
 \item{table}{Table in the database in which to push the dataframe}
-
-\item{df}{Dataframe to push into the database}
 }
 \description{
 Push a dataframe into a database table

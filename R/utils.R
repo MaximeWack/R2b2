@@ -4,6 +4,7 @@
 #' @rdname pipe
 #' @keywords internal
 #' @importFrom dplyr %>%
+#' @export
 #' @usage lhs \%>\% rhs
 NULL
 

@@ -4,14 +4,14 @@
 \alias{dbUpdate}
 \title{Udpdate a dataframe into a database table}
 \usage{
-dbUpdate(con, table, df, PK)
+dbUpdate(df, con, table, PK)
 }
 \arguments{
+\item{df}{Dataframe to update into the database}
+
 \item{con}{Database connection}
 
 \item{table}{Table in the database in which to push the dataframe}
-
-\item{df}{Dataframe to update into the database}
 
 \item{PK}{Character vector of the primary key(s)}
 }
