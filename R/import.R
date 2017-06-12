@@ -15,30 +15,30 @@
 #' The function creates and updates the corresponding patients and encounters,
 #' inserts the new observations, and finally rebuilds the indexes in the database.
 #'
+#' @param data A dataframe of observation facts
+#' @param project The project to which to add the patients and their data
 #' @param host The host to connect to
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass The password for the admin account
-#' @param data A dataframe of observation facts
-#' @param project The project to which to add the patients and their data
 #' @export
-import_data <- function(host, admin, pass, data, project)
+import_data <- function(data, project, host = "", admin = "", pass = "")
 {
   # Patients
   data %>%
     dplyr::select(patient_ide, birth_date, death_date, gender) %>%
     dplyr::distinct() %>%
-    add_patients_demodata(host, admin, pass, ., project) -> patient_mapping
+    add_patients_demodata(project, host, admin, pass) -> patient_mapping
 
   # Encounters
   data %>%
     dplyr::select(patient_ide, encounter_ide, start_date, end_date) %>%
     dplyr::distinct() %>%
-    add_encounters(host, admin, pass, ., project, patient_mapping) -> encounter_mapping
+    add_encounters(project, patient_mapping, host, admin, pass) -> encounter_mapping
 
   # Observations
   data %>%
     dplyr::distinct() %>%
-    add_observations(host, admin, pass, ., patient_mapping, encounter_mapping)
+    add_observations(patient_mapping, encounter_mapping, host, admin, pass)
 
   # Rebuild indexes
   rebuild_indexes_demodata(host, admin, pass)

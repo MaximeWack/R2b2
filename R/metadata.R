@@ -10,7 +10,7 @@
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass the password for the admin account
 #' @export
-clear_default_metadata <- function(host, admin, pass)
+clear_default_metadata <- function(host = "", admin = "", pass = "")
 {
   metadata   <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2metadata", user = admin, password = pass)
 
@@ -38,12 +38,12 @@ clear_default_metadata <- function(host, admin, pass)
 #' Delete the scheme in schemes table
 #' Delete the entry in table_acess
 #'
+#' @param scheme The scheme to use for this ontology
 #' @param host The host to connect to
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass the password for the admin account
-#' @param scheme The scheme to use for this ontology
 #' @export
-delete_ont<- function(host, admin, pass, scheme)
+delete_ont<- function(scheme, host = "", admin = "", pass = "")
 {
   metadata   <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2metadata", user = admin, password = pass)
 
@@ -68,7 +68,7 @@ delete_ont<- function(host, admin, pass, scheme)
 #' @param name The name of the new ontology
 #' @param scheme The scheme to use for this ontology
 #' @export
-add_ont <- function(host, admin, pass, name, scheme)
+add_ont <- function(name, scheme, host = "", admin = "", pass = "")
 {
   metadata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2metadata", user = admin, password = pass)
 
@@ -134,16 +134,16 @@ add_ont <- function(host, admin, pass, name, scheme)
 #' code_modi label_modi
 #' The modifiers apply on all the ontology
 #'
-#' @param host The host to connect to
-#' @param admin The admin account for the PostgreSQL database
-#' @param pass the password for the admin account
 #' @param ont The ontology to insert
 #' @param modi The modifiers to insert
 #' @param name The name of the new ontology
 #' @param scheme The scheme to use for this ontology
 #' @param include_code Whether to include the code in the label or not
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass the password for the admin account
 #' @export
-populate_ont <- function(host, admin, pass, ont, modi = NULL, name, scheme, include_code = T)
+populate_ont <- function(ont, modi = NULL, name, scheme, include_code = T, host = "", admin = "", pass = "")
 {
   metadata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2metadata", user = admin, password = pass)
 

@@ -5,22 +5,22 @@
 #' Populate the ontology table
 #' Populate the concept and modifier dimensions in demodata
 #'
-#' @param host The host to connect to
-#' @param admin The admin account for the PostgreSQL database
-#' @param pass the password for the admin account
 #' @param name The name of the new ontology
 #' @param scheme The scheme to use for this ontology
 #' @param ont The ontology to insert
 #' @param modi The modifiers to insert
 #' @param include_code Whether to include the code in the label or not
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass the password for the admin account
 #' @export
-add_ontology <- function(host = "127.0.0.1", admin, pass, name, scheme, ont, modi = NULL, include_code = T)
+add_ontology <- function(name, scheme, ont, modi = NULL, include_code = T, host = "", admin = "", pass = "")
 {
-  add_ont(host, admin, pass, name, scheme)
+  add_ont(name, scheme, host, admin, pass)
 
-  populate_ont(host, admin, pass, ont, modi, name, scheme, include_code)
+  populate_ont(ont, modi, name, scheme, include_code, host, admin, pass)
 
-  populate_concept(host, admin, pass, ont, modi, name, scheme)
+  populate_concept(ont, modi, name, scheme, host, admin, pass)
 }
 
 #' Delete an ontology from i2b2
@@ -31,16 +31,16 @@ add_ontology <- function(host = "127.0.0.1", admin, pass, name, scheme, ont, mod
 #' Delete the scheme in schemes table
 #' Delete the entry in table_acess
 #'
+#' @param scheme The scheme to use for this ontology
 #' @param host The host to connect to
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass the password for the admin account
-#' @param scheme The scheme to use for this ontology
 #' @export
-delete_ontology <- function(host = "127.0.0.1", admin, pass, scheme)
+delete_ontology <- function(scheme, host = "", admin = "", pass = "")
 {
-  delete_ont(host, admin, pass, scheme)
+  delete_ont(scheme, host, admin, pass)
 
-  delete_concept(host, admin, pass, scheme)
+  delete_concept(scheme, host, admin, pass)
 
-  delete_modifier(host, admin, pass, scheme)
+  delete_modifier(scheme, host, admin, pass)
 }

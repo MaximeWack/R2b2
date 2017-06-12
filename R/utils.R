@@ -75,7 +75,7 @@ dbUpdate <- function(df, con, table, PK)
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass the password for the admin account
 #' @export
-clear_table <- function(db, table, host, admin, pass)
+clear_table <- function(db, table, host = "", admin = "", pass = "")
 {
   con <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = db, user = admin, password = pass)
 

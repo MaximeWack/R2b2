@@ -6,7 +6,7 @@
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass the password for the admin account
 #' @export
-clear_default_demodata <- function(host, admin, pass)
+clear_default_demodata <- function(host = "", admin = "", pass = "")
 {
   c("code_lookup", "concept_dimension", "modifier_dimension", "encounter_mapping", "visit_dimension", "patient_dimension", "patient_mapping", "qt_breakdown_path", "provider_dimension", "observation_fact") %>%
     purrr::walk(~clear_table("i2b2demodata", .x, host, admin, pass))
@@ -16,12 +16,12 @@ clear_default_demodata <- function(host, admin, pass)
 #'
 #' Delete modifiers from modifier_dimension
 #'
+#' @param scheme The scheme to delete from the concepts
 #' @param host The host to connect to
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass the password for the admin account
-#' @param scheme The scheme to delete from the concepts
 #' @export
-delete_modifier <- function(host, admin, pass, scheme)
+delete_modifier <- function(scheme, host = "", admin = "", pass = "")
 {
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
 
@@ -34,12 +34,12 @@ delete_modifier <- function(host, admin, pass, scheme)
 #'
 #' Delete concepts from concept_dimension
 #'
+#' @param scheme The scheme to delete from the concepts
 #' @param host The host to connect to
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass the password for the admin account
-#' @param scheme The scheme to delete from the concepts
 #' @export
-delete_concept <- function(host, admin, pass, scheme)
+delete_concept <- function(scheme, host = "", admin = "", pass = "")
 {
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
 
@@ -56,15 +56,15 @@ delete_concept <- function(host, admin, pass, scheme)
 #' with their respective path, in the form
 #' code_level1 label_level1/code_level2 label_level2/.../code_leaf label_leaf
 #'
-#' @param host The host to connect to
-#' @param admin The admin account for the PostgreSQL database
-#' @param pass the password for the admin account
 #' @param ont The ontology to insert
 #' @param modi The modifiers to insert
 #' @param name The name of the new ontology
 #' @param scheme The scheme to use for this ontology
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass the password for the admin account
 #' @export
-populate_concept <- function(host, admin, pass, ont, modi, name, scheme)
+populate_concept <- function(ont, modi, name, scheme, host = "", admin = "", pass = "")
 {
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
 
@@ -110,14 +110,14 @@ populate_concept <- function(host, admin, pass, ont, modi, name, scheme)
 #' with their respective path, in the form
 #' code_level1 label_level1/code_level2 label_level2/.../code_leaf label_leaf
 #'
-#' @param host The host to connect to
-#' @param admin The admin account for the PostgreSQL database
-#' @param pass the password for the admin account
 #' @param ont The ontology to insert
 #' @param name The name of the new ontology
 #' @param scheme The scheme to use for this ontology
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass the password for the admin account
 #' @export
-populate_provider <- function(host, admin, pass, ont, name, scheme)
+populate_provider <- function(ont, name, scheme, host = "", admin = "", pass = "")
 {
   options(scipen = 999)
 
@@ -154,14 +154,14 @@ populate_provider <- function(host, admin, pass, ont, name, scheme)
 #' - death_date: as a Date object
 #' - gender (F or M)
 #'
+#' @param patients A dataframe of patients
+#' @param project The project to add the patients to
 #' @param host The host to connect to
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass The password for the admin account
-#' @param patients A dataframe of patients
-#' @param project The project to add the patients to
 #' @return A patient mapping dataframe for the patients
 #' @export
-add_patients_demodata <- function(host, admin, pass, patients, project)
+add_patients_demodata <- function(patients, project, host = "", admin = "", pass = "")
 {
   options(scipen = 999)
 
@@ -269,15 +269,15 @@ add_patients_demodata <- function(host, admin, pass, patients, project)
 #' - end_date: the end date of the encounter, as Date object
 #' - inout: I or O if inpatient or outpatient
 #'
-#' @param host The host to connect to
-#' @param admin The admin account for the PostgreSQL database
-#' @param pass The password for the admin account
 #' @param encounters A dataframe of patients
 #' @param project The project to add the patients to
 #' @param patient_mapping The patient mapping table
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass The password for the admin account
 #' @return An encounter mapping dataframe for the encounters
 #' @export
-add_encounters <- function(host, admin, pass, encounters, project, patient_mapping)
+add_encounters <- function(encounters, project, patient_mapping, host = "", admin = "", pass = "")
 {
   options(scipen = 999)
 
@@ -398,14 +398,14 @@ add_encounters <- function(host, admin, pass, encounters, project, patient_mappi
 #' Other observation fact columns can optionnaly be included, 
 #' such as end_date, valtype_cd, tval_char, nval_num, valueflag_cd, units_cd, etc.
 #'
-#' @param host The host to connect to
-#' @param admin The admin account for the PostgreSQL database
-#' @param pass The password for the admin account
 #' @param observations A dataframe of observation facts
 #' @param patient_mapping The patient mapping table
 #' @param encounter_mapping The encounter mapping table
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass The password for the admin account
 #' @export
-add_observations <- function(host, admin, pass, observations, patient_mapping, encounter_mapping)
+add_observations <- function(observations, patient_mapping, encounter_mapping, host = "", admin = "", pass = "")
 {
   options(scipen = 999)
 
@@ -466,7 +466,7 @@ add_observations <- function(host, admin, pass, observations, patient_mapping, e
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass The password for the admin account
 #' @export
-rebuild_indexes_demodata <- function(host, admin, pass)
+rebuild_indexes_demodata <- function(host = "", admin = "", pass = "")
 {
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
 

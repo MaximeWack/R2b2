@@ -6,7 +6,7 @@
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass the password for the admin account
 #' @export
-clear_default_imdata <- function(host, admin, pass)
+clear_default_imdata <- function(host = "", admin = "", pass = "")
 {
   c("im_mpi_demographics", "im_mpi_mapping", "im_project_patients", "im_project_sites") %>%
     purrr::walk(~clear_table("i2b2imdata", .x, host, admin, pass))
@@ -17,13 +17,13 @@ clear_default_imdata <- function(host, admin, pass)
 #' Add patients to the IM cell, generate new encrypted IDs,
 #' and create a project site if needed
 #'
+#' @param patients A vector of patients IDs to insert
+#' @param project The project to add the patients to
 #' @param host The host to connect to
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass The password for the admin account
-#' @param patients A vector of patients IDs to insert
-#' @param project The project to add the patients to
 #' @export
-add_patients_imdata <- function(host, admin, pass, patients, project)
+add_patients_imdata <- function(patients, project, host = "", admin = "", pass = "")
 {
   options(scipen = 999)
 
