@@ -255,7 +255,8 @@ add_patients_demodata <- function(patients, project, host = "", admin = "", pass
               dplyr::inner_join(existing, by = "patient_ide")) %>%
     dplyr::select(patient_ide, patient_num) %>%
     dplyr::distinct() %>%
-    purrr::dmap(as.character)
+    purrr::map(as.character) %>%
+    data.frame(check.names = F, stringsAsFactors = F)
 }
 
 #' Add encounters to the CRC cell
@@ -315,7 +316,8 @@ add_encounters <- function(encounters, project, patient_mapping, host = "", admi
                     patient_ide_source = "HIVE",
                     update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
       dplyr::rename(patient_ide = patient_num) %>%
-      purrr::dmap(as.character) %>%
+      purrr::map(as.character) %>%
+      data.frame(check.names = F, stringsAsFactors = F) %>%
     dbPush(demodata, "encounter_mapping")
   }
 
@@ -329,7 +331,8 @@ add_encounters <- function(encounters, project, patient_mapping, host = "", admi
                     patient_ide_source = "HIVE",
                     update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
       dplyr::rename(patient_ide = patient_num) %>%
-      purrr::dmap(as.character) %>%
+      purrr::map(as.character) %>%
+      data.frame(check.names = F, stringsAsFactors = F) %>%
     dbPush(demodata, "encounter_mapping")
   }
 
@@ -346,7 +349,8 @@ add_encounters <- function(encounters, project, patient_mapping, host = "", admi
                     inout_cd = inout,
                     update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
       dplyr::select(-encounter_ide, -patient_ide, -inout) %>%
-      purrr::dmap(as.character) %>%
+      purrr::map(as.character) %>%
+      data.frame(check.names = F, stringsAsFactors = F) %>%
       dbPush(demodata, "visit_dimension")
   }
 
@@ -365,7 +369,8 @@ add_encounters <- function(encounters, project, patient_mapping, host = "", admi
                     inout_cd = inout,
                     update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
       dplyr::select(-encounter_ide, -patient_ide, -inout) %>%
-      purrr::dmap(as.character) %>%
+      purrr::map(as.character) %>%
+      data.frame(check.names = F, stringsAsFactors = F) %>%
       dbUpdate(demodata, "visit_dimension", "encounter_num")
   }
 
@@ -381,7 +386,8 @@ add_encounters <- function(encounters, project, patient_mapping, host = "", admi
               dplyr::select(encounter_ide, encounter_num)) %>%
     dplyr::mutate(encounter_num = encounter_num %>% as.character) %>%
     dplyr::distinct() %>%
-    purrr::dmap(as.character)
+    purrr::map(as.character) %>%
+    data.frame(check.names = F, stringsAsFactors = F)
 }
 
 #' Add observations to the CRC cell
