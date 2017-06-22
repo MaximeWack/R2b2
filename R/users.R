@@ -119,3 +119,37 @@ delete_users <- function(host = "127.0.0.1", admin, pass, users)
 
   RPostgreSQL::dbDisconnect(pm)
 }
+
+#' List users
+#'
+#' Delete i2b2 users from the instance
+#'
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass The password for the database admin
+#' @export
+list_users <- function(host = "", admin = "", pass = "")
+{
+  src_postgres("i2b2pm", host = host, user = admin, pass = pass) %>%
+    tbl("pm_user_data") %>%
+    select(user_id, full_name, email, project_path) %>%
+    collect(n = Inf)
+}
+
+#' List user roles
+#'
+#' Delete i2b2 users from the instance
+#'
+#' @param user An user id
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass The password for the database admin
+#' @export
+list_user_roles <- function(user, host = "", admin = "", pass = "")
+{
+  src_postgres("i2b2pm", host = host, user = admin, pass = pass) %>%
+    tbl("pm_project_user_roles") %>%
+    filter(user_id == user) %>%
+    select(project_id, user_id, user_role_cd) %>%
+    collect(n = Inf)
+}
