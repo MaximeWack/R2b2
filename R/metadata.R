@@ -223,3 +223,43 @@ populate_ont <- function(ont, modi = NULL, name, scheme, include_code = T, host 
 
   RPostgreSQL::dbDisconnect(metadata)
 }
+
+#' List the available ontologies
+#'
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass the password for the admin account
+#' @export
+list_ont <- function(host = "", admin = "", pass = "")
+{
+  src_postgres("i2b2metadata", host = host, user = admin, pass = pass) %>%
+    tbl("table_access") %>%
+    collect(n = Inf)
+}
+
+#' List the available schemes
+#'
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass the password for the admin account
+#' @export
+list_schemes <- function(host = "", admin = "", pass = "")
+{
+  src_postgres("i2b2metadata", host = host, user = admin, pass = pass) %>%
+    tbl("schemes") %>%
+    collect(n = Inf)
+}
+
+#' Fetch an ontology
+#'
+#' @param ont The name of the ontology, from the c_table_name column in list_ont()
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass the password for the admin account
+#' @export
+get_ont <- function(ont, host = "", admin = "", pass = "")
+{
+  src_postgres("i2b2metadata", host = host, user = admin, pass = pass) %>%
+    tbl(stringr::str_to_lower(ont)) %>%
+    collect(n = Inf)
+}
