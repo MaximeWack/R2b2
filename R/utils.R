@@ -28,19 +28,21 @@ create_password <- function(length = 8)
 #' @param table Table in the database in which to push the dataframe
 dbPush <- function(df, con, table)
 {
-    columns <- stringr::str_c(names(df), collapse = ",")
-    df %>%
-      apply(1, function(oneline)
-            {
-              oneline[is.na(oneline)] <- "NULL"
-              oneline %>%
-                stringr::str_c("'", ., "'", collapse = ",") %>% 
-                stringr::str_c("(", ., ")") %>%
-                stringr::str_replace("'NULL'", "NULL")
-            }) %>%
-    stringr::str_c(collapse = ",") %>%
-    stringr::str_c("INSERT INTO ", table, " (", columns, ") VALUES ", ., ";") %>%
-    RPostgreSQL::dbGetQuery(conn = con, .)
+  options(scipen = 999)
+
+  columns <- stringr::str_c(names(df), collapse = ",")
+  df %>%
+    apply(1, function(oneline)
+          {
+            oneline[is.na(oneline)] <- "NULL"
+            oneline %>%
+              stringr::str_c("'", ., "'", collapse = ",") %>% 
+              stringr::str_c("(", ., ")") %>%
+              stringr::str_replace("'NULL'", "NULL")
+          }) %>%
+  stringr::str_c(collapse = ",") %>%
+  stringr::str_c("INSERT INTO ", table, " (", columns, ") VALUES ", ., ";") %>%
+  RPostgreSQL::dbGetQuery(conn = con, .)
 }
 
 #' Udpdate a dataframe into a database table
@@ -51,11 +53,13 @@ dbPush <- function(df, con, table)
 #' @param PK Character vector of the primary key(s)
 dbUpdate <- function(df, con, table, PK)
 {
-    df %>%
-      apply(1, function(oneline)
-            {
-              oneline[is.na(oneline)] <- "NULL"
-              stringr::str_c(names(oneline), " = '", oneline, "'", collapse = ",") %>%
+  options(scipen = 999)
+
+  df %>%
+    apply(1, function(oneline)
+          {
+            oneline[is.na(oneline)] <- "NULL"
+            stringr::str_c(names(oneline), " = '", oneline, "'", collapse = ",") %>%
               stringr::str_replace("'NULL'", "NULL") -> set
 
               stringr::str_c(PK, " = '", oneline[PK], "'", collapse = " AND ") -> where

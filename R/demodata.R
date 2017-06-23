@@ -135,8 +135,6 @@ populate_concept <- function(ont, modi, name, scheme, host = "", admin = "", pas
 #' @export
 populate_provider <- function(ont, name, scheme, host = "", admin = "", pass = "")
 {
-  options(scipen = 999)
-
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
 
   # Sanitize the ontology
@@ -179,8 +177,6 @@ populate_provider <- function(ont, name, scheme, host = "", admin = "", pass = "
 #' @export
 add_patients_demodata <- function(patients, project, host = "", admin = "", pass = "")
 {
-  options(scipen = 999)
-
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
 
 # Get the existing patient mappings
@@ -296,8 +292,6 @@ add_patients_demodata <- function(patients, project, host = "", admin = "", pass
 #' @export
 add_encounters <- function(encounters, project, patient_mapping, host = "", admin = "", pass = "")
 {
-  options(scipen = 999)
-
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
 
 # Get existing encounters
@@ -429,8 +423,6 @@ add_encounters <- function(encounters, project, patient_mapping, host = "", admi
 #' @export
 add_observations <- function(observations, patient_mapping, encounter_mapping, host = "", admin = "", pass = "")
 {
-  options(scipen = 999)
-
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
 
   observations %>%
