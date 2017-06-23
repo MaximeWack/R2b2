@@ -30,6 +30,14 @@ delete_modifier <- function(scheme, host = "", admin = "", pass = "")
   RPostgreSQL::dbDisconnect(demodata)
 }
 
+list_modifier <- function(scheme, host = "", admin = "", pass = "")
+{
+  dplyr::src_postgres("i2b2demodata", host = host, user = admin, pass = pass) %>%
+    dplyr::tbl("modifier_dimension") %>%
+    dplyr::collect(n = Inf) %>%
+    dplyr::filter(modifier_cd %>% stringr::str_detect(stringr::str_c(scheme, ":.*")))
+}
+
 #' Delete concepts
 #'
 #' Delete concepts from concept_dimension
@@ -46,6 +54,14 @@ delete_concept <- function(scheme, host = "", admin = "", pass = "")
   RPostgreSQL::dbGetQuery(demodata, stringr::str_c("DELETE FROM concept_dimension WHERE (concept_cd LIKE '", scheme, ":%');"))
 
   RPostgreSQL::dbDisconnect(demodata)
+}
+
+list_concepts <- function(scheme, host = "", admin = "", pass = "")
+{
+  dplyr::src_postgres("i2b2demodata", host = host, user = admin, pass = pass) %>%
+    dplyr::tbl("concept_dimension") %>%
+    dplyr::collect(n = Inf) %>%
+    dplyr::filter(concept_cd %>% stringr::str_detect(stringr::str_c(scheme, ":.*")))
 }
 
 #' Populate the concept_dimension
