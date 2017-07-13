@@ -4,20 +4,20 @@
 \alias{populate_provider}
 \title{Populate the provider_dimension}
 \usage{
-populate_provider(host, admin, pass, ont, name, scheme)
+populate_provider(ont, name, scheme, host = "", admin = "", pass = "")
 }
 \arguments{
-\item{host}{The host to connect to}
-
-\item{admin}{The admin account for the PostgreSQL database}
-
-\item{pass}{the password for the admin account}
-
 \item{ont}{The ontology to insert}
 
 \item{name}{The name of the new ontology}
 
 \item{scheme}{The scheme to use for this ontology}
+
+\item{host}{The host to connect to}
+
+\item{admin}{The admin account for the PostgreSQL database}
+
+\item{pass}{the password for the admin account}
 }
 \description{
 Populate the provider_dimension with new providers

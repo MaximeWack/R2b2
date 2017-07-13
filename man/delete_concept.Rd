@@ -4,16 +4,16 @@
 \alias{delete_concept}
 \title{Delete concepts}
 \usage{
-delete_concept(host, admin, pass, scheme)
+delete_concept(scheme, host = "", admin = "", pass = "")
 }
 \arguments{
+\item{scheme}{The scheme to delete from the concepts}
+
 \item{host}{The host to connect to}
 
 \item{admin}{The admin account for the PostgreSQL database}
 
 \item{pass}{the password for the admin account}
-
-\item{scheme}{The scheme to delete from the concepts}
 }
 \description{
 Delete concepts from concept_dimension

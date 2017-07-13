@@ -4,16 +4,16 @@
 \alias{delete_ontology}
 \title{Delete an ontology from i2b2}
 \usage{
-delete_ontology(host = "127.0.0.1", admin, pass, scheme)
+delete_ontology(scheme, host = "", admin = "", pass = "")
 }
 \arguments{
+\item{scheme}{The scheme to use for this ontology}
+
 \item{host}{The host to connect to}
 
 \item{admin}{The admin account for the PostgreSQL database}
 
 \item{pass}{the password for the admin account}
-
-\item{scheme}{The scheme to use for this ontology}
 }
 \description{
 Delete an existing ontology from metadata

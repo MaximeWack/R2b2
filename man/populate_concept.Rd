@@ -4,15 +4,10 @@
 \alias{populate_concept}
 \title{Populate the concept_dimension}
 \usage{
-populate_concept(host, admin, pass, ont, modi, name, scheme)
+populate_concept(ont, modi, name, scheme, host = "", admin = "",
+  pass = "")
 }
 \arguments{
-\item{host}{The host to connect to}
-
-\item{admin}{The admin account for the PostgreSQL database}
-
-\item{pass}{the password for the admin account}
-
 \item{ont}{The ontology to insert}
 
 \item{modi}{The modifiers to insert}
@@ -20,6 +15,12 @@ populate_concept(host, admin, pass, ont, modi, name, scheme)
 \item{name}{The name of the new ontology}
 
 \item{scheme}{The scheme to use for this ontology}
+
+\item{host}{The host to connect to}
+
+\item{admin}{The admin account for the PostgreSQL database}
+
+\item{pass}{the password for the admin account}
 }
 \description{
 Populate the concept_dimension with new concepts

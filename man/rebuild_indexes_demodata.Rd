@@ -4,7 +4,7 @@
 \alias{rebuild_indexes_demodata}
 \title{Rebuild the indexes}
 \usage{
-rebuild_indexes_demodata(host, admin, pass)
+rebuild_indexes_demodata(host = "", admin = "", pass = "")
 }
 \arguments{
 \item{host}{The host to connect to}

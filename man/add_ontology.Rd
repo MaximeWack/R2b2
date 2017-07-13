@@ -4,16 +4,10 @@
 \alias{add_ontology}
 \title{Add an ontology to i2b2}
 \usage{
-add_ontology(host = "127.0.0.1", admin, pass, name, scheme, ont,
-  modi = NULL, include_code = T)
+add_ontology(name, scheme, ont, modi = NULL, include_code = T, host = "",
+  admin = "", pass = "")
 }
 \arguments{
-\item{host}{The host to connect to}
-
-\item{admin}{The admin account for the PostgreSQL database}
-
-\item{pass}{the password for the admin account}
-
 \item{name}{The name of the new ontology}
 
 \item{scheme}{The scheme to use for this ontology}
@@ -23,6 +17,12 @@ add_ontology(host = "127.0.0.1", admin, pass, name, scheme, ont,
 \item{modi}{The modifiers to insert}
 
 \item{include_code}{Whether to include the code in the label or not}
+
+\item{host}{The host to connect to}
+
+\item{admin}{The admin account for the PostgreSQL database}
+
+\item{pass}{the password for the admin account}
 }
 \description{
 Add an ontology into i2b2

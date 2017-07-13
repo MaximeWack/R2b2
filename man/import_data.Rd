@@ -4,18 +4,18 @@
 \alias{import_data}
 \title{Import data into i2b2}
 \usage{
-import_data(host, admin, pass, data, project)
+import_data(data, project, host = "", admin = "", pass = "")
 }
 \arguments{
+\item{data}{A dataframe of observation facts}
+
+\item{project}{The project to which to add the patients and their data}
+
 \item{host}{The host to connect to}
 
 \item{admin}{The admin account for the PostgreSQL database}
 
 \item{pass}{The password for the admin account}
-
-\item{data}{A dataframe of observation facts}
-
-\item{project}{The project to which to add the patients and their data}
 }
 \description{
 Import data from a data frame into i2b2

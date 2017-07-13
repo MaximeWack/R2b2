@@ -4,21 +4,21 @@
 \alias{add_observations}
 \title{Add observations to the CRC cell}
 \usage{
-add_observations(host, admin, pass, observations, patient_mapping,
-  encounter_mapping)
+add_observations(observations, patient_mapping, encounter_mapping, host = "",
+  admin = "", pass = "")
 }
 \arguments{
-\item{host}{The host to connect to}
-
-\item{admin}{The admin account for the PostgreSQL database}
-
-\item{pass}{The password for the admin account}
-
 \item{observations}{A dataframe of observation facts}
 
 \item{patient_mapping}{The patient mapping table}
 
 \item{encounter_mapping}{The encounter mapping table}
+
+\item{host}{The host to connect to}
+
+\item{admin}{The admin account for the PostgreSQL database}
+
+\item{pass}{The password for the admin account}
 }
 \description{
 Add observations to the CRC cell

@@ -4,16 +4,10 @@
 \alias{populate_ont}
 \title{Populate an empty ontology table}
 \usage{
-populate_ont(host, admin, pass, ont, modi = NULL, name, scheme,
-  include_code = T)
+populate_ont(ont, modi = NULL, name, scheme, include_code = T, host = "",
+  admin = "", pass = "")
 }
 \arguments{
-\item{host}{The host to connect to}
-
-\item{admin}{The admin account for the PostgreSQL database}
-
-\item{pass}{the password for the admin account}
-
 \item{ont}{The ontology to insert}
 
 \item{modi}{The modifiers to insert}
@@ -23,6 +17,12 @@ populate_ont(host, admin, pass, ont, modi = NULL, name, scheme,
 \item{scheme}{The scheme to use for this ontology}
 
 \item{include_code}{Whether to include the code in the label or not}
+
+\item{host}{The host to connect to}
+
+\item{admin}{The admin account for the PostgreSQL database}
+
+\item{pass}{the password for the admin account}
 }
 \description{
 Populate an empty ontology table

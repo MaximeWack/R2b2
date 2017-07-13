@@ -4,18 +4,18 @@
 \alias{add_patients_imdata}
 \title{Add patients to the IM cell}
 \usage{
-add_patients_imdata(host, admin, pass, patients, project)
+add_patients_imdata(patients, project, host = "", admin = "", pass = "")
 }
 \arguments{
+\item{patients}{A vector of patients IDs to insert}
+
+\item{project}{The project to add the patients to}
+
 \item{host}{The host to connect to}
 
 \item{admin}{The admin account for the PostgreSQL database}
 
 \item{pass}{The password for the admin account}
-
-\item{patients}{A vector of patients IDs to insert}
-
-\item{project}{The project to add the patients to}
 }
 \description{
 Add patients to the IM cell, generate new encrypted IDs,

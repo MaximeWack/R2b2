@@ -4,7 +4,7 @@
 \alias{clear_table}
 \title{Clear a database table}
 \usage{
-clear_table(db, table, host, admin, pass)
+clear_table(db, table, host = "", admin = "", pass = "")
 }
 \arguments{
 \item{db}{Name of the database}

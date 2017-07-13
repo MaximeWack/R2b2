@@ -4,18 +4,18 @@
 \alias{add_ont}
 \title{Add an ontology to metadata}
 \usage{
-add_ont(host, admin, pass, name, scheme)
+add_ont(name, scheme, host = "", admin = "", pass = "")
 }
 \arguments{
+\item{name}{The name of the new ontology}
+
+\item{scheme}{The scheme to use for this ontology}
+
 \item{host}{The host to connect to}
 
 \item{admin}{The admin account for the PostgreSQL database}
 
 \item{pass}{the password for the admin account}
-
-\item{name}{The name of the new ontology}
-
-\item{scheme}{The scheme to use for this ontology}
 }
 \description{
 Add an empty ontology space

@@ -4,18 +4,18 @@
 \alias{add_patients_demodata}
 \title{Add patients to the CRC cell}
 \usage{
-add_patients_demodata(host, admin, pass, patients, project)
+add_patients_demodata(patients, project, host = "", admin = "", pass = "")
 }
 \arguments{
+\item{patients}{A dataframe of patients}
+
+\item{project}{The project to add the patients to}
+
 \item{host}{The host to connect to}
 
 \item{admin}{The admin account for the PostgreSQL database}
 
 \item{pass}{The password for the admin account}
-
-\item{patients}{A dataframe of patients}
-
-\item{project}{The project to add the patients to}
 }
 \value{
 A patient mapping dataframe for the patients

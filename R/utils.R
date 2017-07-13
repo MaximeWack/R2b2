@@ -45,7 +45,7 @@ dbPush <- function(df, con, table)
   RPostgreSQL::dbGetQuery(conn = con, .)
 }
 
-#' Udpdate a dataframe into a database table
+#' Update a dataframe into a database table
 #'
 #' @param df Dataframe to update into the database
 #' @param con Database connection
@@ -88,6 +88,12 @@ clear_table <- function(db, table, host = "", admin = "", pass = "")
   RPostgreSQL::dbDisconnect(con)
 }
 
+#' Upserta dataframe into a database table
+#'
+#' @param df Dataframe to upsert into the database
+#' @param con Database connection
+#' @param table Table in the database in which to push the dataframe
+#' @param PK Character vector of the primary key(s)
 dbUpsert <- function(df, con, table, PK)
 {
   columns <- setdiff(names(df), PK)

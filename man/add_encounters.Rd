@@ -4,20 +4,21 @@
 \alias{add_encounters}
 \title{Add encounters to the CRC cell}
 \usage{
-add_encounters(host, admin, pass, encounters, project, patient_mapping)
+add_encounters(encounters, project, patient_mapping, host = "", admin = "",
+  pass = "")
 }
 \arguments{
-\item{host}{The host to connect to}
-
-\item{admin}{The admin account for the PostgreSQL database}
-
-\item{pass}{The password for the admin account}
-
 \item{encounters}{A dataframe of patients}
 
 \item{project}{The project to add the patients to}
 
 \item{patient_mapping}{The patient mapping table}
+
+\item{host}{The host to connect to}
+
+\item{admin}{The admin account for the PostgreSQL database}
+
+\item{pass}{The password for the admin account}
 }
 \value{
 An encounter mapping dataframe for the encounters

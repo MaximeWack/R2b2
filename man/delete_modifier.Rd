@@ -4,16 +4,16 @@
 \alias{delete_modifier}
 \title{Delete modifiers}
 \usage{
-delete_modifier(host, admin, pass, scheme)
+delete_modifier(scheme, host = "", admin = "", pass = "")
 }
 \arguments{
+\item{scheme}{The scheme to delete from the concepts}
+
 \item{host}{The host to connect to}
 
 \item{admin}{The admin account for the PostgreSQL database}
 
 \item{pass}{the password for the admin account}
-
-\item{scheme}{The scheme to delete from the concepts}
 }
 \description{
 Delete modifiers from modifier_dimension
