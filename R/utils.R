@@ -98,7 +98,7 @@ dbUpsert <- function(df, con, table, PK)
 {
   columns <- setdiff(names(df), PK)
 
-  write.csv(df, file = "/tmp/data.csv", row.names = F)
+  write.csv(df, file = "/tmp/data.csv", row.names = F, na = "")
 
   temp <- str_c(table, "_tmp")
 
