@@ -483,53 +483,71 @@ add_encounters <- function(encounters, project, patient_mapping = "", host = "",
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass The password for the admin account
 #' @export
-add_observations <- function(observations, patient_mapping, encounter_mapping, host = "", admin = "", pass = "")
+add_observations <- function(observations, patient_mapping = "", encounter_mapping = "", host = "", admin = "", pass = "")
 {
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
 
-  observations %>%
-    dplyr::mutate(encounter_ide = encounter_ide %>% as.character) %>%
-    dplyr::left_join(patient_mapping) %>%
-    dplyr::left_join(encounter_mapping) %>%
-    dplyr::select(-patient_ide, -encounter_ide) -> observations
+  # observations %>%
+  #   dplyr::mutate(encounter_ide = encounter_ide %>% as.character) %>%
+  #   dplyr::left_join(patient_mapping) %>%
+  #   dplyr::left_join(encounter_mapping) %>%
+  #   dplyr::select(-patient_ide, -encounter_ide) -> observations
 
-  dplyr::src_postgres("i2b2demodata", host, user = admin, password = pass) %>%
-    dplyr::tbl("observation_fact") %>%
-    dplyr::filter(encounter_num %in% observations$encounter_num &
-           patient_num %in% observations$patient_num &
-           concept_cd %in% observations$concept_cd &
-           provider_id %in% observations$provider_id &
-           start_date %in% observations$start_date &
-           modifier_cd %in% observations$modifier_cd) %>%
-    dplyr::select(encounter_num, patient_num, concept_cd, provider_id, start_date, modifier_cd) %>%
-    dplyr::collect(n = Inf) -> existing
+  # dplyr::src_postgres("i2b2demodata", host, user = admin, password = pass) %>%
+  #   dplyr::tbl("observation_fact") %>%
+  #   dplyr::filter(encounter_num %in% observations$encounter_num &
+  #          patient_num %in% observations$patient_num &
+  #          concept_cd %in% observations$concept_cd &
+  #          provider_id %in% observations$provider_id &
+  #          start_date %in% observations$start_date &
+  #          modifier_cd %in% observations$modifier_cd) %>%
+  #   dplyr::select(encounter_num, patient_num, concept_cd, provider_id, start_date, modifier_cd) %>%
+  #   dplyr::collect(n = Inf) -> existing
 
-  if (nrow(existing) == 0)
+  # if (nrow(existing) == 0)
+  # {
+  #   existing <- data.frame(encounter_num = character(0), patient_num = character(0), concept_cd = character(0), provider_id = character(0), start_date = as.Date(character(0)), modifier_cd = character(0))
+  # } else
+  # {
+  #   existing %>%
+  #   dplyr::mutate(start_date = as.Date(start_date),
+  #          patient_num = as.character(patient_num),
+  #          encounter_num = as.character(encounter_num)) -> existing
+  # }
+
+#   observations %>%
+#     dplyr::anti_join(existing) -> new_observations
+
+#   observations %>%
+#     dplyr::inner_join(existing) -> old_observations
+
+#   new_observations %>%
+#     dplyr::mutate(start_date = ifelse(is.na(start_date), "", format(start_date, format = "%m/%d/%Y %H:%M:%S")),
+#            update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+#   dbPush(demodata, "observation_fact")
+
+#   old_observations %>%
+#     dplyr::mutate(start_date = ifelse(is.na(start_date), "", format(start_date, format = "%m/%d/%Y %H:%M:%S")),
+#            update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+#   dbUpdate(demodata, "observation_fact", c("encounter_num", "patient_num", "concept_cd", "start_date"))
+
+  RPostgreSQL::dbGetQuery(demodata, "SELECT max(text_search_index) from observation_fact;") %>%
+  .$max -> nextval
+
+  if (nextval %>% is.na)
   {
-    existing <- data.frame(encounter_num = character(0), patient_num = character(0), concept_cd = character(0), provider_id = character(0), start_date = as.Date(character(0)), modifier_cd = character(0))
-  } else
-  {
-    existing %>%
-    dplyr::mutate(start_date = as.Date(start_date),
-           patient_num = as.character(patient_num),
-           encounter_num = as.character(encounter_num)) -> existing
+    RPostgreSQL::dbGetQuery(demodata, "SELECT nextval('observation_fact_text_search_index_seq'::regclass);") %>%
+      .$nextval -> nextval
   }
 
   observations %>%
-    dplyr::anti_join(existing) -> new_observations
-
-  observations %>%
-    dplyr::inner_join(existing) -> old_observations
-
-  new_observations %>%
-    dplyr::mutate(start_date = ifelse(is.na(start_date), "", format(start_date, format = "%m/%d/%Y %H:%M:%S")),
-           update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
-  dbPush(demodata, "observation_fact")
-
-  old_observations %>%
-    dplyr::mutate(start_date = ifelse(is.na(start_date), "", format(start_date, format = "%m/%d/%Y %H:%M:%S")),
-           update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
-  dbUpdate(demodata, "observation_fact", c("encounter_num", "patient_num", "concept_cd", "start_date"))
+    dplyr::mutate(start_date = ifelse(is.na(start_date), NA, format(start_date, format = "%m/%d/%Y %H:%M:%S")),
+                  patient_num = patient_ide,
+                  encounter_num = encounter_ide,
+                  update_date = format(Sys.Date(), "%m/%d/%Y"),
+                  text_search_index = (nextval+1):(nextval + nrow(.))) %>%
+  dplyr::select(-patient_ide, -encounter_ide) %>%
+  dbUpsert(demodata, "observation_fact", c("patient_num", "concept_cd", "modifier_cd", "start_date", "encounter_num", "instance_num", "provider_id"))
 
   RPostgreSQL::dbDisconnect(demodata)
 }
