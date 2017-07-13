@@ -224,6 +224,16 @@ add_patients_demodata <- function(patients, project, host = "", admin = "", pass
 
 # Upsert patients mappings
 patients %>%
+  dplyr::mutate(patient_ide_source = "HIVE",
+                patient_ide_status = "A",
+                project_id = project,
+                patient_num = patient_ide,
+                update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+  dplyr::select(patient_ide, patient_ide_source, patient_num, patient_ide_status, project_id, update_date) %>%
+dbUpsert(demodata, "patient_mapping", c("patient_ide", "patient_ide_source", "project_id"))
+
+# Upsert patients mappings
+patients %>%
   dplyr::mutate(patient_ide_source = project,
                 patient_ide_status = "A",
                 project_id = project,
@@ -310,114 +320,146 @@ dbUpsert(demodata, "patient_mapping", c("patient_ide", "patient_ide_source", "pr
 #' @param pass The password for the admin account
 #' @return An encounter mapping dataframe for the encounters
 #' @export
-add_encounters <- function(encounters, project, patient_mapping, host = "", admin = "", pass = "")
+add_encounters <- function(encounters, project, patient_mapping = "", host = "", admin = "", pass = "")
 {
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
 
-# Get existing encounters
-  dplyr::src_postgres("i2b2demodata", host, user = admin, password = pass) %>%
-    dplyr::tbl("encounter_mapping") %>%
-    dplyr::select(encounter_ide, encounter_num, patient_ide) %>%
-    dplyr::collect(n = Inf) -> existing
+# # Get existing encounters
+#   dplyr::src_postgres("i2b2demodata", host, user = admin, password = pass) %>%
+#     dplyr::tbl("encounter_mapping") %>%
+#     dplyr::select(encounter_ide, encounter_num, patient_ide) %>%
+#     dplyr::collect(n = Inf) -> existing
 
-# Create the new encounter mappings
-  new_id_start <- ifelse(nrow(existing) == 0, 100000001, existing$encounter_num %>% as.numeric %>% max + 1)
+# # Create the new encounter mappings
+#   new_id_start <- ifelse(nrow(existing) == 0, 100000001, existing$encounter_num %>% as.numeric %>% max + 1)
 
-  if (nrow(existing) == 0)
-    existing = data.frame(encounter_ide = character(0), encounter_num = character(0), patient_num = character(0))
+  # if (nrow(existing) == 0)
+  #   existing = data.frame(encounter_ide = character(0), encounter_num = character(0), patient_num = character(0))
+
+  # encounters %>%
+  #   dplyr::mutate(encounter_ide = encounter_ide %>% as.character) %>%
+  #   dplyr::anti_join(existing, by = "encounter_ide") %>%
+  #   dplyr::mutate(encounter_num = seq(new_id_start, length.out = nrow(.))) %>%
+  #   dplyr::left_join(patient_mapping) %>%
+  #   dplyr::select(-patient_ide, -start_date, -end_date, -inout) -> new_encounters
+
+  # if (nrow(new_encounters) == 0)
+  #   new_encounters = data.frame(encounter_ide = character(0), ecnounter_num = character(0), patient_num = character(0))
+
+  # # Push the new encounter mappings
+  # if (nrow(new_encounters) > 0)
+  # {
+  #   new_encounters %>%
+  #     dplyr::mutate(encounter_ide_source = project,
+  #                   encounter_ide_status  = "A",
+  #                   project_id = project,
+  #                   patient_ide_source = "HIVE",
+  #                   update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+  #     dplyr::rename(patient_ide = patient_num) %>%
+  #     purrr::map(as.character) %>%
+  #     data.frame(check.names = F, stringsAsFactors = F) %>%
+  #   dbPush(demodata, "encounter_mapping")
+  # }
+
+  # # Push the new encounter mappings
+  # if (nrow(new_encounters) > 0)
+  # {
+  #   new_encounters %>%
+  #     dplyr::mutate(encounter_ide_source = "HIVE",
+  #                   encounter_ide_status  = "A",
+  #                   project_id = project,
+  #                   patient_ide_source = "HIVE",
+  #                   update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+  #     dplyr::rename(patient_ide = patient_num) %>%
+  #     purrr::map(as.character) %>%
+  #     data.frame(check.names = F, stringsAsFactors = F) %>%
+  #   dbPush(demodata, "encounter_mapping")
+  # }
 
   encounters %>%
-    dplyr::mutate(encounter_ide = encounter_ide %>% as.character) %>%
-    dplyr::anti_join(existing, by = "encounter_ide") %>%
-    dplyr::mutate(encounter_num = seq(new_id_start, length.out = nrow(.))) %>%
-    dplyr::left_join(patient_mapping) %>%
-    dplyr::select(-patient_ide, -start_date, -end_date, -inout) -> new_encounters
-
-  if (nrow(new_encounters) == 0)
-    new_encounters = data.frame(encounter_ide = character(0), ecnounter_num = character(0), patient_num = character(0))
-
-  # Push the new encounter mappings
-  if (nrow(new_encounters) > 0)
-  {
-    new_encounters %>%
-      dplyr::mutate(encounter_ide_source = project,
-                    encounter_ide_status  = "A",
-                    project_id = project,
-                    patient_ide_source = "HIVE",
-                    update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
-      dplyr::rename(patient_ide = patient_num) %>%
-      purrr::map(as.character) %>%
-      data.frame(check.names = F, stringsAsFactors = F) %>%
-    dbPush(demodata, "encounter_mapping")
-  }
-
-  # Push the new encounter mappings
-  if (nrow(new_encounters) > 0)
-  {
-    new_encounters %>%
       dplyr::mutate(encounter_ide_source = "HIVE",
                     encounter_ide_status  = "A",
                     project_id = project,
                     patient_ide_source = "HIVE",
+                    encounter_num = encounter_ide,
                     update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
-      dplyr::rename(patient_ide = patient_num) %>%
-      purrr::map(as.character) %>%
-      data.frame(check.names = F, stringsAsFactors = F) %>%
-    dbPush(demodata, "encounter_mapping")
-  }
+      dplyr::select(encounter_ide, encounter_ide_source, project_id, encounter_num, patient_ide, patient_ide_source, encounter_ide_status, update_date) %>%
+    dbUpsert(demodata, "encounter_mapping", c("encounter_ide", "encounter_ide_source", "project_id", "patient_ide", "patient_ide_source"))
 
-  # Push the new encounters in visit_dimension
-  if (nrow(new_encounters) > 0)
-  {
-    encounters %>%
-      dplyr::mutate(encounter_ide = encounter_ide %>% as.character) %>%
-      dplyr::right_join(new_encounters) %>%
-      dplyr::mutate(length_of_stay = ifelse(is.na(end_date), floor(as.numeric(Sys.Date() - start_date)), floor(as.numeric(end_date - start_date))),
-                    start_date = ifelse(is.na(start_date), "", format(start_date, format = "%m/%d/%Y %H:%M:%S")),
-                    end_date = ifelse(is.na(end_date), NA, format(end_date, format = "%m/%d/%Y %H:%M:%S")),
-                    active_status_cd = ifelse(is.na(end_date), "O", ""),
-                    inout_cd = inout,
+  encounters %>%
+      dplyr::mutate(encounter_ide_source = project,
+                    encounter_ide_status  = "A",
+                    project_id = project,
+                    patient_ide_source = "HIVE",
+                    encounter_num = encounter_ide,
                     update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
-      dplyr::select(-encounter_ide, -patient_ide, -inout) %>%
-      purrr::map(as.character) %>%
-      data.frame(check.names = F, stringsAsFactors = F) %>%
-      dbPush(demodata, "visit_dimension")
-  }
+      dplyr::select(encounter_ide, encounter_ide_source, project_id, encounter_num, patient_ide, patient_ide_source, encounter_ide_status, update_date) %>%
+    dbUpsert(demodata, "encounter_mapping", c("encounter_ide", "encounter_ide_source", "project_id", "patient_ide", "patient_ide_source"))
 
-  # Update the existing encounters in visit_dimension
-  if (nrow(existing) > 0)
-  {
-    encounters %>%
-      dplyr::left_join(patient_mapping) %>%
-      dplyr::select(-patient_ide) %>%
-      dplyr::mutate(encounter_ide = encounter_ide %>% as.character) %>%
-      dplyr::inner_join(existing, by = "encounter_ide") %>%
-      dplyr::mutate(length_of_stay = ifelse(is.na(end_date), floor(as.numeric(Sys.Date() - start_date)), floor(as.numeric(end_date - start_date))),
-                    start_date = ifelse(is.na(start_date), "", format(start_date, format = "%m/%d/%Y %H:%M:%S")),
-                    end_date = ifelse(is.na(end_date), NA, format(end_date, format = "%m/%d/%Y %H:%M:%S")),
-                    active_status_cd = ifelse(is.na(end_date), "O", ""),
-                    inout_cd = inout,
-                    update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
-      dplyr::select(-encounter_ide, -patient_ide, -inout) %>%
-      purrr::map(as.character) %>%
-      data.frame(check.names = F, stringsAsFactors = F) %>%
-      dbUpdate(demodata, "visit_dimension", "encounter_num")
-  }
+  # # Push the new encounters in visit_dimension
+  # if (nrow(new_encounters) > 0)
+  # {
+  #   encounters %>%
+  #     dplyr::mutate(encounter_ide = encounter_ide %>% as.character) %>%
+  #     dplyr::right_join(new_encounters) %>%
+  #     dplyr::mutate(length_of_stay = ifelse(is.na(end_date), floor(as.numeric(Sys.Date() - start_date)), floor(as.numeric(end_date - start_date))),
+  #                   start_date = ifelse(is.na(start_date), "", format(start_date, format = "%m/%d/%Y %H:%M:%S")),
+  #                   end_date = ifelse(is.na(end_date), NA, format(end_date, format = "%m/%d/%Y %H:%M:%S")),
+  #                   active_status_cd = ifelse(is.na(end_date), "O", ""),
+  #                   inout_cd = inout,
+  #                   update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+  #     dplyr::select(-encounter_ide, -patient_ide, -inout) %>%
+  #     purrr::map(as.character) %>%
+  #     data.frame(check.names = F, stringsAsFactors = F) %>%
+  #     dbPush(demodata, "visit_dimension")
+  # }
+
+  # # Update the existing encounters in visit_dimension
+  # if (nrow(existing) > 0)
+  # {
+  #   encounters %>%
+  #     dplyr::left_join(patient_mapping) %>%
+  #     dplyr::select(-patient_ide) %>%
+  #     dplyr::mutate(encounter_ide = encounter_ide %>% as.character) %>%
+  #     dplyr::inner_join(existing, by = "encounter_ide") %>%
+  #     dplyr::mutate(length_of_stay = ifelse(is.na(end_date), floor(as.numeric(Sys.Date() - start_date)), floor(as.numeric(end_date - start_date))),
+  #                   start_date = ifelse(is.na(start_date), "", format(start_date, format = "%m/%d/%Y %H:%M:%S")),
+  #                   end_date = ifelse(is.na(end_date), NA, format(end_date, format = "%m/%d/%Y %H:%M:%S")),
+  #                   active_status_cd = ifelse(is.na(end_date), "O", ""),
+  #                   inout_cd = inout,
+  #                   update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+  #     dplyr::select(-encounter_ide, -patient_ide, -inout) %>%
+  #     purrr::map(as.character) %>%
+  #     data.frame(check.names = F, stringsAsFactors = F) %>%
+  #     dbUpdate(demodata, "visit_dimension", "encounter_num")
+  # }
+
+  encounters %>%
+    dplyr::mutate(length_of_stay = ifelse(is.na(end_date), floor(as.numeric(Sys.Date() - start_date)), floor(as.numeric(end_date - start_date))),
+                  start_date = ifelse(is.na(start_date), NA, format(start_date, format = "%m/%d/%Y %H:%M:%S")),
+                  end_date = ifelse(is.na(end_date), NA, format(end_date, format = "%m/%d/%Y %H:%M:%S")),
+                  active_status_cd = ifelse(is.na(end_date), "O", NA),
+                  inout_cd = inout,
+                  encounter_num = encounter_ide,
+                  patient_num = patient_ide,
+                  update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+    dplyr::select(encounter_num, patient_num, active_status_cd, start_date, end_date, inout_cd, length_of_stay, update_date) %>%
+  dbUpsert(demodata, "visit_dimension", c("encounter_num", "patient_num"))
 
   RPostgreSQL::dbDisconnect(demodata)
 
-  encounters %>%
-    dplyr::mutate(encounter_ide = encounter_ide %>% as.character) %>%
-    dplyr::inner_join(new_encounters, by = "encounter_ide") %>%
-    dplyr::select(encounter_ide, encounter_num) %>%
-    dplyr::bind_rows(encounters %>%
-              dplyr::mutate(encounter_ide = encounter_ide %>% as.character) %>%
-              dplyr::inner_join(existing, by = "encounter_ide") %>%
-              dplyr::select(encounter_ide, encounter_num)) %>%
-    dplyr::mutate(encounter_num = encounter_num %>% as.character) %>%
-    dplyr::distinct() %>%
-    purrr::map(as.character) %>%
-    data.frame(check.names = F, stringsAsFactors = F)
+  # encounters %>%
+  #   dplyr::mutate(encounter_ide = encounter_ide %>% as.character) %>%
+  #   dplyr::inner_join(new_encounters, by = "encounter_ide") %>%
+  #   dplyr::select(encounter_ide, encounter_num) %>%
+  #   dplyr::bind_rows(encounters %>%
+  #             dplyr::mutate(encounter_ide = encounter_ide %>% as.character) %>%
+  #             dplyr::inner_join(existing, by = "encounter_ide") %>%
+  #             dplyr::select(encounter_ide, encounter_num)) %>%
+  #   dplyr::mutate(encounter_num = encounter_num %>% as.character) %>%
+  #   dplyr::distinct() %>%
+  #   purrr::map(as.character) %>%
+  #   data.frame(check.names = F, stringsAsFactors = F)
 }
 
 #' Add observations to the CRC cell
