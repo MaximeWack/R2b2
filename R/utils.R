@@ -87,3 +87,44 @@ clear_table <- function(db, table, host = "", admin = "", pass = "")
 
   RPostgreSQL::dbDisconnect(con)
 }
+
+dbUpsert <- function(df, con, table, PK)
+{
+  columns <- setdiff(names(df), PK)
+
+  write.csv(df, file = "/tmp/data.csv", row.names = F)
+
+  temp <- str_c(table, "_tmp")
+
+# Create a temp table
+  stringr::str_c("CREATE TEMP TABLE ", temp, " (LIKE ", table, ");") %>%
+  RPostgreSQL::dbGetQuery(conn = con, .)
+
+# Load data in the temp table
+  stringr::str_c("COPY ", temp, " (", names(df) %>% str_c(collapse = ","), ") FROM '/tmp/data.csv' WITH CSV HEADER;") %>%
+  RPostgreSQL::dbGetQuery(conn = con, .)
+
+# Update existing rows
+  stringr::str_c("UPDATE", table,
+                 "SET", str_c(columns, "=", temp, ".", columns, collapse = ","),
+                 "FROM", temp,
+                 "WHERE", str_c(table, ".", PK, "=", temp, ".", PK, collapse = " AND "),
+                 ";", sep = " ") %>%
+  RPostgreSQL::dbGetQuery(conn = con, .)
+
+# Insert new rows
+  stringr::str_c("INSERT INTO", table,
+                 "SELECT", str_c(temp, ".*"),
+                 "FROM", temp,
+                 "LEFT OUTER JOIN", table,
+                 "ON (", str_c(table, ".", PK, "=", temp, ".", PK, collapse = " AND "), ")",
+                 "WHERE", str_c(table, ".", PK, " IS NULL", collapse = " AND "),
+                 ";", sep = " ") %>%
+  RPostgreSQL::dbGetQuery(conn = con, .)
+
+# Delete the temp table and file
+  stringr::str_c("DROP TABLE", temp, ";", sep = " ") %>%
+  RPostgreSQL::dbGetQuery(conn = con, .)
+
+  unlink("/tmp/data.csv")
+}
