@@ -125,12 +125,12 @@ add_ont <- function(name, scheme, host = "", admin = "", pass = "")
 #' Populate an empty ontology table
 #'
 #' Populate an ontology table
-#' ont is a character vector containing all the leaves of the ontology
+#' ont is a dataframe containing at least the c_fullname column, a character vector containing all the leaves of the ontology
 #' with their respective path, in the form
 #' code_level1 label_level1\\code_level2 label_level2\\...\\code_leaf label_leaf
 #' The function rebuilds the folders automatically
 #'
-#' modi is a character vector containing the modifiers, in the form
+#' modi is a dataframe containing at least the c_fullname column, a character vector containing the modifiers, in the form
 #' code_modi label_modi
 #' The modifiers apply on all the ontology
 #'
@@ -148,77 +148,107 @@ populate_ont <- function(ont, modi = NULL, name, scheme, include_code = T, host 
   metadata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2metadata", user = admin, password = pass)
 
   # Sanitize the ontology
-  ont <- ont %>% stringr::str_replace_all("'", "''")
-  modi <- modi %>% stringr::str_replace_all("'", "''")
+  ont %>%
+    dplyr::mutate(c_fullname = c_fullname %>% stringr::str_replace_all("'", "''")) ->
+  ont
 
-  # Create the data frame holding the contents of the new table, starting with leaves
-  df <- data.frame(c_fullname = ont, c_visualattributes = "LA", stringsAsFactors = F)
+  modi %>%
+    dplyr::mutate(c_fullname = c_fullname %>% stringr::str_replace_all("'", "''")) ->
+  modi
 
-  # Delete root leaves
-  ont <- ont %>% purrr::keep(~stringr::str_detect(., "\\\\"))
+  # Tag explicit folders and root leaves
+  ont %>%
+    mutate(type = case_when(c_fullname %>% map_lgl(~str_detect(setdiff(c_fullname, .x), .x) %>% any) ~ "folder",
+                            c_fullname %>% stringr::str_detect("\\\\") ~ "leaf",
+                            T ~ "root_leaf"),
+           c_visualattributes = ifelse(type == "folder", "FA", "LA")) ->
+  ont
 
   # Add the folders by 'deconstructing' the paths
-  while (any(stringr::str_detect(ont, "\\\\")))
+  ont %>%
+    filter(! c_fullname %>% str_detect(ont$c_fullname[ont$type == "folder"]),
+           type == "leaf") %>%
+    pull(c_fullname) ->
+  leaves
+
+  while (any(stringr::str_detect(leaves, "\\\\")))
   {
-    ont <- ont %>% stringr::str_replace("\\\\[^\\\\]+$", "") %>% unique
-    df <- df %>%
-      dplyr::bind_rows(data.frame(c_fullname = ont, c_visualattributes = "FA", stringsAsFactors = F))
+    leaves %>%
+      stringr::str_replace("\\\\[^\\\\]+$", "") %>%
+      unique ->
+    leaves
+    ont %>%
+      dplyr::add_row(c_fullname = leaves, c_visualattributes = "FA") ->
+    ont
   }
 
-  df %>%
+  ont %>%
+    # Delete temp type variable
+    dplyr::select(-type) %>%
     # Discard duplicated paths
     dplyr::distinct() %>%
     # Insert the name of the ontology at the root
     dplyr::mutate(c_fullname = stringr::str_c("\\", name, "\\", c_fullname)) %>%
-    dplyr::bind_rows(data.frame(c_fullname = stringr::str_c("\\", name), c_visualattributes = "FA")) %>%
-    # Populate the other columns
+    # dplyr::bind_rows(data.frame(c_fullname = stringr::str_c("\\", name), c_visualattributes = "FA")) %>%
+    dplyr::add_row(c_fullname = stringr::str_c("\\", name), c_visualattributes = "FA") %>%
+    # Populate the other columns if they are not given, with a default to concept_dimension
+    dplyr::bind_cols(tibble(c_synonym_cd = rep(NA, nrow(.)),
+                            c_facttablecolumn = rep(NA, nrow(.)),
+                            c_tablename = rep(NA, nrow(.)),
+                            c_columnname = rep(NA, nrow(.)),
+                            c_columndatatype = rep(NA, nrow(.)),
+                            c_operator = rep(NA, nrow(.)),
+                            c_tooltip = rep(NA, nrow(.)),
+                            c_dimcode = rep(NA, nrow(.)))) %>%
+    dplyr::select(-ends_with("1")) %>%
     dplyr::mutate(c_hlevel = stringr::str_count(c_fullname, "\\\\") - 1,
                   c_name = stringr::str_extract(c_fullname, "[^\\\\]+$"),
                   c_basecode = stringr::str_c(scheme, ":", c_name %>% stringr::str_extract("^.+? ") %>% stringr::str_trim()),
                   c_basecode = ifelse(is.na(c_basecode), "", c_basecode),
-                  c_synonym_cd = "N",
-                  c_facttablecolumn = "concept_cd",
-                  c_tablename = "concept_dimension",
-                  c_columnname = "concept_path",
-                  c_columndatatype = "T",
-                  c_operator = "LIKE",
-                  c_tooltip = c_name,
+                  c_synonym_cd = ifelse(is.na(c_synonym_cd), "N", c_synonymcd),
+                  c_facttablecolumn = ifelse(is.na(c_facttablecolumn), "concept_cd",c_facttablecolumn),
+                  c_tablename = ifelse(is.na(c_tablename), "concept_dimension", c_tablename),
+                  c_columnname = ifelse(is.na(c_columnname), "concept_path", c_columnname),
+                  c_columndatatype = ifelse(is.na(c_columndatatype), "T", c_columndatatype),
+                  c_operator = ifelse(is.na(c_operator), "LIKE", c_operator),
+                  c_tooltip = ifelse(is.na(c_tooltip), c_name, c_tooltip),
                   m_applied_path = "@",
                   c_fullname = stringr::str_c(c_fullname, "\\"),
                   # Use only codes to build shorter paths
                   c_fullname = stringr::str_replace_all(c_fullname, "\\\\(.+?) [^\\\\]+", "\\\\\\1"),
-                  c_dimcode = c_fullname,
-                  update_date = format(Sys.Date(), "%m/%d/%Y")) -> df
+                  c_dimcode = ifelse(is.na(c_dimcode), c_fullname, c_dimcode),
+                  update_date = format(Sys.Date(), "%m/%d/%Y")) ->
+  ont
 
-    if (!include_code)
-      df$c_name[df$c_hlevel > 0] <- df$c_name[df$c_hlevel > 0] %>% stringr::str_extract(" .*$") %>% stringr::str_trim()
+  if (!include_code)
+    ont$c_name[ont$c_hlevel > 0] <- ont$c_name[ont$c_hlevel > 0] %>% stringr::str_extract(" .*$") %>% stringr::str_trim()
 
-    # Push the dataframe into the new ontology table
-    dbPush(df, metadata, scheme)
+  # Push the dataframe into the new ontology table
+  dbPush(ont, metadata, scheme)
 
-    if (length(modi) > 0)
-    {
-      data.frame(modi = modi, stringsAsFactors = F) %>%
-        dplyr::mutate(c_hlevel = 1,
-                      c_name = modi %>% stringr::str_extract(" .*$") %>% stringr::str_trim(),
-                      c_fullname = stringr::str_c("\\", c_name, "\\"),
-                      c_synonym_cd = "N",
-                      c_visualattributes = "RA",
-                      c_basecode = stringr::str_c(scheme, ":", modi %>% stringr::str_extract("^.+? ") %>% stringr::str_trim()),
-                      c_facttablecolumn = "modifier_cd",
-                      c_tablename = "modifier_dimension",
-                      c_columnname = "modifier_path",
-                      c_columndatatype = "T",
-                      c_operator = "LIKE",
-                      c_tooltip = c_name,
-                      c_dimcode = c_fullname,
-                      m_applied_path = stringr::str_c("\\", name, "\\%"),
-                      update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
-      dplyr::select(-modi) -> df
+  if (length(modi) > 0)
+  {
+    modi %>%
+      dplyr::mutate(c_hlevel = 1,
+                    c_name = c_fullname %>% stringr::str_extract(" .*$") %>% stringr::str_trim(),
+                    c_synonym_cd = "N",
+                    c_visualattributes = "RA",
+                    c_basecode = stringr::str_c(scheme, ":", c_fullname %>% stringr::str_extract("^.+? ") %>% stringr::str_trim()),
+                    c_fullname = stringr::str_c("\\", c_name, "\\"),
+                    c_facttablecolumn = "modifier_cd",
+                    c_tablename = "modifier_dimension",
+                    c_columnname = "modifier_path",
+                    c_columndatatype = "T",
+                    c_operator = "LIKE",
+                    c_tooltip = c_name,
+                    c_dimcode = c_fullname,
+                    m_applied_path = stringr::str_c("\\", name, "\\%"),
+                    update_date = format(Sys.Date(), "%m/%d/%Y")) ->
+    modi
 
-    # Push the dataframe into the new ontology table
-    dbPush(df, metadata, scheme)
-    }
+  # Push the dataframe into the new ontology table
+  dbPush(modi, metadata, scheme)
+}
 
 
   RPostgreSQL::dbDisconnect(metadata)

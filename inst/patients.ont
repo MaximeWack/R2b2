@@ -1,5 +1,7 @@
-sexe Sexe\m Masculin
-sexe Sexe\f Féminin
-age Age
-statut Statut\v Vivant
-statut Statut\d Décédé
+c_fullname, c_facttablecolumn, c_tablename, c_columnname, c_operator, c_dimcode
+sexe Sexe, patient_num, patient_dimension, sex_cd, LIKE, %
+sexe Sexe\m Masculin, patient_num, patient_dimension, sex_cd, =, M
+sexe Sexe\f Féminin, patient_num, patient_dimension, sex_cd, =, F
+age Age,,,,,
+statut Statut\v Vivant,,,,,
+statut Statut\d Décédé,,,,,
