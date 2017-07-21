@@ -134,3 +134,5 @@ dbUpsert <- function(df, con, table, PK)
 
   unlink("/tmp/data.csv")
 }
+
+`%||%` <- function(a, b) if (is.null(a)) b else a
