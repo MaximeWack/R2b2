@@ -143,7 +143,7 @@ add_ont <- function(name, scheme, host = "", admin = "", pass = "")
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass the password for the admin account
 #' @export
-populate_ont <- function(ont, modi = NULL, name, scheme, include_code = T, host = "", admin = "", pass = "")
+populate_ont <- function(ont, modi = NULL, name, scheme, include_code = T, def_facttablecolumn = "concept_cd", def_tablename = "concept_dimension", def_columnname = "concept_path", def_columndatatype = "T", def_operator = "LIKE", host = "", admin = "", pass = "")
 {
   metadata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2metadata", user = admin, password = pass)
 
@@ -152,21 +152,24 @@ populate_ont <- function(ont, modi = NULL, name, scheme, include_code = T, host 
     dplyr::mutate(c_fullname = c_fullname %>% stringr::str_replace_all("'", "''")) ->
   ont
 
-  modi %>%
-    dplyr::mutate(c_fullname = c_fullname %>% stringr::str_replace_all("'", "''")) ->
-  modi
+  if(! modi %>% is.null)
+  {
+    modi %>%
+      dplyr::mutate(c_fullname = c_fullname %>% stringr::str_replace_all("'", "''")) ->
+    modi
+  }
 
   # Tag explicit folders and root leaves
   ont %>%
-    mutate(type = case_when(c_fullname %>% map_lgl(~str_detect(setdiff(c_fullname, .x), .x) %>% any) ~ "folder",
+    mutate(type = case_when(c_fullname %>% map_lgl(~stringr::str_detect(setdiff(c_fullname, .x), fixed(.x)) %>% any) ~ "folder",
                             c_fullname %>% stringr::str_detect("\\\\") ~ "leaf",
                             T ~ "root_leaf"),
            c_visualattributes = ifelse(type == "folder", "FA", "LA")) ->
   ont
 
-  # Add the folders by 'deconstructing' the paths
+  # Add the folders for orphaned leaves by 'deconstructing' the paths
   ont %>%
-    filter(! c_fullname %>% str_detect(ont$c_fullname[ont$type == "folder"]),
+    filter(! (map(ont$c_fullname[ont$type == "folder"], ~stringr::str_detect(ont$c_fullname, .x)) %>% Reduce(f = `|`) %||% F),
            type == "leaf") %>%
     pull(c_fullname) ->
   leaves
@@ -206,11 +209,11 @@ populate_ont <- function(ont, modi = NULL, name, scheme, include_code = T, host 
                   c_basecode = stringr::str_c(scheme, ":", c_name %>% stringr::str_extract("^.+? ") %>% stringr::str_trim()),
                   c_basecode = ifelse(is.na(c_basecode), "", c_basecode),
                   c_synonym_cd = ifelse(is.na(c_synonym_cd), "N", c_synonymcd),
-                  c_facttablecolumn = ifelse(is.na(c_facttablecolumn), "concept_cd",c_facttablecolumn),
-                  c_tablename = ifelse(is.na(c_tablename), "concept_dimension", c_tablename),
-                  c_columnname = ifelse(is.na(c_columnname), "concept_path", c_columnname),
-                  c_columndatatype = ifelse(is.na(c_columndatatype), "T", c_columndatatype),
-                  c_operator = ifelse(is.na(c_operator), "LIKE", c_operator),
+                  c_facttablecolumn = ifelse(is.na(c_facttablecolumn), def_facttablecolumn,c_facttablecolumn),
+                  c_tablename = ifelse(is.na(c_tablename), def_tablename, c_tablename),
+                  c_columnname = ifelse(is.na(c_columnname), def_columnname, c_columnname),
+                  c_columndatatype = ifelse(is.na(c_columndatatype), def_columndatatype, c_columndatatype),
+                  c_operator = ifelse(is.na(c_operator), def_operator, c_operator),
                   c_tooltip = ifelse(is.na(c_tooltip), c_name, c_tooltip),
                   m_applied_path = "@",
                   c_fullname = stringr::str_c(c_fullname, "\\"),
@@ -248,7 +251,7 @@ populate_ont <- function(ont, modi = NULL, name, scheme, include_code = T, host 
 
   # Push the dataframe into the new ontology table
   dbPush(modi, metadata, scheme)
-}
+  }
 
 
   RPostgreSQL::dbDisconnect(metadata)
