@@ -1,7 +1,8 @@
-c_fullname
-age_hospit Age à l'hospitalisation
-dates Dates\entree Date d'entrée
-dates Dates\sortie Date de sortie
-dates Dates\duree Durée de séjour
-type Type de séjour\hospit Hospitalisation
-type Type de séjour\consult Consultation
+c_fullname, c_facttablecolumn, c_tablename, c_columnname, c_operator, c_dimcode
+age_hospit Age à l'hospitalisation,,,,,
+type Type de séjour, encounter_num, visit_dimension, inout_cd, like, %
+type Type de séjour\hospit Hospitalisation, encounter_num, visit_dimension, inout_cd, =, I
+type Type de séjour\consult Consultation, encounter_num, visit_dimension, inout_cd, =, O
+passage Passage, encounter_num, visit_dimension, active_status_cd, like, %
+passage Passage\en_cours En cours, encounter_num, visit_dimension, active_status_cd, =, O
+passage Passage\termine Terminé, encounter_num, visit_dimension, active_status_cd, =, S
