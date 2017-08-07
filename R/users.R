@@ -109,7 +109,7 @@ add_users <- function(domain, admin, pass, users, url = "http://127.0.0.1:9090/i
 #' @param pass The password for the database admin
 #' @param users A character vector of user ids
 #' @export
-delete_users <- function(host = "127.0.0.1", admin, pass, users)
+delete_users <- function(users, host = "", admin = "", pass = "")
 {
   pm   <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2pm",   user = admin, password = pass)
 
