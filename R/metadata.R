@@ -149,19 +149,19 @@ populate_ont <- function(ont, modi = NULL, name, scheme, include_code = T, def_f
 
   # Sanitize the ontology
   ont %>%
-    dplyr::mutate(c_fullname = c_fullname %>% stringr::str_replace_all("'", "''")) ->
+    dplyr::mutate_all(~stringr::str_replace_all(., "'", "''")) ->
   ont
 
   if(! modi %>% is.null)
   {
     modi %>%
-      dplyr::mutate(c_fullname = c_fullname %>% stringr::str_replace_all("'", "''")) ->
+      dplyr::mutate_all(~stringr::str_replace_all("'", "''")) ->
     modi
   }
 
   # Tag explicit folders and root leaves
   ont %>%
-    mutate(type = case_when(c_fullname %>% map_lgl(~stringr::str_detect(setdiff(c_fullname, .x), fixed(.x)) %>% any) ~ "folder",
+    dplyr::mutate(type = dplyr::case_when(c_fullname %>% purrr::map_lgl(~stringr::str_detect(setdiff(c_fullname, .x), stringr::fixed(.x)) %>% any) ~ "folder",
                             c_fullname %>% stringr::str_detect("\\\\") ~ "leaf",
                             T ~ "root_leaf"),
            c_visualattributes = ifelse(type == "folder", "FA", "LA")) ->
@@ -169,9 +169,9 @@ populate_ont <- function(ont, modi = NULL, name, scheme, include_code = T, def_f
 
   # Add the folders for orphaned leaves by 'deconstructing' the paths
   ont %>%
-    filter(! (map(ont$c_fullname[ont$type == "folder"], ~stringr::str_detect(ont$c_fullname, .x)) %>% Reduce(f = `|`) %||% F),
+    dplyr::filter(! (purrr::map(ont$c_fullname[ont$type == "folder"], ~stringr::str_detect(ont$c_fullname, .x)) %>% purrr::reduce(`|`) %||% F),
            type == "leaf") %>%
-    pull(c_fullname) ->
+    dplyr::pull(c_fullname) ->
   leaves
 
   while (any(stringr::str_detect(leaves, "\\\\")))
@@ -195,7 +195,7 @@ populate_ont <- function(ont, modi = NULL, name, scheme, include_code = T, def_f
     # dplyr::bind_rows(data.frame(c_fullname = stringr::str_c("\\", name), c_visualattributes = "FA")) %>%
     dplyr::add_row(c_fullname = stringr::str_c("\\", name), c_visualattributes = "FA") %>%
     # Populate the other columns if they are not given, with a default to concept_dimension
-    dplyr::bind_cols(tibble(c_synonym_cd = rep(NA, nrow(.)),
+    dplyr::bind_cols(tibble::tibble(c_synonym_cd = rep(NA, nrow(.)),
                             c_facttablecolumn = rep(NA, nrow(.)),
                             c_tablename = rep(NA, nrow(.)),
                             c_columnname = rep(NA, nrow(.)),
@@ -203,7 +203,7 @@ populate_ont <- function(ont, modi = NULL, name, scheme, include_code = T, def_f
                             c_operator = rep(NA, nrow(.)),
                             c_tooltip = rep(NA, nrow(.)),
                             c_dimcode = rep(NA, nrow(.)))) %>%
-    dplyr::select(-ends_with("1")) %>%
+    dplyr::select(-dplyr::ends_with("1")) %>%
     dplyr::mutate(c_hlevel = stringr::str_count(c_fullname, "\\\\") - 1,
                   c_name = stringr::str_extract(c_fullname, "[^\\\\]+$"),
                   c_basecode = stringr::str_c(scheme, ":", c_name %>% stringr::str_extract("^.+? ") %>% stringr::str_trim()),
@@ -265,9 +265,9 @@ populate_ont <- function(ont, modi = NULL, name, scheme, include_code = T, def_f
 #' @export
 list_ont <- function(host = "", admin = "", pass = "")
 {
-  src_postgres("i2b2metadata", host = host, user = admin, pass = pass) %>%
-    tbl("table_access") %>%
-    collect(n = Inf)
+  dplyr::src_postgres("i2b2metadata", host = host, user = admin, pass = pass) %>%
+    dplyr::tbl("table_access") %>%
+    dplyr::collect(n = Inf)
 }
 
 #' List the available schemes
@@ -278,9 +278,9 @@ list_ont <- function(host = "", admin = "", pass = "")
 #' @export
 list_schemes <- function(host = "", admin = "", pass = "")
 {
-  src_postgres("i2b2metadata", host = host, user = admin, pass = pass) %>%
-    tbl("schemes") %>%
-    collect(n = Inf)
+  dplyr::src_postgres("i2b2metadata", host = host, user = admin, pass = pass) %>%
+    dplyr::tbl("schemes") %>%
+    dplyr::collect(n = Inf)
 }
 
 #' Fetch an ontology
@@ -292,7 +292,7 @@ list_schemes <- function(host = "", admin = "", pass = "")
 #' @export
 get_ont <- function(ont, host = "", admin = "", pass = "")
 {
-  src_postgres("i2b2metadata", host = host, user = admin, pass = pass) %>%
-    tbl(stringr::str_to_lower(ont)) %>%
-    collect(n = Inf)
+  dplyr::src_postgres("i2b2metadata", host = host, user = admin, pass = pass) %>%
+    dplyr::tbl(stringr::str_to_lower(ont)) %>%
+    dplyr::collect(n = Inf)
 }
