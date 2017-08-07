@@ -8,7 +8,7 @@
 #' @export
 clear_default_demodata <- function(host = "", admin = "", pass = "")
 {
-  c("code_lookup", "concept_dimension", "modifier_dimension", "encounter_mapping", "visit_dimension", "patient_dimension", "patient_mapping", "qt_breakdown_path", "provider_dimension", "observation_fact") %>%
+  c("code_lookup", "concept_dimension", "modifier_dimension", "encounter_mapping", "visit_dimension", "patient_dimension", "patient_mapping", "provider_dimension", "observation_fact", "qt_analysis_plugin", "qt_analysis_plugin_result_type", "qt_patient_enc_collection", "qt_patient_set_collection", "qt_pdo_query_master", "qt_xml_result", "qt_query_result_instance", "qt_query_instance", "qt_query_master") %>%
     purrr::walk(~clear_table("i2b2demodata", .x, host, admin, pass))
 }
 
