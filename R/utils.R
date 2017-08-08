@@ -98,33 +98,33 @@ dbUpsert <- function(df, con, table, PK)
 {
   columns <- setdiff(names(df), PK)
 
-  write.csv(df, file = "/tmp/data.csv", row.names = F, na = "")
+  utils::write.csv(df, file = "/tmp/data.csv", row.names = F, na = "")
 
-  temp <- str_c(table, "_tmp")
+  temp <- stringr::str_c(table, "_tmp")
 
 # Create a temp table
   stringr::str_c("CREATE TEMP TABLE ", temp, " (LIKE ", table, ");") %>%
   RPostgreSQL::dbGetQuery(conn = con, .)
 
 # Load data in the temp table
-  stringr::str_c("COPY ", temp, " (", names(df) %>% str_c(collapse = ","), ") FROM '/tmp/data.csv' WITH CSV HEADER;") %>%
+  stringr::str_c("COPY ", temp, " (", names(df) %>% stringr::str_c(collapse = ","), ") FROM '/tmp/data.csv' WITH CSV HEADER;") %>%
   RPostgreSQL::dbGetQuery(conn = con, .)
 
 # Update existing rows
   stringr::str_c("UPDATE", table,
-                 "SET", str_c(columns, "=", temp, ".", columns, collapse = ","),
+                 "SET", stringr::str_c(columns, "=", temp, ".", columns, collapse = ","),
                  "FROM", temp,
-                 "WHERE", str_c(table, ".", PK, "=", temp, ".", PK, collapse = " AND "),
+                 "WHERE", stringr::str_c(table, ".", PK, "=", temp, ".", PK, collapse = " AND "),
                  ";", sep = " ") %>%
   RPostgreSQL::dbGetQuery(conn = con, .)
 
 # Insert new rows
   stringr::str_c("INSERT INTO", table,
-                 "SELECT", str_c(temp, ".*"),
+                 "SELECT", stringr::str_c(temp, ".*"),
                  "FROM", temp,
                  "LEFT OUTER JOIN", table,
-                 "ON (", str_c(table, ".", PK, "=", temp, ".", PK, collapse = " AND "), ")",
-                 "WHERE", str_c(table, ".", PK, " IS NULL", collapse = " AND "),
+                 "ON (", stringr::str_c(table, ".", PK, "=", temp, ".", PK, collapse = " AND "), ")",
+                 "WHERE", stringr::str_c(table, ".", PK, " IS NULL", collapse = " AND "),
                  ";", sep = " ") %>%
   RPostgreSQL::dbGetQuery(conn = con, .)
 
