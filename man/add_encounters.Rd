@@ -4,8 +4,8 @@
 \alias{add_encounters}
 \title{Add encounters to the CRC cell}
 \usage{
-add_encounters(encounters, project, patient_mapping, host = "", admin = "",
-  pass = "")
+add_encounters(encounters, project, patient_mapping = "", host = "",
+  admin = "", pass = "")
 }
 \arguments{
 \item{encounters}{A dataframe of patients}

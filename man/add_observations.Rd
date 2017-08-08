@@ -4,8 +4,8 @@
 \alias{add_observations}
 \title{Add observations to the CRC cell}
 \usage{
-add_observations(observations, patient_mapping, encounter_mapping, host = "",
-  admin = "", pass = "")
+add_observations(observations, patient_mapping = "", encounter_mapping = "",
+  host = "", admin = "", pass = "")
 }
 \arguments{
 \item{observations}{A dataframe of observation facts}

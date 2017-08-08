@@ -4,8 +4,10 @@
 \alias{populate_ont}
 \title{Populate an empty ontology table}
 \usage{
-populate_ont(ont, modi = NULL, name, scheme, include_code = T, host = "",
-  admin = "", pass = "")
+populate_ont(ont, modi = NULL, name, scheme, include_code = T,
+  def_facttablecolumn = "concept_cd", def_tablename = "concept_dimension",
+  def_columnname = "concept_path", def_columndatatype = "T",
+  def_operator = "LIKE", host = "", admin = "", pass = "")
 }
 \arguments{
 \item{ont}{The ontology to insert}
@@ -18,6 +20,16 @@ populate_ont(ont, modi = NULL, name, scheme, include_code = T, host = "",
 
 \item{include_code}{Whether to include the code in the label or not}
 
+\item{def_facttablecolumn}{Default value for that column}
+
+\item{def_tablename}{Default value for that column}
+
+\item{def_columnname}{Default value for that column}
+
+\item{def_columndatatype}{Default value for that column}
+
+\item{def_operator}{Default value for that column}
+
 \item{host}{The host to connect to}
 
 \item{admin}{The admin account for the PostgreSQL database}
@@ -29,12 +41,12 @@ Populate an empty ontology table
 }
 \details{
 Populate an ontology table
-ont is a character vector containing all the leaves of the ontology
+ont is a dataframe containing at least the c_fullname column, a character vector containing all the leaves of the ontology
 with their respective path, in the form
 code_level1 label_level1\\code_level2 label_level2\\...\\code_leaf label_leaf
 The function rebuilds the folders automatically
 
-modi is a character vector containing the modifiers, in the form
+modi is a dataframe containing at least the c_fullname column, a character vector containing the modifiers, in the form
 code_modi label_modi
 The modifiers apply on all the ontology
 }

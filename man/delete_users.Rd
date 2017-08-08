@@ -4,16 +4,16 @@
 \alias{delete_users}
 \title{Delete users}
 \usage{
-delete_users(host = "127.0.0.1", admin, pass, users)
+delete_users(users, host = "", admin = "", pass = "")
 }
 \arguments{
+\item{users}{A character vector of user ids}
+
 \item{host}{The host to connect to}
 
 \item{admin}{The admin account for the PostgreSQL database}
 
 \item{pass}{The password for the database admin}
-
-\item{users}{A character vector of user ids}
 }
 \description{
 Delete i2b2 users from the instance

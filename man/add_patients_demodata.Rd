@@ -17,9 +17,6 @@ add_patients_demodata(patients, project, host = "", admin = "", pass = "")
 
 \item{pass}{The password for the admin account}
 }
-\value{
-A patient mapping dataframe for the patients
-}
 \description{
 Add patients to the CRC cell, generate new encrypted IDs,
 }
