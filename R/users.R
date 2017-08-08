@@ -133,7 +133,7 @@ list_users <- function(host = "", admin = "", pass = "")
   src_postgres("i2b2pm", host = host, user = admin, pass = pass) %>%
     tbl("pm_user_data") %>%
     select(user_id, full_name, email, project_path) %>%
-    collect(n = Inf)
+    collect()
 }
 
 #' List user roles
@@ -151,5 +151,5 @@ list_user_roles <- function(user, host = "", admin = "", pass = "")
     tbl("pm_project_user_roles") %>%
     filter(user_id == user) %>%
     select(project_id, user_id, user_role_cd) %>%
-    collect(n = Inf)
+    collect()
 }

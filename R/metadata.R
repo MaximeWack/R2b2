@@ -267,7 +267,7 @@ list_ont <- function(host = "", admin = "", pass = "")
 {
   dplyr::src_postgres("i2b2metadata", host = host, user = admin, pass = pass) %>%
     dplyr::tbl("table_access") %>%
-    dplyr::collect(n = Inf)
+    dplyr::collect()
 }
 
 #' List the available schemes
@@ -280,7 +280,7 @@ list_schemes <- function(host = "", admin = "", pass = "")
 {
   dplyr::src_postgres("i2b2metadata", host = host, user = admin, pass = pass) %>%
     dplyr::tbl("schemes") %>%
-    dplyr::collect(n = Inf)
+    dplyr::collect()
 }
 
 #' Fetch an ontology
@@ -294,5 +294,5 @@ get_ont <- function(ont, host = "", admin = "", pass = "")
 {
   dplyr::src_postgres("i2b2metadata", host = host, user = admin, pass = pass) %>%
     dplyr::tbl(stringr::str_to_lower(ont)) %>%
-    dplyr::collect(n = Inf)
+    dplyr::collect()
 }

@@ -33,7 +33,7 @@ add_patients_imdata <- function(patients, project, host = "", admin = "", pass =
   dplyr::src_postgres("i2b2imdata", host, user = admin, password = pass) %>%
     dplyr::tbl("im_mpi_mapping") %>%
     dplyr::select(global_id, lcl_site, lcl_id) %>%
-    dplyr::collect(n = Inf) -> existing
+    dplyr::collect() -> existing
 
 # Create new IDEs
   new_id_start <- ifelse(nrow(existing) == 0, 100000001, existing$global_id %>% as.numeric %>% max + 1)
