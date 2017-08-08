@@ -142,6 +142,11 @@ add_ont <- function(name, scheme, host = "", admin = "", pass = "")
 #' @param host The host to connect to
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass the password for the admin account
+#' @param def_columndatatype Default value for that column
+#' @param def_tablename Default value for that column
+#' @param def_operator Default value for that column
+#' @param def_facttablecolumn Default value for that column
+#' @param def_columnname Default value for that column
 #' @export
 populate_ont <- function(ont, modi = NULL, name, scheme, include_code = T, def_facttablecolumn = "concept_cd", def_tablename = "concept_dimension", def_columnname = "concept_path", def_columndatatype = "T", def_operator = "LIKE", host = "", admin = "", pass = "")
 {
