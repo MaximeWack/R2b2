@@ -17,7 +17,7 @@ add_user <- function(domain, admin, pass, id, name, email, password, url = "http
   base_msg() %>%
     add_header(domain, admin, pass) %>%
     add_body("pm:set_user", user_name = id, full_name = name, email = email, password = password, is_admin = 0) %>%
-    send_msg(url)
+  send_msg(url)
 }
 
 #' Add user roles

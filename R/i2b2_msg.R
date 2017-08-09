@@ -77,13 +77,13 @@ add_header <- function(msg, domain, username, password)
 #' @export
 add_body <- function(msg, service, ..., attrib = NULL)
 {
-# Create param nodes
+  # Create param nodes
   params <- list(...) %>% purrr::map(list)
 
   mb <- list()
   mb[[service]] <- params
 
-# Set attributes
+  # Set attributes
   if(!is.null(attrib))
   {
     names(attrib) %>%
@@ -108,7 +108,7 @@ add_body <- function(msg, service, ..., attrib = NULL)
 #' @export
 send_msg <- function(msg, cellurl)
 {
-# Correct the base tag
+  # Correct the base tag
   request <- msg %>%
     xml2::as_xml_document() %>% 
     as.character %>%

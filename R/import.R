@@ -27,18 +27,20 @@ import_data <- function(data, project, host = "", admin = "", pass = "")
   data %>%
     dplyr::select(patient_ide, birth_date, death_date, gender) %>%
     dplyr::distinct() %>%
-    add_patients_demodata(project, host, admin, pass) -> patient_mapping
+    add_patients_demodata(project, host, admin, pass) ->
+  patient_mapping
 
   # Encounters
   data %>%
     dplyr::select(patient_ide, encounter_ide, start_date, end_date) %>%
     dplyr::distinct() %>%
-    add_encounters(project, patient_mapping, host, admin, pass) -> encounter_mapping
+    add_encounters(project, patient_mapping, host, admin, pass) ->
+  encounter_mapping
 
   # Observations
   data %>%
     dplyr::distinct() %>%
-    add_observations(patient_mapping, encounter_mapping, host, admin, pass)
+  add_observations(patient_mapping, encounter_mapping, host, admin, pass)
 
   # Rebuild indexes
   rebuild_indexes_demodata(host, admin, pass)

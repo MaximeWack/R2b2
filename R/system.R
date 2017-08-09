@@ -10,7 +10,7 @@ clear_webclient <- function()
     stringr::str_c(collapse = "\n") %>%
     stringr::str_replace("demo", "") %>%
     stringr::str_replace("demouser", "") %>%
-    write("/var/www/html/webclient/js-i2b2/i2b2_ui_config.js")
+  write("/var/www/html/webclient/js-i2b2/i2b2_ui_config.js")
 }
 
 #' Set the permissions for the webclient and wildfly folders
@@ -43,28 +43,28 @@ set_permissions <- function()
 #' @export
 create_admin <- function(admin = "i2b2admin", pass= NULL, pass_length = 8)
 {
-# Generate a new password of default length 10
+  # Generate a new password of default length 10
   if (is.null(pass))
     pass <- create_password(pass_length)
 
-# Create the system user
+  # Create the system user
   system(stringr::str_c("useradd ", admin, " -g users -G wildfly -m"))
   system(stringr::str_c("echo \"", admin, ":", pass, "\" | chpasswd"))
   print(stringr::str_c(admin, " system account created with password: ", pass))
-  
-# Connect to the db
+
+  # Connect to the db
   con <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = "127.0.0.1", user = "postgres", password = "demouser")
-  
-# Create the database user and its database
+
+  # Create the database user and its database
   RPostgreSQL::dbGetQuery(con, stringr::str_c("create user ", admin, " with superuser createrole createdb password '", pass, "';"))
   RPostgreSQL::dbGetQuery(con, stringr::str_c("create database ", admin, ";"))
   print(stringr::str_c(admin, " postgresql account created with password: ", pass))
 
-# Reset the root account password
+  # Reset the root account password
   RPostgreSQL::dbGetQuery(con, stringr::str_c("alter user postgres password '", pass, "';"))
   print(stringr::str_c("Changed password for user postgres to: ", pass))
 
-# Disconnect the db
+  # Disconnect the db
   RPostgreSQL::dbDisconnect(con)
 
   pass
@@ -85,7 +85,7 @@ create_admin <- function(admin = "i2b2admin", pass= NULL, pass_length = 8)
 #' @export
 secure_db <- function(admin, pass, pass_length = 8)
 {
-# Connect to the db
+  # Connect to the db
   con <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = "127.0.0.1", user = admin, password = pass)
 
 # Generate passwords

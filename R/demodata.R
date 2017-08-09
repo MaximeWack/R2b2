@@ -101,7 +101,7 @@ populate_concept <- function(ont, modi, name, scheme, host = "", admin = "", pas
                   concept_path = stringr::str_replace_all(concept_path, "\\\\(.+?) [^\\\\]+", "\\\\\\1"),
                   update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
     # Push the dataframe into the new ontology table
-    dbPush(demodata, "concept_dimension")
+  dbPush(demodata, "concept_dimension")
 
   if (length(modi) > 0)
   {
@@ -110,7 +110,7 @@ populate_concept <- function(ont, modi, name, scheme, host = "", admin = "", pas
                     modifier_path = stringr::str_c("\\", name_char, "\\"),
                     modifier_cd = stringr::str_c(scheme, ":", modi %>% stringr::str_extract("^.+? ") %>% stringr::str_trim()),
                     update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
-    dplyr::select(-modi) %>%
+      dplyr::select(-modi) %>%
     # Push the dataframe into the new ontology table
     dbPush(demodata, "modifier_dimension")
   }
@@ -153,7 +153,7 @@ populate_provider <- function(ont, name, scheme, host = "", admin = "", pass = "
                   provider_path = stringr::str_replace_all(provider_path, "\\\\(.+?) [^\\\\]+", "\\\\\\1"),
                   update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
     # Push the dataframe into the new ontology table
-    dbPush(demodata, "provider_dimension")
+  dbPush(demodata, "provider_dimension")
 
   RPostgreSQL::dbDisconnect(demodata)
 }
@@ -179,24 +179,24 @@ add_patients_demodata <- function(patients, project, host = "", admin = "", pass
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
 
 # Upsert patients mappings
-patients %>%
-  dplyr::mutate(patient_ide_source = "HIVE",
-                patient_ide_status = "A",
-                project_id = project,
-                patient_num = patient_ide,
-                update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
-  dplyr::select(patient_ide, patient_ide_source, patient_num, patient_ide_status, project_id, update_date) %>%
-dbUpsert(demodata, "patient_mapping", c("patient_ide", "patient_ide_source", "project_id"))
+  patients %>%
+    dplyr::mutate(patient_ide_source = "HIVE",
+                  patient_ide_status = "A",
+                  project_id = project,
+                  patient_num = patient_ide,
+                  update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+    dplyr::select(patient_ide, patient_ide_source, patient_num, patient_ide_status, project_id, update_date) %>%
+  dbUpsert(demodata, "patient_mapping", c("patient_ide", "patient_ide_source", "project_id"))
 
 # Upsert patients mappings
-patients %>%
-  dplyr::mutate(patient_ide_source = project,
-                patient_ide_status = "A",
-                project_id = project,
-                patient_num = patient_ide,
-                update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
-  dplyr::select(patient_ide, patient_ide_source, patient_num, patient_ide_status, project_id, update_date) %>%
-dbUpsert(demodata, "patient_mapping", c("patient_ide", "patient_ide_source", "project_id"))
+  patients %>%
+    dplyr::mutate(patient_ide_source = project,
+                  patient_ide_status = "A",
+                  project_id = project,
+                  patient_num = patient_ide,
+                  update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+    dplyr::select(patient_ide, patient_ide_source, patient_num, patient_ide_status, project_id, update_date) %>%
+  dbUpsert(demodata, "patient_mapping", c("patient_ide", "patient_ide_source", "project_id"))
 
   patients %>%
     dplyr::mutate(age_in_years_num = ifelse(is.na(death_date), floor(as.numeric(Sys.Date() - birth_date)/365.25), floor(as.numeric(death_date - birth_date)/365.25)),
@@ -243,7 +243,7 @@ add_encounters <- function(encounters, project, patient_mapping = "", host = "",
                     encounter_num = encounter_ide,
                     update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
       dplyr::select(encounter_ide, encounter_ide_source, project_id, encounter_num, patient_ide, patient_ide_source, encounter_ide_status, update_date) %>%
-    dbUpsert(demodata, "encounter_mapping", c("encounter_ide", "encounter_ide_source", "project_id", "patient_ide", "patient_ide_source"))
+  dbUpsert(demodata, "encounter_mapping", c("encounter_ide", "encounter_ide_source", "project_id", "patient_ide", "patient_ide_source"))
 
   encounters %>%
       dplyr::mutate(encounter_ide_source = project,
@@ -253,7 +253,7 @@ add_encounters <- function(encounters, project, patient_mapping = "", host = "",
                     encounter_num = encounter_ide,
                     update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
       dplyr::select(encounter_ide, encounter_ide_source, project_id, encounter_num, patient_ide, patient_ide_source, encounter_ide_status, update_date) %>%
-    dbUpsert(demodata, "encounter_mapping", c("encounter_ide", "encounter_ide_source", "project_id", "patient_ide", "patient_ide_source"))
+  dbUpsert(demodata, "encounter_mapping", c("encounter_ide", "encounter_ide_source", "project_id", "patient_ide", "patient_ide_source"))
 
   encounters %>%
     dplyr::mutate(length_of_stay = ifelse(is.na(end_date), floor(as.numeric(Sys.Date() - start_date)), floor(as.numeric(end_date - start_date))),
@@ -310,7 +310,7 @@ add_observations <- function(observations, patient_mapping = "", encounter_mappi
                   encounter_num = encounter_ide,
                   update_date = format(Sys.Date(), "%m/%d/%Y"),
                   text_search_index = (nextval+1):(nextval + nrow(.))) %>%
-  dplyr::select(-patient_ide, -encounter_ide) %>%
+    dplyr::select(-patient_ide, -encounter_ide) %>%
   dbUpsert(demodata, "observation_fact", c("patient_num", "concept_cd", "modifier_cd", "start_date", "encounter_num", "instance_num", "provider_id"))
 
   RPostgreSQL::dbDisconnect(demodata)

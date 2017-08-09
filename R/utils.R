@@ -40,8 +40,8 @@ dbPush <- function(df, con, table)
               stringr::str_c("(", ., ")") %>%
               stringr::str_replace("'NULL'", "NULL")
           }) %>%
-  stringr::str_c(collapse = ",") %>%
-  stringr::str_c("INSERT INTO ", table, " (", columns, ") VALUES ", ., ";") %>%
+    stringr::str_c(collapse = ",") %>%
+    stringr::str_c("INSERT INTO ", table, " (", columns, ") VALUES ", ., ";") %>%
   RPostgreSQL::dbGetQuery(conn = con, .)
 }
 
@@ -66,7 +66,7 @@ dbUpdate <- function(df, con, table, PK)
 
               stringr::str_c("UPDATE ", table, " SET ", set, " WHERE ", where, ";") %>%
               RPostgreSQL::dbGetQuery(conn = con, .)
-            })
+          })
 }
 
 #' Clear a database table
@@ -102,15 +102,15 @@ dbUpsert <- function(df, con, table, PK)
 
   temp <- stringr::str_c(table, "_tmp")
 
-# Create a temp table
+  # Create a temp table
   stringr::str_c("CREATE TEMP TABLE ", temp, " (LIKE ", table, ");") %>%
   RPostgreSQL::dbGetQuery(conn = con, .)
 
-# Load data in the temp table
+  # Load data in the temp table
   stringr::str_c("COPY ", temp, " (", names(df) %>% stringr::str_c(collapse = ","), ") FROM '/tmp/data.csv' WITH CSV HEADER;") %>%
   RPostgreSQL::dbGetQuery(conn = con, .)
 
-# Update existing rows
+  # Update existing rows
   stringr::str_c("UPDATE", table,
                  "SET", stringr::str_c(columns, "=", temp, ".", columns, collapse = ","),
                  "FROM", temp,
@@ -118,7 +118,7 @@ dbUpsert <- function(df, con, table, PK)
                  ";", sep = " ") %>%
   RPostgreSQL::dbGetQuery(conn = con, .)
 
-# Insert new rows
+  # Insert new rows
   stringr::str_c("INSERT INTO", table,
                  "SELECT", stringr::str_c(temp, ".*"),
                  "FROM", temp,
@@ -128,7 +128,7 @@ dbUpsert <- function(df, con, table, PK)
                  ";", sep = " ") %>%
   RPostgreSQL::dbGetQuery(conn = con, .)
 
-# Delete the temp table and file
+  # Delete the temp table and file
   stringr::str_c("DROP TABLE", temp, ";", sep = " ") %>%
   RPostgreSQL::dbGetQuery(conn = con, .)
 

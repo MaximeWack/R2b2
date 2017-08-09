@@ -12,24 +12,24 @@
 #' @export
 set_domain <- function(admin, pass, domain_id, domain_name)
 {
-# Connect to the db
+  # Connect to the db
   hive <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = "127.0.0.1", dbname = "i2b2hive", user = admin, password = pass)
   pm   <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = "127.0.0.1", dbname = "i2b2pm",   user = admin, password = pass)
 
-# Set the domain id to all cells in i2b2hive
+  # Set the domain id to all cells in i2b2hive
   c("crc", "im", "ont", "work") %>%
     purrr::walk(~RPostgreSQL::dbGetQuery(hive, stringr::str_c("UPDATE ", .x, "_db_lookup SET c_domain_id = '", domain_id, "';")))
 
-# Set the domain id and name in pm_hive_data
+  # Set the domain id and name in pm_hive_data
   RPostgreSQL::dbGetQuery(pm, stringr::str_c("UPDATE pm_hive_data SET domain_id = '", domain_id, "', domain_name = '", domain_id, "';"))
 
-# Set the domain name for the webclient
+  # Set the domain name for the webclient
   "/var/www/html/webclient/i2b2_config_data.js" %>%
     readLines %>%
     stringr::str_c(collapse = "\n") %>%
     stringr::str_replace("domain: *\"[^\"]+\"", stringr::str_c("domain: \"", domain_id, "\"")) %>%
     stringr::str_replace("name: *\"[^\"]+\"",   stringr::str_c("name: \"", domain_name, "\"")) %>%
-    write(file = "/var/www/html/webclient/i2b2_config_data.js")
+  write(file = "/var/www/html/webclient/i2b2_config_data.js")
 
   # Disconnect the db
   RPostgreSQL::dbDisconnect(hive)
@@ -50,16 +50,17 @@ set_domain <- function(admin, pass, domain_id, domain_name)
 #' @export
 set_project <- function(host = "127.0.0.1", admin, pass, project_id, project_name)
 {
-# Connect to the db
+  # Connect to the db
   hive <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host, dbname = "i2b2hive", user = admin, password = pass)
   pm   <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host, dbname = "i2b2pm",   user = admin, password = pass)
 
-# Set the project id to all cells in i2b2hive
+  # Set the project id to all cells in i2b2hive
   c("im", "ont", "work") %>%
     purrr::walk(~RPostgreSQL::dbGetQuery(hive, stringr::str_c("UPDATE ", .x, "_db_lookup SET c_project_path = '", project_id, "/';")))
+
   RPostgreSQL::dbGetQuery(hive, stringr::str_c("UPDATE crc_db_lookup SET c_project_path = '/", project_id, "/';"))
 
-# Set the project id and name in pm_hive_data
+  # Set the project id and name in pm_hive_data
   RPostgreSQL::dbGetQuery(pm, stringr::str_c("UPDATE pm_project_data SET project_id = '", project_id, "', project_name = '", project_name, "', project_path = '/", project_id, "';"))
   RPostgreSQL::dbGetQuery(pm, stringr::str_c("UPDATE pm_project_user_roles SET project_id = '", project_id, "' WHERE (project_id = 'Demo');"))
 

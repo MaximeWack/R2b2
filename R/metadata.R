@@ -167,15 +167,15 @@ populate_ont <- function(ont, modi = NULL, name, scheme, include_code = T, def_f
   # Tag explicit folders and root leaves
   ont %>%
     dplyr::mutate(type = dplyr::case_when(c_fullname %>% purrr::map_lgl(~stringr::str_detect(setdiff(c_fullname, .x), stringr::fixed(.x)) %>% any) ~ "folder",
-                            c_fullname %>% stringr::str_detect("\\\\") ~ "leaf",
-                            T ~ "root_leaf"),
-           c_visualattributes = ifelse(type == "folder", "FA", "LA")) ->
+                                          c_fullname %>% stringr::str_detect("\\\\") ~ "leaf",
+                                          T ~ "root_leaf"),
+                  c_visualattributes = ifelse(type == "folder", "FA", "LA")) ->
   ont
 
   # Add the folders for orphaned leaves by 'deconstructing' the paths
   ont %>%
     dplyr::filter(! (purrr::map(ont$c_fullname[ont$type == "folder"], ~stringr::str_detect(ont$c_fullname, .x)) %>% purrr::reduce(`|`) %||% F),
-           type == "leaf") %>%
+                  type == "leaf") %>%
     dplyr::pull(c_fullname) ->
   leaves
 
@@ -185,6 +185,7 @@ populate_ont <- function(ont, modi = NULL, name, scheme, include_code = T, def_f
       stringr::str_replace("\\\\[^\\\\]+$", "") %>%
       unique ->
     leaves
+
     ont %>%
       dplyr::add_row(c_fullname = leaves, c_visualattributes = "FA") ->
     ont
@@ -201,13 +202,13 @@ populate_ont <- function(ont, modi = NULL, name, scheme, include_code = T, def_f
     dplyr::add_row(c_fullname = stringr::str_c("\\", name), c_visualattributes = "FA") %>%
     # Populate the other columns if they are not given, with a default to concept_dimension
     dplyr::bind_cols(tibble::tibble(c_synonym_cd = rep(NA, nrow(.)),
-                            c_facttablecolumn = rep(NA, nrow(.)),
-                            c_tablename = rep(NA, nrow(.)),
-                            c_columnname = rep(NA, nrow(.)),
-                            c_columndatatype = rep(NA, nrow(.)),
-                            c_operator = rep(NA, nrow(.)),
-                            c_tooltip = rep(NA, nrow(.)),
-                            c_dimcode = rep(NA, nrow(.)))) %>%
+                                    c_facttablecolumn = rep(NA, nrow(.)),
+                                    c_tablename = rep(NA, nrow(.)),
+                                    c_columnname = rep(NA, nrow(.)),
+                                    c_columndatatype = rep(NA, nrow(.)),
+                                    c_operator = rep(NA, nrow(.)),
+                                    c_tooltip = rep(NA, nrow(.)),
+                                    c_dimcode = rep(NA, nrow(.)))) %>%
     dplyr::select(-dplyr::ends_with("1")) %>%
     dplyr::mutate(c_hlevel = stringr::str_count(c_fullname, "\\\\") - 1,
                   c_name = stringr::str_extract(c_fullname, "[^\\\\]+$"),
@@ -254,8 +255,8 @@ populate_ont <- function(ont, modi = NULL, name, scheme, include_code = T, def_f
                     update_date = format(Sys.Date(), "%m/%d/%Y")) ->
     modi
 
-  # Push the dataframe into the new ontology table
-  dbPush(modi, metadata, scheme)
+    # Push the dataframe into the new ontology table
+    dbPush(modi, metadata, scheme)
   }
 
 

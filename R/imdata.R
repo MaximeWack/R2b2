@@ -33,14 +33,16 @@ add_patients_imdata <- function(patients, project, host = "", admin = "", pass =
   dplyr::src_postgres("i2b2imdata", host, user = admin, password = pass) %>%
     dplyr::tbl("im_mpi_mapping") %>%
     dplyr::select(global_id, lcl_site, lcl_id) %>%
-    dplyr::collect() -> existing
+    dplyr::collect() ->
+  existing
 
 # Create new IDEs
   new_id_start <- ifelse(nrow(existing) == 0, 100000001, existing$global_id %>% as.numeric %>% max + 1)
 
   data.frame(lcl_id = as.character(patients)) %>%
     dplyr::anti_join(existing) %>%
-    dplyr::mutate(global_id = seq(new_id_start, length.out = nrow(.))) -> new_patients
+    dplyr::mutate(global_id = seq(new_id_start, length.out = nrow(.))) ->
+  new_patients
 
 # Push the new patient mappings
   new_patients %>%
