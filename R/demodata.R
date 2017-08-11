@@ -8,8 +8,25 @@
 #' @export
 clear_default_demodata <- function(host = "", admin = "", pass = "")
 {
-  c("code_lookup", "concept_dimension", "modifier_dimension", "encounter_mapping", "visit_dimension", "patient_dimension", "patient_mapping", "provider_dimension", "observation_fact", "qt_analysis_plugin", "qt_analysis_plugin_result_type", "qt_patient_enc_collection", "qt_patient_set_collection", "qt_pdo_query_master", "qt_xml_result", "qt_query_result_instance", "qt_query_instance", "qt_query_master") %>%
-    purrr::walk(~clear_table("i2b2demodata", .x, host, admin, pass))
+  c("code_lookup",
+    "concept_dimension",
+    "encounter_mapping",
+    "modifier_dimension",
+    "observation_fact",
+    "patient_dimension",
+    "patient_mapping",
+    "provider_dimension",
+    "qt_analysis_plugin",
+    "qt_analysis_plugin_result_type",
+    "qt_patient_enc_collection",
+    "qt_patient_set_collection",
+    "qt_pdo_query_master",
+    "qt_xml_result",
+    "qt_query_result_instance",
+    "qt_query_instance",
+    "qt_query_master",
+    "visit_dimension") %>%
+  purrr::walk(~clear_table("i2b2demodata", .x, host, admin, pass))
 }
 
 #' Delete modifiers
@@ -92,11 +109,19 @@ populate_concept <- function(ont, modi, name, scheme, host = "", admin = "", pas
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
 
   # Sanitize the ontology
-  ont <- ont %>% stringr::str_replace_all("'", "''")
-  modi <- modi %>% stringr::str_replace_all("'", "''")
+  ont %>%
+    dplyr::mutate_all(~stringr::str_replace_all(., "'", "''")) ->
+  ont
+
+  if(! modi %>% is.null)
+  {
+    modi %>%
+      dplyr::mutate_all(~stringr::str_replace_all("'", "''")) ->
+    modi
+  }
 
   # Create the data frame holding the contents of the new table
-  data.frame(concept_path = ont, stringsAsFactors = F) %>%
+  data.frame(concept_path = ont$c_fullname, stringsAsFactors = F) %>%
     # Insert the name of the ontology at the root
     dplyr::mutate(concept_path = stringr::str_c("\\", name, "\\", concept_path)) %>%
     # Populate the other columns
@@ -110,14 +135,14 @@ populate_concept <- function(ont, modi, name, scheme, host = "", admin = "", pas
     # Push the dataframe into the new ontology table
   dbPush(demodata, "concept_dimension")
 
-  if (length(modi) > 0)
+  if (! modi %>% is.null)
   {
-    data.frame(modi = modi) %>%
-      dplyr::mutate(name_char = modi %>% stringr::str_extract(" .*$") %>% stringr::str_trim(),
+    modi %>% 
+      dplyr::mutate(name_char = c_fullname %>% stringr::str_extract(" .*$") %>% stringr::str_trim(),
                     modifier_path = stringr::str_c("\\", name_char, "\\"),
-                    modifier_cd = stringr::str_c(scheme, ":", modi %>% stringr::str_extract("^.+? ") %>% stringr::str_trim()),
+                    modifier_cd = stringr::str_c(scheme, ":", c_fullname %>% stringr::str_extract("^.+? ") %>% stringr::str_trim()),
                     update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
-      dplyr::select(-modi) %>%
+      dplyr::select(-c_fullname) %>%
     # Push the dataframe into the new ontology table
     dbPush(demodata, "modifier_dimension")
   }
