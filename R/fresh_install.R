@@ -17,15 +17,13 @@
 #' @export
 fresh_install <- function(admin, pass, domain_id, domain_name, project_id, project_name)
 {
-  host <- "127.0.0.1"
-
   set_permissions()
 
   create_admin(admin, pass)
 
   set_domain(admin, pass, domain_id, domain_name)
 
-  set_project(host, admin, pass, project_id, project_name)
+  set_project(project_id, project_name)
 
   add_users(domain_id, "i2b2", "demouser", data.frame(id = admin, password = pass, name = admin, email = "", role = "ADMIN", project = project_id))
 
