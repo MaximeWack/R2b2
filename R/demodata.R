@@ -56,6 +56,13 @@ delete_concept <- function(scheme, host = "", admin = "", pass = "")
   RPostgreSQL::dbDisconnect(demodata)
 }
 
+#' List concepts
+#'
+#' List the concepts corresponding to a scheme
+#'
+#' @param scheme The scheme to get the concepts from
+#' @return A list of concepts
+#' @export
 list_concepts <- function(scheme, host = "", admin = "", pass = "")
 {
   dplyr::src_postgres("i2b2demodata", host = host, user = admin, pass = pass) %>%
