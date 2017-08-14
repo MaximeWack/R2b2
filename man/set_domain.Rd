@@ -4,16 +4,18 @@
 \alias{set_domain}
 \title{Set the domain}
 \usage{
-set_domain(admin, pass, domain_id, domain_name)
+set_domain(domain_id, domain_name, host = "", admin = "", pass = "")
 }
 \arguments{
-\item{admin}{Name of the database admin account}
-
-\item{pass}{Password of the database admin account}
-
 \item{domain_id}{The desired domain_id}
 
 \item{domain_name}{The desired domain_name}
+
+\item{host}{The host to connect to}
+
+\item{admin}{Name of the database admin account}
+
+\item{pass}{Password of the database admin account}
 }
 \description{
 Set the domain id and domain name of the instance
