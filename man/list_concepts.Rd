@@ -8,6 +8,12 @@ list_concepts(scheme, host = "", admin = "", pass = "")
 }
 \arguments{
 \item{scheme}{The scheme to get the concepts from}
+
+\item{host}{The host to connect to}
+
+\item{admin}{The admin account for the PostgreSQL database}
+
+\item{pass}{the password for the admin account}
 }
 \value{
 A list of concepts

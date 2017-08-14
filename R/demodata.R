@@ -78,6 +78,9 @@ delete_concept <- function(scheme, host = "", admin = "", pass = "")
 #' List the concepts corresponding to a scheme
 #'
 #' @param scheme The scheme to get the concepts from
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass the password for the admin account
 #' @return A list of concepts
 #' @export
 list_concepts <- function(scheme, host = "", admin = "", pass = "")
