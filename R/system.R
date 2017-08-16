@@ -70,62 +70,62 @@ create_admin <- function(admin = "i2b2admin", pass= NULL, pass_length = 8)
   pass
 }
 
-#' Secure the i2b2 databases
-#'
-#' Secure the i2b2 databases
-#'
-#' Connect to the database using the admin account credentials, provided as admin and pass,
-#' generate pass_length long passwords for each database
-#' and update the cells config with the new passwords.
-#' 
-#' @param admin Name of the database admin account
-#' @param pass Password of the database admin account
-#' @param pass_length Length of the generated passwords
-#' @return A vector for one statistic column
-#' @export
-secure_db <- function(admin, pass, pass_length = 8)
-{
-  # Connect to the db
-  con <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = "127.0.0.1", user = admin, password = pass)
+# #' Secure the i2b2 databases
+# #'
+# #' Secure the i2b2 databases
+# #'
+# #' Connect to the database using the admin account credentials, provided as admin and pass,
+# #' generate pass_length long passwords for each database
+# #' and update the cells config with the new passwords.
+# #'
+# #' @param admin Name of the database admin account
+# #' @param pass Password of the database admin account
+# #' @param pass_length Length of the generated passwords
+# #' @return A vector for one statistic column
+# #' @export
+# secure_db <- function(admin, pass, pass_length = 8)
+# {
+#   # Connect to the db
+#   con <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = "127.0.0.1", user = admin, password = pass)
 
-# Generate passwords
-  accounts <- c("demodata", "hive", "imdata", "metadata", "pm", "workdata")
-  passwords <- accounts %>% sapply(function(x){create_password(pass_length)})
+# # Generate passwords
+#   accounts <- c("demodata", "hive", "imdata", "metadata", "pm", "workdata")
+#   passwords <- accounts %>% sapply(function(x){create_password(pass_length)})
 
-# Change db accounts passwords
-  accounts %>%
-  sapply(function(x)
-         {
-           RPostgreSQL::dbGetQuery(con, stringr::str_c("alter user i2b2", x, " password '", passwords[x], "';"))
-         })
+# # Change db accounts passwords
+#   accounts %>%
+#   sapply(function(x)
+#          {
+#            RPostgreSQL::dbGetQuery(con, stringr::str_c("alter user i2b2", x, " password '", passwords[x], "';"))
+#          })
 
-  path <- "/opt/wildfly-10.0.0.Final/standalone/deployments/" 
+#   path <- "/opt/wildfly-10.0.0.Final/standalone/deployments/"
 
-  # Modify all passwords in all cells config files accordingly
-  stringr::str_c(c("crc", "im", "ont", "pm", "work"), "-ds.xml") %>%
-    purrr::map(function(x)
-        {
-          stringr::str_c(path, x) %>%
-            readLines %>%
-            stringr::str_c(collapse = "\n") %>%
-            {
-              config <- .
+#   # Modify all passwords in all cells config files accordingly
+#   stringr::str_c(c("crc", "im", "ont", "pm", "work"), "-ds.xml") %>%
+#     purrr::map(function(x)
+#         {
+#           stringr::str_c(path, x) %>%
+#             readLines %>%
+#             stringr::str_c(collapse = "\n") %>%
+#             {
+#               config <- .
 
-              for(acc in accounts)
-              {
-                config %>% 
-                  stringr::str_replace_all(stringr::str_c("<user-name>i2b2", acc, "</user-name>\n(\t*)<password>[^<]*</password>"),
-                                  stringr::str_c("<user-name>i2b2", acc, "</user-name>\n\\1<password>",passwords[acc],"</password>")) -> config
-              }
+#               for(acc in accounts)
+#               {
+#                 config %>%
+#                   stringr::str_replace_all(stringr::str_c("<user-name>i2b2", acc, "</user-name>\n(\t*)<password>[^<]*</password>"),
+#                                   stringr::str_c("<user-name>i2b2", acc, "</user-name>\n\\1<password>",passwords[acc],"</password>")) -> config
+#               }
 
-              config
-            } %>%
-              write(stringr::str_c(path, x))
-        })
+#               config
+#             } %>%
+#               write(stringr::str_c(path, x))
+#         })
 
-  # Disconnect the db
-  RPostgreSQL::dbDisconnect(con)
+#   # Disconnect the db
+#   RPostgreSQL::dbDisconnect(con)
 
-  accounts %>%
-    purrr::walk(~print(stringr::str_c("Password for database user i2b2", .x, " set to: ", passwords[.x])))
-}
+#   accounts %>%
+#     purrr::walk(~print(stringr::str_c("Password for database user i2b2", .x, " set to: ", passwords[.x])))
+# }
