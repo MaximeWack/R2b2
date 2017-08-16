@@ -110,7 +110,7 @@ send_msg <- function(msg, cellurl)
 {
   # Correct the base tag
   request <- msg %>%
-    xml2::as_xml_document() %>% 
+    xml2::as_xml_document() %>%
     as.character %>%
     stringr::str_replace_all("i2b2_request", "i2b2:request")
 

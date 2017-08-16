@@ -140,7 +140,7 @@ populate_concept <- function(ont, modi, name, scheme, host = "", admin = "", pas
 
   if (! modi %>% is.null)
   {
-    modi %>% 
+    modi %>%
       dplyr::mutate(name_char = c_fullname %>% stringr::str_extract(" .*$") %>% stringr::str_trim(),
                     modifier_path = stringr::str_c("\\", name_char, "\\"),
                     modifier_cd = stringr::str_c(scheme, ":", c_fullname %>% stringr::str_extract("^.+? ") %>% stringr::str_trim()),
@@ -316,7 +316,7 @@ add_encounters <- function(encounters, project, patient_mapping = "", host = "",
 #' - concept_cd: the concept to insert
 #' - provider_id: the provider
 #' - modifier_cd: optionnal modifier for the concept
-#' Other observation fact columns can optionnaly be included, 
+#' Other observation fact columns can optionnaly be included,
 #' such as end_date, valtype_cd, tval_char, nval_num, valueflag_cd, units_cd, etc.
 #'
 #' @param observations A dataframe of observation facts

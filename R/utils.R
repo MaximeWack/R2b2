@@ -36,7 +36,7 @@ dbPush <- function(df, con, table)
           {
             oneline[is.na(oneline)] <- "NULL"
             oneline %>%
-              stringr::str_c("'", ., "'", collapse = ",") %>% 
+              stringr::str_c("'", ., "'", collapse = ",") %>%
               stringr::str_c("(", ., ")") %>%
               stringr::str_replace("'NULL'", "NULL")
           }) %>%
