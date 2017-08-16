@@ -152,7 +152,7 @@ delete_project <- function(project_id, host = "", admin = "", pass = "")
 
   RPostgreSQL::dbGetQuery(pm, stringr::str_c("DELETE FROM pm_project_data WHERE project_id = '", project_id, "';"))
 
-  RPostgreSQL::dbGetQuery(pm, stringr::str_c("DROP DATABASE i2b2", project_id, "demodata;"))
+  RPostgreSQL::dbGetQuery(pm, stringr::str_c("DROP DATABASE i2b2", project_id, "data;"))
 
   # Disconnect the db
   RPostgreSQL::dbDisconnect(hive)
