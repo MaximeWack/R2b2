@@ -13,6 +13,6 @@ clear_default_workdata <- function(host = "", admin = "", pass = "")
   purrr::walk(~clear_table("i2b2workdata", .x, host, admin, pass))
 
   RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2workdata", user = admin, password = pass) %>%
-    RPostgreSQL::dbGetQuery("INSERT INTO workplace_access values ('demo', 'WORKPLACE', 'N', '0', '@', '@', '@', 'N', '0',,'CA', '@', , , );")
+    RPostgreSQL::dbGetQuery("INSERT INTO workplace_access values ('demo', 'WORKPLACE', 'N', '0', '@', '@', '@', 'N', '0', NULL, 'CA', '@', NULL, NULL, NULL);")
 }
 
