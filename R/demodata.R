@@ -26,7 +26,7 @@ clear_default_demodata <- function(host = "", admin = "", pass = "")
     "qt_query_instance",
     "qt_query_master",
     "visit_dimension") %>%
-  purrr::walk(~clear_table(stringr::str_c("i2b2", project, "data"), .x, host, admin, pass))
+  purrr::walk(~clear_table(stringr::str_c("i2b2demodata"), .x, host, admin, pass))
 }
 
 #' Clear the demodata tables
