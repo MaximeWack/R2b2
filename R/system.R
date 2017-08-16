@@ -80,7 +80,7 @@ create_admin <- function(admin = "i2b2admin", pass= NULL, pass_length = 8)
 #' @export
 service <- function(service, action = c("start", "stop", "restart"), use_sudo = T)
 {
-  ifelse(service == "pg", "postgresql-9.1", service)
+  service <- ifelse(service == "pg", "postgresql-9.1", service)
   cmd <- ifelse(use_sudo, "sudo service", "service")
   system(stringr::str_c(cmd, service, action, sep = " "))
 }
