@@ -19,8 +19,6 @@ add_ontology <- function(name, scheme, ont, modi = NULL, include_code = T, host 
   add_ont(name, scheme, host, admin, pass)
 
   populate_ont(ont, modi, name, scheme, include_code, host, admin, pass)
-
-  populate_concept(ont, modi, name, scheme, host, admin, pass)
 }
 
 #' Delete an ontology from i2b2
@@ -39,8 +37,4 @@ add_ontology <- function(name, scheme, ont, modi = NULL, include_code = T, host 
 delete_ontology <- function(scheme, host = "", admin = "", pass = "")
 {
   delete_ont(scheme, host, admin, pass)
-
-  delete_concept(scheme, host, admin, pass)
-
-  delete_modifier(scheme, host, admin, pass)
 }

@@ -76,6 +76,7 @@ create_admin <- function(admin = "i2b2admin", pass= NULL, pass_length = 8)
 #'
 #' @param service The service to manage (pg for short for postgresql-9.1)
 #' @param action The action to perform
+#' @param use_sudo Use sudo if not executed by root account (defaults to T)
 #' @export
 service <- function(service, action = c("start", "stop", "restart"), use_sudo = T)
 {

@@ -91,7 +91,7 @@ add_project <- function(project_id, project_name, host = "", admin = "", pass = 
 
 # crc-ds.xml
   xml2::read_html("/opt/wildfly-10.0.0.Final/standalone/deployments/crc-ds.xml") %>%
-    xml_nodes("datasources") -> crc
+    rvest::xml_nodes("datasources") -> crc
 
   datasource <- list()
   datasource$datasource$`connection-url` <- list(stringr::str_c("jdbc:postgresql://localhost:5432/i2b2", project_id, "data"))
@@ -107,11 +107,11 @@ add_project <- function(project_id, project_name, host = "", admin = "", pass = 
   attr(datasource$datasource, "pool-name") <- stringr::str_c("QueryTool", project_id, "DS")
   attr(datasource$datasource, "enabled") <- "true"
   attr(datasource$datasource, "use-ccm") <- "false"
-  datasource %>% as_xml_document -> datasource
+  datasource %>% xml2::as_xml_document -> datasource
 
   crc %>% xml2::xml_add_child(datasource)
 
-  write_xml(crc, "/opt/wildfly-10.0.0.Final/standalone/deployments/crc-ds.xml")
+  xml2::write_xml(crc, "/opt/wildfly-10.0.0.Final/standalone/deployments/crc-ds.xml")
 }
 
 #' List projects
@@ -168,6 +168,6 @@ delete_project <- function(project_id, host = "", admin = "", pass = "")
   new <- list(datasources = datasources)
   attr(new$datasources, "xmlns") <- "http://www.jboss.org/ironjacamar/schema"
 
-  xml2::write_xml(new %>% as_xml_document, "/opt/wildfly-10.0.0.Final/standalone/deployments/crc-ds.xml")
+  xml2::write_xml(new %>% xml2::as_xml_document, "/opt/wildfly-10.0.0.Final/standalone/deployments/crc-ds.xml")
 }
 
