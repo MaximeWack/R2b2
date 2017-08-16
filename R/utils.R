@@ -84,6 +84,7 @@ clear_table <- function(db, table, host = "", admin = "", pass = "")
   con <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = db, user = admin, password = pass)
 
   RPostgreSQL::dbGetQuery(con, stringr::str_c("DELETE FROM ", table, ";"))
+  RPostgreSQL::dbGetQuery(con, stringr::str_c("VACUUM ", table, ";"))
 
   RPostgreSQL::dbDisconnect(con)
 }
