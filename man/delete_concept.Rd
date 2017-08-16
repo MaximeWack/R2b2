@@ -4,10 +4,12 @@
 \alias{delete_concept}
 \title{Delete concepts}
 \usage{
-delete_concept(scheme, host = "", admin = "", pass = "")
+delete_concept(scheme, project, host = "", admin = "", pass = "")
 }
 \arguments{
 \item{scheme}{The scheme to delete from the concepts}
+
+\item{project}{The name of the project}
 
 \item{host}{The host to connect to}
 

@@ -4,10 +4,12 @@
 \alias{delete_modifier}
 \title{Delete modifiers}
 \usage{
-delete_modifier(scheme, host = "", admin = "", pass = "")
+delete_modifier(scheme, project, host = "", admin = "", pass = "")
 }
 \arguments{
 \item{scheme}{The scheme to delete from the concepts}
+
+\item{project}{The name of the project}
 
 \item{host}{The host to connect to}
 

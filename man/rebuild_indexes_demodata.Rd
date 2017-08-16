@@ -4,9 +4,11 @@
 \alias{rebuild_indexes_demodata}
 \title{Rebuild the indexes}
 \usage{
-rebuild_indexes_demodata(host = "", admin = "", pass = "")
+rebuild_indexes_demodata(project, host = "", admin = "", pass = "")
 }
 \arguments{
+\item{project}{The name of the project}
+
 \item{host}{The host to connect to}
 
 \item{admin}{The admin account for the PostgreSQL database}

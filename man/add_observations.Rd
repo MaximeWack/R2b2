@@ -4,11 +4,13 @@
 \alias{add_observations}
 \title{Add observations to the CRC cell}
 \usage{
-add_observations(observations, patient_mapping = "", encounter_mapping = "",
-  host = "", admin = "", pass = "")
+add_observations(observations, project, patient_mapping = "",
+  encounter_mapping = "", host = "", admin = "", pass = "")
 }
 \arguments{
 \item{observations}{A dataframe of observation facts}
+
+\item{project}{The name of the project}
 
 \item{patient_mapping}{The patient mapping table}
 
@@ -31,6 +33,6 @@ The observations dataframe must contain the following columns:
 - concept_cd: the concept to insert
 - provider_id: the provider
 - modifier_cd: optionnal modifier for the concept
-Other observation fact columns can optionnaly be included, 
+Other observation fact columns can optionnaly be included,
 such as end_date, valtype_cd, tval_char, nval_num, valueflag_cd, units_cd, etc.
 }

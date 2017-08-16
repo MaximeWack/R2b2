@@ -7,7 +7,7 @@
 list_projects(host = "", admin = "", pass = "")
 }
 \arguments{
-\item{host}{Address of the host, defaults to 127.0.0.1}
+\item{host}{Address of the hostdefaults to 127.0.0.1}
 
 \item{admin}{Name of the database admin account}
 

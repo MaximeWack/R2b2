@@ -28,7 +28,7 @@ The data dataframe must contain the following columns:
 - concept_cd: the concept to insert
 - provider_id: the provider
 - modifier_cd: optionnal modifier for the concept
-Other observation fact columns can optionnaly be included, 
+Other observation fact columns can optionnaly be included,
 such as end_date, valtype_cd, tval_char, nval_num, valueflag_cd, units_cd, etc.
 
 The function creates and updates the corresponding patients and encounters,

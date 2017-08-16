@@ -4,7 +4,8 @@
 \alias{populate_provider}
 \title{Populate the provider_dimension}
 \usage{
-populate_provider(ont, name, scheme, host = "", admin = "", pass = "")
+populate_provider(ont, name, scheme, project, host = "", admin = "",
+  pass = "")
 }
 \arguments{
 \item{ont}{The ontology to insert}
@@ -12,6 +13,8 @@ populate_provider(ont, name, scheme, host = "", admin = "", pass = "")
 \item{name}{The name of the new ontology}
 
 \item{scheme}{The scheme to use for this ontology}
+
+\item{project}{The name of the project}
 
 \item{host}{The host to connect to}
 

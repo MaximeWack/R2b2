@@ -4,10 +4,12 @@
 \alias{list_concepts}
 \title{List concepts}
 \usage{
-list_concepts(scheme, host = "", admin = "", pass = "")
+list_concepts(scheme, project, host = "", admin = "", pass = "")
 }
 \arguments{
 \item{scheme}{The scheme to get the concepts from}
+
+\item{project}{The name of the project}
 
 \item{host}{The host to connect to}
 

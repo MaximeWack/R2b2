@@ -26,7 +26,39 @@ clear_default_demodata <- function(host = "", admin = "", pass = "")
     "qt_query_instance",
     "qt_query_master",
     "visit_dimension") %>%
-  purrr::walk(~clear_table("i2b2demodata", .x, host, admin, pass))
+  purrr::walk(~clear_table(stringr::str_c("i2b2", project, "data"), .x, host, admin, pass))
+}
+
+#' Clear the demodata tables
+#'
+#' Clear the demodata tables
+#'
+#' @param project The name of the project
+#' @param host The host to connect to
+#' @param admin The admin account for the PostgreSQL database
+#' @param pass the password for the admin account
+#' @export
+clear_demodata <- function(project, host = "", admin = "", pass = "")
+{
+  c("code_lookup",
+    "concept_dimension",
+    "encounter_mapping",
+    "modifier_dimension",
+    "observation_fact",
+    "patient_dimension",
+    "patient_mapping",
+    "provider_dimension",
+    "qt_analysis_plugin",
+    "qt_analysis_plugin_result_type",
+    "qt_patient_enc_collection",
+    "qt_patient_set_collection",
+    "qt_pdo_query_master",
+    "qt_xml_result",
+    "qt_query_result_instance",
+    "qt_query_instance",
+    "qt_query_master",
+    "visit_dimension") %>%
+  purrr::walk(~clear_table(stringr::str_c("i2b2", project ,"data"), .x, host, admin, pass))
 }
 
 #' Delete modifiers
@@ -34,22 +66,23 @@ clear_default_demodata <- function(host = "", admin = "", pass = "")
 #' Delete modifiers from modifier_dimension
 #'
 #' @param scheme The scheme to delete from the concepts
+#' @param project The name of the project
 #' @param host The host to connect to
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass the password for the admin account
 #' @export
-delete_modifier <- function(scheme, host = "", admin = "", pass = "")
+delete_modifier <- function(scheme, project, host = "", admin = "", pass = "")
 {
-  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
+  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = stringr::str_c("i2b2", project, "data"), user = admin, password = pass)
 
   RPostgreSQL::dbGetQuery(demodata, stringr::str_c("DELETE FROM modifier_dimension WHERE (modifier_cd LIKE '", scheme, ":%');"))
 
   RPostgreSQL::dbDisconnect(demodata)
 }
 
-list_modifier <- function(scheme, host = "", admin = "", pass = "")
+list_modifier <- function(scheme, project, host = "", admin = "", pass = "")
 {
-  dplyr::src_postgres("i2b2demodata", host = host, user = admin, pass = pass) %>%
+  dplyr::src_postgres(stringr::str_c("i2b2", project, "data"), host = host, user = admin, pass = pass) %>%
     dplyr::tbl("modifier_dimension") %>%
     dplyr::collect() %>%
     dplyr::filter(modifier_cd %>% stringr::str_detect(stringr::str_c(scheme, ":.*")))
@@ -60,13 +93,14 @@ list_modifier <- function(scheme, host = "", admin = "", pass = "")
 #' Delete concepts from concept_dimension
 #'
 #' @param scheme The scheme to delete from the concepts
+#' @param project The name of the project
 #' @param host The host to connect to
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass the password for the admin account
 #' @export
-delete_concept <- function(scheme, host = "", admin = "", pass = "")
+delete_concept <- function(scheme, project, host = "", admin = "", pass = "")
 {
-  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
+  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = stringr::str_c("i2b2", project, "data"), user = admin, password = pass)
 
   RPostgreSQL::dbGetQuery(demodata, stringr::str_c("DELETE FROM concept_dimension WHERE (concept_cd LIKE '", scheme, ":%');"))
 
@@ -78,14 +112,15 @@ delete_concept <- function(scheme, host = "", admin = "", pass = "")
 #' List the concepts corresponding to a scheme
 #'
 #' @param scheme The scheme to get the concepts from
+#' @param project The name of the project
 #' @param host The host to connect to
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass the password for the admin account
 #' @return A list of concepts
 #' @export
-list_concepts <- function(scheme, host = "", admin = "", pass = "")
+list_concepts <- function(scheme, project, host = "", admin = "", pass = "")
 {
-  dplyr::src_postgres("i2b2demodata", host = host, user = admin, pass = pass) %>%
+  dplyr::src_postgres(stringr::str_c("i2b2", project, "data"), host = host, user = admin, pass = pass) %>%
     dplyr::tbl("concept_dimension") %>%
     dplyr::collect() %>%
     dplyr::filter(concept_cd %>% stringr::str_detect(stringr::str_c(scheme, ":.*")))
@@ -103,13 +138,14 @@ list_concepts <- function(scheme, host = "", admin = "", pass = "")
 #' @param modi The modifiers to insert
 #' @param name The name of the new ontology
 #' @param scheme The scheme to use for this ontology
+#' @param project The name of the project
 #' @param host The host to connect to
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass the password for the admin account
 #' @export
-populate_concept <- function(ont, modi, name, scheme, host = "", admin = "", pass = "")
+populate_concept <- function(ont, modi, name, scheme, project, host = "", admin = "", pass = "")
 {
-  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
+  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = stringr::str_c("i2b2", project, "data"), user = admin, password = pass)
 
   # Sanitize the ontology
   ont %>%
@@ -164,13 +200,14 @@ populate_concept <- function(ont, modi, name, scheme, host = "", admin = "", pas
 #' @param ont The ontology to insert
 #' @param name The name of the new ontology
 #' @param scheme The scheme to use for this ontology
+#' @param project The name of the project
 #' @param host The host to connect to
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass the password for the admin account
 #' @export
-populate_provider <- function(ont, name, scheme, host = "", admin = "", pass = "")
+populate_provider <- function(ont, name, scheme, project, host = "", admin = "", pass = "")
 {
-  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
+  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = stringr::str_c("i2b2", project, "data"), user = admin, password = pass)
 
   # Sanitize the ontology
   ont <- ont %>% stringr::str_replace_all("'", "''")
@@ -211,7 +248,7 @@ populate_provider <- function(ont, name, scheme, host = "", admin = "", pass = "
 #' @export
 add_patients_demodata <- function(patients, project, host = "", admin = "", pass = "")
 {
-  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
+  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = stringr::str_c("i2b2", project, "data"), user = admin, password = pass)
 
 # Upsert patients mappings
   patients %>%
@@ -268,7 +305,7 @@ add_patients_demodata <- function(patients, project, host = "", admin = "", pass
 #' @export
 add_encounters <- function(encounters, project, patient_mapping = "", host = "", admin = "", pass = "")
 {
-  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
+  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = stringr::str_c("i2b2", project, "data"), user = admin, password = pass)
 
   encounters %>%
       dplyr::mutate(encounter_ide_source = "HIVE",
@@ -320,15 +357,16 @@ add_encounters <- function(encounters, project, patient_mapping = "", host = "",
 #' such as end_date, valtype_cd, tval_char, nval_num, valueflag_cd, units_cd, etc.
 #'
 #' @param observations A dataframe of observation facts
+#' @param project The name of the project
 #' @param patient_mapping The patient mapping table
 #' @param encounter_mapping The encounter mapping table
 #' @param host The host to connect to
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass The password for the admin account
 #' @export
-add_observations <- function(observations, patient_mapping = "", encounter_mapping = "", host = "", admin = "", pass = "")
+add_observations <- function(observations, project, patient_mapping = "", encounter_mapping = "", host = "", admin = "", pass = "")
 {
-  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
+  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = stringr::str_c("i2b2", project, "data"), user = admin, password = pass)
 
   RPostgreSQL::dbGetQuery(demodata, "SELECT max(text_search_index) from observation_fact;") %>%
   .$max -> nextval
@@ -355,13 +393,14 @@ add_observations <- function(observations, patient_mapping = "", encounter_mappi
 #'
 #' Rebuild the indexes in i2b2demodata
 #'
+#' @param project The name of the project
 #' @param host The host to connect to
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass The password for the admin account
 #' @export
-rebuild_indexes_demodata <- function(host = "", admin = "", pass = "")
+rebuild_indexes_demodata <- function(project, host = "", admin = "", pass = "")
 {
-  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2demodata", user = admin, password = pass)
+  demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = stringr::str_c("i2b2", project, "data"), user = admin, password = pass)
 
   RPostgreSQL::dbGetQuery(demodata, "REINDEX DATABASE i2b2demodata;")
   RPostgreSQL::dbDisconnect(demodata)
