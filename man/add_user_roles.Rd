@@ -5,7 +5,8 @@
 \title{Add user roles}
 \usage{
 add_user_roles(admin, pass, id, project, roles,
-  url = "http://127.0.0.1:9090/i2b2/services/PMService/getServices")
+  url = "http://127.0.0.1:9090/i2b2/services/PMService/getServices",
+  domain = "")
 }
 \arguments{
 \item{admin}{The username to connect with}
@@ -19,6 +20,8 @@ add_user_roles(admin, pass, id, project, roles,
 \item{roles}{A character vector of roles to add}
 
 \item{url}{The URL of the i2b2 cell to communicate with}
+
+\item{domain}{The domain to act on}
 }
 \value{
 The XML return message as an httr::content() object

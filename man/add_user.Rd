@@ -5,7 +5,8 @@
 \title{Add an user}
 \usage{
 add_user(admin, pass, id, name, email, password,
-  url = "http://127.0.0.1:9090/i2b2/services/PMService/getServices")
+  url = "http://127.0.0.1:9090/i2b2/services/PMService/getServices",
+  domain = "")
 }
 \arguments{
 \item{admin}{The username to connect with}
@@ -21,6 +22,8 @@ add_user(admin, pass, id, name, email, password,
 \item{password}{The password for the new user}
 
 \item{url}{The URL of the i2b2 cell to communicate with}
+
+\item{domain}{The domain to act on}
 }
 \value{
 The XML return message as an httr::content() object
