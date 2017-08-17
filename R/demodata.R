@@ -308,43 +308,59 @@ add_patients_demodata <- function(patients, project, host = "", admin = "", pass
 #'
 #' @param encounters A dataframe of patients
 #' @param project The project to add the patients to
-#' @param patient_mapping The patient mapping table
 #' @param host The host to connect to
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass The password for the admin account
 #' @return An encounter mapping dataframe for the encounters
 #' @export
-add_encounters <- function(encounters, project, patient_mapping = "", host = "", admin = "", pass = "")
+add_encounters <- function(encounters, project, host = "", admin = "", pass = "")
 {
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = stringr::str_c("i2b2", stringr::str_to_lower(project), "data"), user = admin, password = pass)
 
+  demodata %>%
+    dplyr::tbl("encounter_mapping") %>%
+    dplyr::filter(encounter_ide_source == "HIVE") %>%
+    dplyr::select(encounter_ide, encounter_num) %>%
+    dplyr::collect() ->
+  mapping
+
+  if (nrow(mapping) == 0)
+    mapping <- data.frame(encounter_ide = character(0), encounter_num = numeric(0), stringsAsFactors = F)
+
+  start <- ifelse(nrow(mapping) == 0, 1, max(mapping$encounter_num) + 1)
+
   encounters %>%
+    dplyr::inner_join(mapping) -> mapped
+
+  encounters %>%
+    dplyr::anti_join(mapping) %>%
+    dplyr::mutate(encounter_num = seq(start, length.out = nrow(.))) -> unmapped
+
+  unmapped %>%
       dplyr::mutate(encounter_ide_source = "HIVE",
                     encounter_ide_status  = "A",
                     project_id = project,
                     patient_ide_source = "HIVE",
-                    encounter_num = encounter_ide,
                     update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
       dplyr::select(encounter_ide, encounter_ide_source, project_id, encounter_num, patient_ide, patient_ide_source, encounter_ide_status, update_date) %>%
   dbUpsert(demodata, "encounter_mapping", c("encounter_ide", "encounter_ide_source", "project_id", "patient_ide", "patient_ide_source"))
 
-  encounters %>%
+  unmapped %>%
       dplyr::mutate(encounter_ide_source = project,
                     encounter_ide_status  = "A",
                     project_id = project,
                     patient_ide_source = "HIVE",
-                    encounter_num = encounter_ide,
                     update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
       dplyr::select(encounter_ide, encounter_ide_source, project_id, encounter_num, patient_ide, patient_ide_source, encounter_ide_status, update_date) %>%
   dbUpsert(demodata, "encounter_mapping", c("encounter_ide", "encounter_ide_source", "project_id", "patient_ide", "patient_ide_source"))
 
-  encounters %>%
+  mapped %>%
+    dplyr::bind_rows(unmapped) %>%
     dplyr::mutate(length_of_stay = ifelse(is.na(end_date), floor(as.numeric(Sys.Date() - start_date)), floor(as.numeric(end_date - start_date))),
                   start_date = ifelse(is.na(start_date), NA, format(start_date, format = "%m/%d/%Y %H:%M:%S")),
                   end_date = ifelse(is.na(end_date), NA, format(end_date, format = "%m/%d/%Y %H:%M:%S")),
                   active_status_cd = ifelse(is.na(end_date), "O", "S"),
                   inout_cd = inout,
-                  encounter_num = encounter_ide,
                   patient_num = patient_ide,
                   update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
     dplyr::select(encounter_num, patient_num, active_status_cd, start_date, end_date, inout_cd, length_of_stay, update_date) %>%
@@ -375,9 +391,19 @@ add_encounters <- function(encounters, project, patient_mapping = "", host = "",
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass The password for the admin account
 #' @export
-add_observations <- function(observations, project, patient_mapping = "", encounter_mapping = "", host = "", admin = "", pass = "")
+add_observations <- function(observations, project, host = "", admin = "", pass = "")
 {
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = stringr::str_c("i2b2", stringr::str_to_lower(project), "data"), user = admin, password = pass)
+
+  demodata %>%
+    dplyr::tbl("encounter_mapping") %>%
+    dplyr::filter(encounter_ide_source == "HIVE") %>%
+    dplyr::select(encounter_ide, encounter_num) %>%
+    dplyr::collect() ->
+  mapping
+
+  observations %>%
+    dplyr::inner_join(mapping) -> observations
 
   RPostgreSQL::dbGetQuery(demodata, "SELECT max(text_search_index) from observation_fact;") %>%
   .$max -> nextval
@@ -391,7 +417,6 @@ add_observations <- function(observations, project, patient_mapping = "", encoun
   observations %>%
     dplyr::mutate(start_date = ifelse(is.na(start_date), NA, format(start_date, format = "%m/%d/%Y %H:%M:%S")),
                   patient_num = patient_ide,
-                  encounter_num = encounter_ide,
                   update_date = format(Sys.Date(), "%m/%d/%Y"),
                   text_search_index = (nextval+1):(nextval + nrow(.))) %>%
     dplyr::select(-patient_ide, -encounter_ide) %>%
