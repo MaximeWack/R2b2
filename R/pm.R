@@ -101,13 +101,13 @@ add_project <- function(project_id, project_name, host = "", admin = "", pass = 
   datasource$datasource$security$password <- list("demouser")
   datasource$datasource$validation$`validate-on-match` <- list("false")
   datasource$datasource$validation$`background-validation` <- list("false")
-  datasource$datasource$statement$`share-prepared-statement` <- list("false")
+  datasource$datasource$statement$`share-prepared-statements` <- list("false")
   attr(datasource$datasource, "jta") <- "false"
   attr(datasource$datasource, "jndi-name") <- stringr::str_c("java:/QueryTool", project_id, "DS")
   attr(datasource$datasource, "pool-name") <- stringr::str_c("QueryTool", project_id, "DS")
   attr(datasource$datasource, "enabled") <- "true"
   attr(datasource$datasource, "use-ccm") <- "false"
-  datasource %>% xml2::as_xml_document -> datasource
+  datasource %>% xml2::as_xml_document() -> datasource
 
   crc %>% xml2::xml_add_child(datasource)
 
@@ -161,13 +161,13 @@ delete_project <- function(project_id, host = "", admin = "", pass = "")
 # Change crc-ds.xml
   xml2::read_html("/opt/wildfly-10.0.0.Final/standalone/deployments/crc-ds.xml") %>%
     rvest::xml_nodes(stringr::str_c("datasource[jndi-name!='java:/QueryTool", project_id, "DS']")) %>%
-    xml2::as_list %>%
+    xml2::as_list() %>%
     stats::setNames(rep("datasource", length(.))) ->
   datasources
 
   new <- list(datasources = datasources)
   attr(new$datasources, "xmlns") <- "http://www.jboss.org/ironjacamar/schema"
 
-  xml2::write_xml(new %>% xml2::as_xml_document, "/opt/wildfly-10.0.0.Final/standalone/deployments/crc-ds.xml")
+  xml2::write_xml(new %>% xml2::as_xml_document(), "/opt/wildfly-10.0.0.Final/standalone/deployments/crc-ds.xml")
 }
 
