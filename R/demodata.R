@@ -414,6 +414,6 @@ rebuild_indexes_demodata <- function(project, host = "", admin = "", pass = "")
 {
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = stringr::str_c("i2b2", stringr::str_to_lower(project), "data"), user = admin, password = pass)
 
-  RPostgreSQL::dbGetQuery(demodata, "REINDEX DATABASE i2b2demodata;")
+  RPostgreSQL::dbGetQuery(demodata, stringr::str_c("REINDEX DATABASE i2b2", stringr::str_to_lower(project), "data;"))
   RPostgreSQL::dbDisconnect(demodata)
 }
