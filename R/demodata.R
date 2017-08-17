@@ -250,7 +250,7 @@ populate_provider <- function(ont, scheme, project, host = "", admin = "", pass 
 #' - patient_ide: the original patient ID
 #' - birth_date: as a Date object
 #' - death_date: as a Date object
-#' - gender (F or M)
+#' - sex_cd (F or M)
 #'
 #' @param patients A dataframe of patients
 #' @param project The project to add the patients to
@@ -287,7 +287,6 @@ add_patients_demodata <- function(patients, project, host = "", admin = "", pass
                   birth_date = ifelse(is.na(birth_date), NA, format(birth_date, format = "%m/%d/%Y %H:%M:%S")),
                   death_date = ifelse(is.na(death_date), NA, format(death_date, format = "%m/%d/%Y %H:%M:%S")),
                   vital_status_cd = ifelse(is.na(death_date), "N", "S"),
-                  sex_cd = gender,
                   update_date = format(Sys.Date(), "%m/%d/%Y"),
                   patient_num = patient_ide) %>%
     dplyr::select(patient_num, vital_status_cd, birth_date, death_date, sex_cd, age_in_years_num, update_date) %>%
