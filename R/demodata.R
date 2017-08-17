@@ -154,7 +154,7 @@ populate_concept <- function(ont, modi, scheme, project, host = "", admin = "", 
   if(! modi %>% is.null)
   {
     modi %>%
-      dplyr::mutate_all(~stringr::str_replace_all("'", "''")) ->
+      dplyr::mutate_all(~stringr::str_replace_all(., "'", "''")) ->
     modi
   }
 

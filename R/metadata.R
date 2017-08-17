@@ -159,7 +159,7 @@ populate_ont <- function(ont, modi = NULL, scheme, include_code = T, def_facttab
   if(! modi %>% is.null)
   {
     modi %>%
-      dplyr::mutate_all(~stringr::str_replace_all("'", "''")) ->
+      dplyr::mutate_all(~stringr::str_replace_all(., "'", "''")) ->
     modi
   }
 
