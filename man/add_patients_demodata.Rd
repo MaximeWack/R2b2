@@ -25,5 +25,5 @@ The patients dataframe must contain the following columns:
 - patient_ide: the original patient ID
 - birth_date: as a Date object
 - death_date: as a Date object
-- gender (F or M)
+- sex_cd (F or M)
 }

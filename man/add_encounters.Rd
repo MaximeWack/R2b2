@@ -4,15 +4,12 @@
 \alias{add_encounters}
 \title{Add encounters to the CRC cell}
 \usage{
-add_encounters(encounters, project, patient_mapping = "", host = "",
-  admin = "", pass = "")
+add_encounters(encounters, project, host = "", admin = "", pass = "")
 }
 \arguments{
 \item{encounters}{A dataframe of patients}
 
 \item{project}{The project to add the patients to}
-
-\item{patient_mapping}{The patient mapping table}
 
 \item{host}{The host to connect to}
 
