@@ -81,7 +81,7 @@ add_project <- function(project_id, project_name, host = "", admin = "", pass = 
   RPostgreSQL::dbGetQuery(hive, stringr::str_c("INSERT INTO crc_db_lookup (c_domain_id, c_project_path, c_owner_id, c_db_fullschema, c_db_datasource, c_db_servertype, c_db_nicename) VALUES ('", domain_id, "', '/", project_id, "/', '@', 'public', 'java:/QueryTool", project_id, "DS', 'POSTGRESQL', '", project_name,"');"))
 
   # Set the project id and name in pm_hive_data
-  RPostgreSQL::dbGetQuery(pm, stringr::str_c("INSERT INTO pm_project_data (project_id, project_name, project_wiki, project_path) VALUES ('", project_id, "', '", project_name, "', 'http://www.i2b2.org', '/", project_id, "');"))
+  RPostgreSQL::dbGetQuery(pm, stringr::str_c("INSERT INTO pm_project_data (project_id, project_name, project_wiki, project_path, status_cd) VALUES ('", project_id, "', '", project_name, "', 'http://www.i2b2.org', '/", project_id, "', 'A');"))
 
   RPostgreSQL::dbGetQuery(hive, stringr::str_c("CREATE DATABASE i2b2", project_id, "data WITH TEMPLATE i2b2demodata owner i2b2demodata;"))
 
