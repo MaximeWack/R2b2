@@ -109,9 +109,16 @@ add_project <- function(project_id, project_name, host = "", admin = "", pass = 
   attr(datasource$datasource, "use-ccm") <- "false"
   datasource %>% xml2::as_xml_document() -> datasource
 
-  crc %>% xml2::xml_add_child(datasource)
+  crc %>%
+    xml2::xml_add_child(datasource) %>%
+    rvest::xml_nodes("datasource") %>%
+    xml2::as_list() %>%
+    stats::setNames(rep("datasource", length(.))) -> crc
 
-  xml2::write_xml(crc, "/opt/wildfly-10.0.0.Final/standalone/deployments/crc-ds.xml")
+  new <- list(datasources = crc)
+  attr(new$datasources, "xmlns") <- "http://www.jboss.org/ironjacamar/schema"
+
+  xml2::write_xml(new %>% xml2::as_xml_document(), "/opt/wildfly-10.0.0.Final/standalone/deployments/crc-ds.xml")
 }
 
 #' List projects
