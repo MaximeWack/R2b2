@@ -136,14 +136,13 @@ list_concepts <- function(scheme, project, host = "", admin = "", pass = "")
 #'
 #' @param ont The ontology to insert
 #' @param modi The modifiers to insert
-#' @param name The name of the new ontology
 #' @param scheme The scheme to use for this ontology
 #' @param project The name of the project
 #' @param host The host to connect to
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass the password for the admin account
 #' @export
-populate_concept <- function(ont, modi, name, scheme, project, host = "", admin = "", pass = "")
+populate_concept <- function(ont, modi, scheme, project, host = "", admin = "", pass = "")
 {
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = stringr::str_c("i2b2", stringr::str_to_lower(project), "data"), user = admin, password = pass)
 
@@ -158,6 +157,12 @@ populate_concept <- function(ont, modi, name, scheme, project, host = "", admin 
       dplyr::mutate_all(~stringr::str_replace_all("'", "''")) ->
     modi
   }
+
+  # Get the name of the ontology from the scheme
+  list_ont(host, admin, pass) %>%
+    filter(c_table_cd == scheme) %>%
+    pull(c_name) ->
+  name
 
   # Create the data frame holding the contents of the new table
   data.frame(concept_path = ont$c_fullname, stringsAsFactors = F) %>%
@@ -198,22 +203,29 @@ populate_concept <- function(ont, modi, name, scheme, project, host = "", admin 
 #' code_level1 label_level1/code_level2 label_level2/.../code_leaf label_leaf
 #'
 #' @param ont The ontology to insert
-#' @param name The name of the new ontology
 #' @param scheme The scheme to use for this ontology
 #' @param project The name of the project
 #' @param host The host to connect to
 #' @param admin The admin account for the PostgreSQL database
 #' @param pass the password for the admin account
 #' @export
-populate_provider <- function(ont, name, scheme, project, host = "", admin = "", pass = "")
+populate_provider <- function(ont, scheme, project, host = "", admin = "", pass = "")
 {
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = stringr::str_c("i2b2", stringr::str_to_lower(project), "data"), user = admin, password = pass)
 
   # Sanitize the ontology
-  ont <- ont %>% stringr::str_replace_all("'", "''")
+  ont %>%
+    dplyr::mutate_all(~stringr::str_replace_all(., "'", "''")) ->
+  ont
+
+  # Get the name of the ontology from the scheme
+  list_ont(host, admin, pass) %>%
+    filter(c_table_cd == scheme) %>%
+    pull(c_name) ->
+  name
 
   # Create the data frame holding the contents of the new table
-  data.frame(provider_path = ont, stringsAsFactors = F) %>%
+  data.frame(provider_path = ont$c_fullname, stringsAsFactors = F) %>%
     # Insert the name of the ontology at the root
     dplyr::mutate(provider_path = stringr::str_c("\\", name, "\\", provider_path)) %>%
     # Populate the other columns
