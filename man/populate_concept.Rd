@@ -4,15 +4,13 @@
 \alias{populate_concept}
 \title{Populate the concept_dimension}
 \usage{
-populate_concept(ont, modi, name, scheme, project, host = "", admin = "",
+populate_concept(ont, modi, scheme, project, host = "", admin = "",
   pass = "")
 }
 \arguments{
 \item{ont}{The ontology to insert}
 
 \item{modi}{The modifiers to insert}
-
-\item{name}{The name of the new ontology}
 
 \item{scheme}{The scheme to use for this ontology}
 
