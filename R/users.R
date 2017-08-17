@@ -2,7 +2,6 @@
 #'
 #' Add an i2b2 user to the instance
 #'
-#' @param domain The name of the domain to interact with
 #' @param admin The username to connect with
 #' @param pass The password for the user
 #' @param id The id (no spaces, unique) of the new user
@@ -12,10 +11,10 @@
 #' @param url The URL of the i2b2 cell to communicate with
 #' @return The XML return message as an httr::content() object
 #' @export
-add_user <- function(domain, admin, pass, id, name, email, password, url = "http://127.0.0.1:9090/i2b2/services/PMService/getServices")
+add_user <- function(admin, pass, id, name, email, password, url = "http://127.0.0.1:9090/i2b2/services/PMService/getServices")
 {
   base_msg() %>%
-    add_header(domain, admin, pass) %>%
+    add_header(admin, pass) %>%
     add_body("pm:set_user", user_name = id, full_name = name, email = email, password = password, is_admin = 0) %>%
   send_msg(url)
 }
@@ -24,7 +23,6 @@ add_user <- function(domain, admin, pass, id, name, email, password, url = "http
 #'
 #' Add roles to an i2b2 user
 #'
-#' @param domain The name of the domain to interact with
 #' @param admin The username to connect with
 #' @param pass The password for the user
 #' @param id The id (no spaces, unique) of the new user
@@ -33,13 +31,13 @@ add_user <- function(domain, admin, pass, id, name, email, password, url = "http
 #' @param url The URL of the i2b2 cell to communicate with
 #' @return The XML return message as an httr::content() object
 #' @export
-add_user_roles <- function(domain, admin, pass, id, project, roles, url = "http://127.0.0.1:9090/i2b2/services/PMService/getServices")
+add_user_roles <- function(admin, pass, id, project, roles, url = "http://127.0.0.1:9090/i2b2/services/PMService/getServices")
 {
   roles %>%
     purrr::walk(function(role)
                 {
                   base_msg() %>%
-                    add_header(domain, admin, pass) %>%
+                    add_header(admin, pass) %>%
                     add_body("pm:set_role", user_name = id, role = role, project_id = project) %>%
                     send_msg(url)
                 })
@@ -63,23 +61,22 @@ add_user_roles <- function(domain, admin, pass, id, project, roles, url = "http:
 #' USER gives USER and DATA_OBFSC roles for the project
 #' Any DATA_* role gives USER and roles down from the DATA_* role given to the project
 #'
-#' @param domain The name of the domain to interact with
 #' @param admin The username to connect with
 #' @param pass The password for the user
 #' @param users The dataframe containing the users to add
 #' @param url The URL of the i2b2 cell to communicate with
 #' @return The XML return message as an httr::content() object
 #' @export
-add_users <- function(domain, admin, pass, users, url = "http://127.0.0.1:9090/i2b2/services/PMService/getServices")
+add_users <- function(admin, pass, users, url = "http://127.0.0.1:9090/i2b2/services/PMService/getServices")
 {
   apply(users, 1, function(user)
         {
-          add_user(domain, admin, pass, user["id"], user["name"], user["email"], user["password"], url)
+          add_user(admin, pass, user["id"], user["name"], user["email"], user["password"], url)
 
           if (user["role"] == "ADMIN")
           {
             roles <- c("MANAGER", "USER", "DATA_PROT", "DATA_DEID", "DATA_LDS", "DATA_AGG", "DATA_OBFSC")
-            add_user_roles(domain, admin, pass, user["id"], "@", "ADMIN", url)
+            add_user_roles(admin, pass, user["id"], "@", "ADMIN", url)
           }
           else if (user["role"] == "MANAGER")
             roles <- c("MANAGER", "USER", "DATA_DEID", "DATA_LDS", "DATA_AGG", "DATA_OBFSC")
@@ -96,7 +93,7 @@ add_users <- function(domain, admin, pass, users, url = "http://127.0.0.1:9090/i
           else if (user["role"] == "DATA_OBFSC")
             roles <- c("USER", "DATA_OBFSC")
 
-          add_user_roles(domain, admin, pass, user["id"], user["project"], roles, url)
+          add_user_roles(admin, pass, user["id"], user["project"], roles, url)
         })
 }
 

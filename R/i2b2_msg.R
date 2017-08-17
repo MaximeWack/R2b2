@@ -24,13 +24,14 @@ base_msg <- function()
 #' base_msg can be piped into add_header
 #'
 #' @param msg The XML message to add the header to
-#' @param domain The name of the domain to interact with
 #' @param username The username to connect with
 #' @param password The password for the user
 #' @return The XML message list object
 #' @export
-add_header <- function(msg, domain, username, password)
+add_header <- function(msg, username, password)
 {
+  domain <- get_domain()$domain_id
+
   mh <- list()
   mh$i2b2_version_compatible <- list("1.1")
   mh$hl7_version_compatible <- list("2.4")
