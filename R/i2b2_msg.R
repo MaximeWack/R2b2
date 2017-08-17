@@ -28,9 +28,10 @@ base_msg <- function()
 #' @param password The password for the user
 #' @return The XML message list object
 #' @export
-add_header <- function(msg, username, password)
+add_header <- function(msg, username, password, domain = "")
 {
-  domain <- get_domain()$domain_id
+  if (domain == "")
+    domain <- get_domain()$domain_id
 
   mh <- list()
   mh$i2b2_version_compatible <- list("1.1")
