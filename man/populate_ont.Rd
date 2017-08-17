@@ -4,7 +4,7 @@
 \alias{populate_ont}
 \title{Populate an empty ontology table}
 \usage{
-populate_ont(ont, modi = NULL, name, scheme, include_code = T,
+populate_ont(ont, modi = NULL, scheme, include_code = T,
   def_facttablecolumn = "concept_cd", def_tablename = "concept_dimension",
   def_columnname = "concept_path", def_columndatatype = "T",
   def_operator = "LIKE", host = "", admin = "", pass = "")
@@ -13,8 +13,6 @@ populate_ont(ont, modi = NULL, name, scheme, include_code = T,
 \item{ont}{The ontology to insert}
 
 \item{modi}{The modifiers to insert}
-
-\item{name}{The name of the new ontology}
 
 \item{scheme}{The scheme to use for this ontology}
 

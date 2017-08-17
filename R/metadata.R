@@ -136,7 +136,6 @@ add_ont <- function(name, scheme, host = "", admin = "", pass = "")
 #'
 #' @param ont The ontology to insert
 #' @param modi The modifiers to insert
-#' @param name The name of the new ontology
 #' @param scheme The scheme to use for this ontology
 #' @param include_code Whether to include the code in the label or not
 #' @param host The host to connect to
@@ -148,7 +147,7 @@ add_ont <- function(name, scheme, host = "", admin = "", pass = "")
 #' @param def_facttablecolumn Default value for that column
 #' @param def_columnname Default value for that column
 #' @export
-populate_ont <- function(ont, modi = NULL, name, scheme, include_code = T, def_facttablecolumn = "concept_cd", def_tablename = "concept_dimension", def_columnname = "concept_path", def_columndatatype = "T", def_operator = "LIKE", host = "", admin = "", pass = "")
+populate_ont <- function(ont, modi = NULL, scheme, include_code = T, def_facttablecolumn = "concept_cd", def_tablename = "concept_dimension", def_columnname = "concept_path", def_columndatatype = "T", def_operator = "LIKE", host = "", admin = "", pass = "")
 {
   metadata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2metadata", user = admin, password = pass)
 
@@ -191,6 +190,12 @@ populate_ont <- function(ont, modi = NULL, name, scheme, include_code = T, def_f
     ont
   }
 
+  # Get the name of the ontology from the scheme
+  list_ont(host, admin, pass) %>%
+    filter(c_table_cd == scheme) %>%
+    pull(c_name) ->
+  name
+
   ont %>%
     # Delete temp type variable
     dplyr::select(-type) %>%
@@ -198,7 +203,6 @@ populate_ont <- function(ont, modi = NULL, name, scheme, include_code = T, def_f
     dplyr::distinct() %>%
     # Insert the name of the ontology at the root
     dplyr::mutate(c_fullname = stringr::str_c("\\", name, "\\", c_fullname)) %>%
-    # dplyr::bind_rows(data.frame(c_fullname = stringr::str_c("\\", name), c_visualattributes = "FA")) %>%
     dplyr::add_row(c_fullname = stringr::str_c("\\", name), c_visualattributes = "FA") %>%
     # Populate the other columns if they are not given, with a default to concept_dimension
     dplyr::bind_cols(tibble::tibble(c_synonym_cd = rep(NA, nrow(.)),
