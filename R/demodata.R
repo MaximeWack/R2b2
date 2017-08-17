@@ -160,8 +160,8 @@ populate_concept <- function(ont, modi, scheme, project, host = "", admin = "", 
 
   # Get the name of the ontology from the scheme
   list_ont(host, admin, pass) %>%
-    filter(c_table_cd == scheme) %>%
-    pull(c_name) ->
+    dplyr::filter(c_table_cd == scheme) %>%
+    dplyr::pull(c_name) ->
   name
 
   # Create the data frame holding the contents of the new table
@@ -220,8 +220,8 @@ populate_provider <- function(ont, scheme, project, host = "", admin = "", pass 
 
   # Get the name of the ontology from the scheme
   list_ont(host, admin, pass) %>%
-    filter(c_table_cd == scheme) %>%
-    pull(c_name) ->
+    dplyr::filter(c_table_cd == scheme) %>%
+    dplyr::pull(c_name) ->
   name
 
   # Create the data frame holding the contents of the new table

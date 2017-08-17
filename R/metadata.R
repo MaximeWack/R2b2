@@ -192,8 +192,8 @@ populate_ont <- function(ont, modi = NULL, scheme, include_code = T, def_facttab
 
   # Get the name of the ontology from the scheme
   list_ont(host, admin, pass) %>%
-    filter(c_table_cd == scheme) %>%
-    pull(c_name) ->
+    dplyr::filter(c_table_cd == scheme) %>%
+    dplyr::pull(c_name) ->
   name
 
   ont %>%

@@ -26,6 +26,7 @@ base_msg <- function()
 #' @param msg The XML message to add the header to
 #' @param username The username to connect with
 #' @param password The password for the user
+#' @param domain The domain to act on
 #' @return The XML message list object
 #' @export
 add_header <- function(msg, username, password, domain = "")

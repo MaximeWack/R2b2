@@ -12,6 +12,8 @@ add_header(msg, username, password, domain = "")
 \item{username}{The username to connect with}
 
 \item{password}{The password for the user}
+
+\item{domain}{The domain to act on}
 }
 \value{
 The XML message list object
