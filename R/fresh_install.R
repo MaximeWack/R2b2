@@ -12,28 +12,63 @@
 #' @param pass the password for the admin account
 #' @param domain_id The desired domain_id
 #' @param domain_name The desired domain_name
-#' @param project_id The desired project id
-#' @param project_name The desired project name
 #' @export
-fresh_install <- function(admin, pass, domain_id, domain_name, project_id, project_name)
+fresh_install <- function(admin, pass, domain_id, domain_name)
 {
+  # System
   set_permissions()
 
   create_admin(admin, pass)
 
-  set_domain(admin, pass, domain_id, domain_name)
-
-  set_project(project_id, project_name)
-
-  add_users(domain_id, "i2b2", "demouser", data.frame(id = admin, password = pass, name = admin, email = "", role = "ADMIN", project = project_id))
-
-  delete_users(host, admin, pass, c("i2b2", "demo"))
-
+  # Clear the default install
   clear_webclient()
 
-  clear_default_metadata(host, admin, pass)
+  clear_default_workdata()
 
-  clear_default_demodata(host, admin, pass)
+  clear_default_metadata()
 
-  clear_default_imdata(host, admin, pass)
+  clear_default_imdata()
+
+  clear_default_demodata()
+
+  # Set the new domain
+  set_domain(domain_id, domain_name)
+
+  # Add new admin
+  add_users("i2b2", "demouser", data.frame(id = admin, password = pass, name = admin, email = "", role = "ADMIN", project = "@"))
+
+  # Prepare to clone i2b2demodata
+  service("pg", "restart")
+
+  add_project("CHRU")
+
+  add_user_roles("i2b2", "demouser", "maxx", "CHRU", c("MANAGER", "USER", "DATA_PROT"))  
+
+  # Clean old users
+  delete_users(c("i2b2","demo"))
+
+  # Add ontologies
+  add_ont("Diagnostics", "CIM")
+  add_ont("Actes", "CCAM")
+  add_ont("Patients", "PAT")
+  add_ont("Hospitalisations", "HOS")
+  add_ont("Services", "STRUCT")
+  add_ont("Biologies", "BIO")
+
+  # Populate the ontologies
+  populate_ont(readr::read_csv("..inst/cim.ont"), readr::read_csv("..inst/cim.modi"), "CIM")
+  populate_ont(readr::read_csv("../inst/ccam.ont"), modi = NULL, "CCAM")
+  populate_ont(readr::read_csv("../inst/patients.ont"), modi = NULL, "PAT", include_code = F)
+  populate_ont(readr::read_csv("../inst/hospit.ont"), modi = NULL, "HOS", include_code = F)
+  populate_ont(readr::read_csv("../inst/struct.ont"), modi = NULL, "STRUCT")
+  populate_ont(readr::read_csv("../inst/bio.ont"), modi = NULL, "BIO", include_code = F)
+
+  # Populate the concept/provider tables needed
+  populate_concept(readr::read_csv("../inst/cim.ont"), readr::read_csv("../inst/cim.modi"), "CIM", "CHRU")
+  populate_concept(readr::read_csv("../inst/ccam.ont"), modi = NULL, "CCAM", "CHRU")
+  populate_concept(readr::read_csv("../inst/bio.ont"), modi = NULL, "BIO", "CHRU")
+  populate_provider(readr::read_csv("../inst/struct.ont"), "STRUCT", "CHRU")
+
+  # Restart wildfly
+  service("jboss", "restart")
 }
