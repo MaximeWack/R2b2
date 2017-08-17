@@ -94,7 +94,7 @@ add_project <- function(project_id, project_name, host = "", admin = "", pass = 
     rvest::xml_nodes("datasources") -> crc
 
   datasource <- list()
-  datasource$datasource$`connection-url` <- list(stringr::str_c("jdbc:postgresql://localhost:5432/i2b2", project_id, "data"))
+  datasource$datasource$`connection-url` <- list(stringr::str_c("jdbc:postgresql://localhost:5432/i2b2", stringr::str_to_lower(project_id), "data"))
   datasource$datasource$`driver-class` <- list("org.postgresql.Driver")
   datasource$datasource$driver <- list("postgresql-9.2-1002.jdbc4.jar")
   datasource$datasource$security$`user-name` <- list("i2b2demodata")
