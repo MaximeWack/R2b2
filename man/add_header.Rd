@@ -4,12 +4,10 @@
 \alias{add_header}
 \title{Add the header to the message}
 \usage{
-add_header(msg, domain, username, password)
+add_header(msg, username, password)
 }
 \arguments{
 \item{msg}{The XML message to add the header to}
-
-\item{domain}{The name of the domain to interact with}
 
 \item{username}{The username to connect with}
 

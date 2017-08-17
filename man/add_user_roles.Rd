@@ -4,12 +4,10 @@
 \alias{add_user_roles}
 \title{Add user roles}
 \usage{
-add_user_roles(domain, admin, pass, id, project, roles,
+add_user_roles(admin, pass, id, project, roles,
   url = "http://127.0.0.1:9090/i2b2/services/PMService/getServices")
 }
 \arguments{
-\item{domain}{The name of the domain to interact with}
-
 \item{admin}{The username to connect with}
 
 \item{pass}{The password for the user}

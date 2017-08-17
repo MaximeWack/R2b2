@@ -4,12 +4,10 @@
 \alias{add_user}
 \title{Add an user}
 \usage{
-add_user(domain, admin, pass, id, name, email, password,
+add_user(admin, pass, id, name, email, password,
   url = "http://127.0.0.1:9090/i2b2/services/PMService/getServices")
 }
 \arguments{
-\item{domain}{The name of the domain to interact with}
-
 \item{admin}{The username to connect with}
 
 \item{pass}{The password for the user}

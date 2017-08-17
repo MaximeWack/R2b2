@@ -4,7 +4,7 @@
 \alias{fresh_install}
 \title{Make a fresh install from the base VM}
 \usage{
-fresh_install(admin, pass, domain_id, domain_name, project_id, project_name)
+fresh_install(admin, pass, domain_id, domain_name)
 }
 \arguments{
 \item{admin}{The admin account for the PostgreSQL database}
@@ -14,10 +14,6 @@ fresh_install(admin, pass, domain_id, domain_name, project_id, project_name)
 \item{domain_id}{The desired domain_id}
 
 \item{domain_name}{The desired domain_name}
-
-\item{project_id}{The desired project id}
-
-\item{project_name}{The desired project name}
 }
 \description{
 Make a fresh install from the base VM
