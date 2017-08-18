@@ -263,14 +263,14 @@ add_patients_demodata <- function(patients, project, host = "", admin = "", pass
   demodata <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = stringr::str_c("i2b2", stringr::str_to_lower(project), "data"), user = admin, password = pass)
 
 # Upsert patients mappings
-  patients %>%
-    dplyr::mutate(patient_ide_source = "HIVE",
-                  patient_ide_status = "A",
-                  project_id = project,
-                  patient_num = patient_ide,
-                  update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
-    dplyr::select(patient_ide, patient_ide_source, patient_num, patient_ide_status, project_id, update_date) %>%
-  dbUpsert(demodata, "patient_mapping", c("patient_ide", "patient_ide_source", "project_id"))
+  # patients %>%
+  #   dplyr::mutate(patient_ide_source = "HIVE",
+  #                 patient_ide_status = "A",
+  #                 project_id = project,
+  #                 patient_num = patient_ide,
+  #                 update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+  #   dplyr::select(patient_ide, patient_ide_source, patient_num, patient_ide_status, project_id, update_date) %>%
+  # dbUpsert(demodata, "patient_mapping", c("patient_ide", "patient_ide_source", "project_id"))
 
 # Upsert patients mappings
   patients %>%
@@ -319,7 +319,7 @@ add_encounters <- function(encounters, project, host = "", admin = "", pass = ""
 
   demodata %>%
     dplyr::tbl("encounter_mapping") %>%
-    dplyr::filter(encounter_ide_source == "HIVE") %>%
+    # dplyr::filter(encounter_ide_source == "HIVE") %>%
     dplyr::select(encounter_ide, encounter_num) %>%
     dplyr::collect() ->
   mapping
@@ -336,14 +336,14 @@ add_encounters <- function(encounters, project, host = "", admin = "", pass = ""
     dplyr::anti_join(mapping) %>%
     dplyr::mutate(encounter_num = seq(start, length.out = nrow(.))) -> unmapped
 
-  unmapped %>%
-      dplyr::mutate(encounter_ide_source = "HIVE",
-                    encounter_ide_status  = "A",
-                    project_id = project,
-                    patient_ide_source = "HIVE",
-                    update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
-      dplyr::select(encounter_ide, encounter_ide_source, project_id, encounter_num, patient_ide, patient_ide_source, encounter_ide_status, update_date) %>%
-  dbUpsert(demodata, "encounter_mapping", c("encounter_ide", "encounter_ide_source", "project_id", "patient_ide", "patient_ide_source"))
+  # unmapped %>%
+  #     dplyr::mutate(encounter_ide_source = "HIVE",
+  #                   encounter_ide_status  = "A",
+  #                   project_id = project,
+  #                   patient_ide_source = "HIVE",
+  #                   update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
+  #     dplyr::select(encounter_ide, encounter_ide_source, project_id, encounter_num, patient_ide, patient_ide_source, encounter_ide_status, update_date) %>%
+  # dbUpsert(demodata, "encounter_mapping", c("encounter_ide", "encounter_ide_source", "project_id", "patient_ide", "patient_ide_source"))
 
   unmapped %>%
       dplyr::mutate(encounter_ide_source = project,
@@ -397,7 +397,7 @@ add_observations <- function(observations, project, host = "", admin = "", pass 
 
   demodata %>%
     dplyr::tbl("encounter_mapping") %>%
-    dplyr::filter(encounter_ide_source == "HIVE") %>%
+    # dplyr::filter(encounter_ide_source == "HIVE") %>%
     dplyr::select(encounter_ide, encounter_num) %>%
     dplyr::collect() ->
   mapping
