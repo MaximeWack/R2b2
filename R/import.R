@@ -56,6 +56,9 @@ import_patients_visits <- function(patients, project)
            death_date = death_date %>% as.Date(format = "%Y/%m/%d %H:%M:%S"),
            sex_cd = ifelse(sex_cd == "1", "M", "F")) %>%
     dplyr::filter(!is.na(patient_ide)) %>%
+    dplyr::mutate(encounter_ide = ifelse(encounter_ide %>% stringr::str_detect("\\."),
+                                         stringr::str_c(encounter_ide, lubridate::day(start_date) %>% stringr::str_pad(2, "left", "0")),
+                                         encounter_ide)) %>%
     dplyr::mutate(patient_ide = ifelse(patient_ide %>% as.numeric > 2^32,
                                 patient_ide %>% stringr::str_sub(2),
                                 patient_ide)) ->
@@ -65,14 +68,14 @@ import_patients_visits <- function(patients, project)
   patients %>%
     dplyr::select(patient_ide, birth_date, death_date, sex_cd) %>%
     dplyr::distinct() %>%
-    add_patients_demodata(project)
+  add_patients_demodata(project)
 
   # Encounters
   patients %>%
     dplyr::select(patient_ide, encounter_ide, start_date, end_date) %>%
     dplyr::distinct() %>%
     dplyr::mutate(inout = "I") %>%
-    add_encounters(project)
+  add_encounters(project)
 
   # Observations : Age à l'hospitalisation
   patients %>%
@@ -86,7 +89,7 @@ import_patients_visits <- function(patients, project)
            tval_char = "E",
            nval_num = as.numeric(start_date - birth_date)/365.25) %>%
     dplyr::select(-birth_date) %>%
-    add_observations(project)
+  add_observations(project)
 }
 
 import_diagnostics <- function(diags, project)
@@ -98,12 +101,17 @@ import_diagnostics <- function(diags, project)
     dplyr::filter(!is.na(concept_cd)) %>%
     dplyr::mutate(concept_cd = stringr::str_c("CIM:", concept_cd),
            provider_id = stringr::str_c("STRUCT:", provider_id),
-           modifier_cd = stringr::str_c("CIM:", modifier_cd),
-           instance_num = 1) %>%
+           modifier_cd = stringr::str_c("CIM:", modifier_cd)) %>%
+    dplyr::mutate(encounter_ide = ifelse(encounter_ide %>% stringr::str_detect("\\."),
+                                         stringr::str_c(encounter_ide, lubridate::day(start_date)),
+                                         encounter_ide)) %>%
     dplyr::mutate(patient_ide = ifelse(patient_ide %>% as.numeric > 2^32,
                                 patient_ide %>% stringr::str_sub(2),
                                 patient_ide)) %>%
-    add_observations(project)
+    dplyr::group_by(patient_ide, encounter_ide, start_date, provider_id, concept_cd, modifier_cd) %>%
+    dplyr::mutate(instance_num = 1:n()) %>%
+    dplyr::ungroup() %>%
+  add_observations(project)
 }
 
 import_actes <- function(actes, project)
@@ -115,11 +123,16 @@ import_actes <- function(actes, project)
     dplyr::filter(!is.na(concept_cd)) %>%
     dplyr::mutate(concept_cd = stringr::str_c("CCAM:", concept_cd),
            provider_id = stringr::str_c("STRUCT:", provider_id),
-           modifier_cd = "@",
-           instance_num = 1) %>%
+           modifier_cd = "@") %>%
+    dplyr::mutate(encounter_ide = ifelse(encounter_ide %>% stringr::str_detect("\\."),
+                                         stringr::str_c(encounter_ide, lubridate::day(start_date)),
+                                         encounter_ide)) %>%
     dplyr::mutate(patient_ide = ifelse(patient_ide %>% as.numeric > 2^32,
                                 patient_ide %>% stringr::str_sub(2),
                                 patient_ide)) %>%
-    add_observations(project)
+    dplyr::group_by(patient_ide, encounter_ide, start_date, provider_id, concept_cd, modifier_cd) %>%
+    dplyr::mutate(instance_num = 1:n()) %>%
+    dplyr::ungroup() %>%
+  add_observations(project)
 }
 
