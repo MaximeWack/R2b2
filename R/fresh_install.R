@@ -68,7 +68,24 @@ fresh_install <- function(admin, pass, domain_id, domain_name)
   populate_concept(readr::read_csv("../inst/ccam.ont"), modi = NULL, "CCAM", "CHRU")
   populate_concept(readr::read_csv("../inst/bio.ont"), modi = NULL, "BIO", "CHRU")
   populate_provider(readr::read_csv("../inst/struct.ont"), "STRUCT", "CHRU")
+  populate_concept(readr::read_csv("../inst/hospit.ont"), modi = NULL, "HOS", "CHRU")
+  populate_concept(readr::read_csv("../inst/patients.ont"), modi = NULL, "PAT", "CHRU")
 
   # Restart wildfly
   service("jboss", "restart")
 }
+
+pop_chru <- function()
+{
+  readr::read_csv("~/2016/pims16.csv", col_types = readr::cols(.default = readr::col_character())) %>%
+  import_patients_visits("CHRU")
+
+  readr::read_csv("~/2016/diags16.csv", col_types = readr::cols(.default = readr::col_character())) %>%
+  import_diagnostics("CHRU")
+
+  readr::read_csv("~/2016/actes16.csv", col_types = readr::cols(.default = readr::col_character())) %>%
+  import_actes("CHRU")
+
+
+}
+
