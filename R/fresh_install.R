@@ -77,7 +77,9 @@ fresh_install <- function(admin, pass, domain_id, domain_name)
 
 pop_chru <- function()
 {
-  readr::read_csv("~/2016/pims16.csv", col_types = readr::cols(.default = readr::col_character())) %>%
+  readr::read_csv("~/2016/pims16.csv", col_types = readr::cols(.default = readr::col_character())) -> patients
+
+  patients %>%
   import_patients_visits("CHRU")
 
   readr::read_csv("~/2016/diags16.csv", col_types = readr::cols(.default = readr::col_character())) %>%
@@ -86,6 +88,30 @@ pop_chru <- function()
   readr::read_csv("~/2016/actes16.csv", col_types = readr::cols(.default = readr::col_character())) %>%
   import_actes("CHRU")
 
+  readr::read_csv("~/2016/mensurations16.csv", col_types = readr::cols(.default = readr::col_character())) %>%
+  import_mensurations(patients, "CHRU")
 
+  readr::read_csv("~/2016/bio16_1.csv", col_types = readr::cols(.default = readr::col_character())) %>%
+  import_bios(patients, "CHRU")
+
+  readr::read_csv("~/2016/bio16_2.csv", col_types = readr::cols(.default = readr::col_character())) %>%
+  import_bios(patients, "CHRU")
+
+  readr::read_csv("~/2016/pims17.csv", col_types = readr::cols(.default = readr::col_character())) -> patients
+
+  patients %>%
+  import_patients_visits("CHRU")
+
+  readr::read_csv("~/2016/diags17.csv", col_types = readr::cols(.default = readr::col_character())) %>%
+  import_diagnostics("CHRU")
+
+  readr::read_csv("~/2016/actes17.csv", col_types = readr::cols(.default = readr::col_character())) %>%
+  import_actes("CHRU")
+
+  readr::read_csv("~/2016/mensurations17.csv", col_types = readr::cols(.default = readr::col_character())) %>%
+  import_mensurations(patients, "CHRU")
+
+  readr::read_csv("~/2016/bio17.csv", col_types = readr::cols(.default = readr::col_character())) %>%
+  import_bios(patients, "CHRU")
 }
 
