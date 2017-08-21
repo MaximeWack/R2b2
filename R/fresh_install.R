@@ -111,7 +111,7 @@ pop_chru <- function()
   readr::read_csv("~/2016/mensurations17.csv", col_types = readr::cols(.default = readr::col_character())) %>%
   import_mensurations(patients, "CHRU")
 
-  readr::read_csv("~/2016/bio17.csv", col_types = readr::cols(.default = readr::col_character())) %>%
+  readr::read_csv("~/2016/bios17.csv", col_types = readr::cols(.default = readr::col_character())) %>%
   import_bios(patients, "CHRU")
 }
 
