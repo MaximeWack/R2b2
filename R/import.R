@@ -134,6 +134,7 @@ import_mensurations <- function(mensurations, patients, project)
                   valtype_cd = "N",
                   tval_char = "E",
                   nval_num = as.numeric(poids)) %>%
+    dplyr::filter(!is.na(nval_num)) %>%
     dplyr::select(-poids) %>%
     dplyr::group_by(patient_ide, encounter_ide, start_date, provider_id, concept_cd, modifier_cd) %>%
     dplyr::mutate(instance_num = 1:n()) %>%
@@ -148,6 +149,7 @@ import_mensurations <- function(mensurations, patients, project)
                   valtype_cd = "N",
                   tval_char = "E",
                   nval_num = as.numeric(taille)) %>%
+    dplyr::filter(!is.na(nval_num)) %>%
     dplyr::select(-taille) %>%
     dplyr::group_by(patient_ide, encounter_ide, start_date, provider_id, concept_cd, modifier_cd) %>%
     dplyr::mutate(instance_num = 1:n()) %>%
@@ -162,6 +164,7 @@ import_mensurations <- function(mensurations, patients, project)
                   valtype_cd = "N",
                   tval_char = "E",
                   nval_num = as.numeric(IMC)) %>%
+    dplyr::filter(!is.na(nval_num)) %>%
     dplyr::select(-IMC) %>%
     dplyr::group_by(patient_ide, encounter_ide, start_date, provider_id, concept_cd, modifier_cd) %>%
     dplyr::mutate(instance_num = 1:n()) %>%
