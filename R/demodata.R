@@ -418,7 +418,7 @@ add_observations <- function(observations, project, host = "", admin = "", pass 
     dplyr::mutate(start_date = ifelse(is.na(start_date), NA, format(start_date, format = "%m/%d/%Y %H:%M:%S")),
                   patient_num = patient_ide,
                   update_date = format(Sys.Date(), "%m/%d/%Y"),
-                  text_search_index = (nextval+1):(nextval + nrow(.))) %>%
+                  text_search_index = seq(nextval+1, length.out = nrow(.))) %>%
     dplyr::select(-patient_ide, -encounter_ide) %>%
   dbUpsert(demodata, "observation_fact", c("patient_num", "concept_cd", "modifier_cd", "start_date", "encounter_num", "instance_num", "provider_id"))
 
