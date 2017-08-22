@@ -52,6 +52,8 @@ import_patients_visits <- function(patients, project)
     stats::setNames(c("patient_ide", "encounter_ide", "start_date", "end_date", "sex_cd", "birth_date", "death_date", "rum_start", "rum_end", "provider_id", "project")) %>%
     dplyr::mutate(start_date = start_date %>% as.Date(format = "%Y/%m/%d %H:%M:%S"),
            end_date = end_date %>% as.Date(format = "%Y/%m/%d %H:%M:%S"),
+           rum_start = rum_start %>% as.Date(format = "%Y/%m/%d %H:%M:%S"),
+           rum_end = rum_end %>% as.Date(format = "%Y/%m/%d %H:%M:%S"),
            birth_date = birth_date %>% as.Date(format = "%Y/%m/%d %H:%M:%S"),
            death_date = death_date %>% as.Date(format = "%Y/%m/%d %H:%M:%S"),
            sex_cd = ifelse(sex_cd == "1", "M", "F")) %>%
@@ -77,7 +79,7 @@ import_patients_visits <- function(patients, project)
     dplyr::mutate(inout = "I") %>%
   add_encounters(project)
 
-  # Observations : Age à l'hospitalisation
+  # Observations : Age à l'hospitalisation
   patients %>%
     dplyr::select(patient_ide, encounter_ide, start_date = rum_start, birth_date, provider_id) %>%
     dplyr::distinct() %>%
@@ -89,7 +91,7 @@ import_patients_visits <- function(patients, project)
            nval_num = as.numeric(start_date - birth_date)/365.25) %>%
     dplyr::select(-birth_date) %>%
     dplyr::group_by(patient_ide, encounter_ide, start_date, provider_id, concept_cd, modifier_cd) %>%
-    dplyr::mutate(instance_num = 1:n()) %>%
+    dplyr::mutate(instance_num = seq(1, length.out = n())) %>%
     dplyr::ungroup() %>%
   add_observations(project)
 }
@@ -137,7 +139,7 @@ import_mensurations <- function(mensurations, patients, project)
     dplyr::filter(!is.na(nval_num)) %>%
     dplyr::select(-poids) %>%
     dplyr::group_by(patient_ide, encounter_ide, start_date, provider_id, concept_cd, modifier_cd) %>%
-    dplyr::mutate(instance_num = 1:n()) %>%
+    dplyr::mutate(instance_num = seq(1, length.out = n())) %>%
     dplyr::ungroup() %>%
     add_observations(project)
 
@@ -152,7 +154,7 @@ import_mensurations <- function(mensurations, patients, project)
     dplyr::filter(!is.na(nval_num)) %>%
     dplyr::select(-taille) %>%
     dplyr::group_by(patient_ide, encounter_ide, start_date, provider_id, concept_cd, modifier_cd) %>%
-    dplyr::mutate(instance_num = 1:n()) %>%
+    dplyr::mutate(instance_num = seq(1, length.out = n())) %>%
     dplyr::ungroup() %>%
     add_observations(project)
 
@@ -167,7 +169,7 @@ import_mensurations <- function(mensurations, patients, project)
     dplyr::filter(!is.na(nval_num)) %>%
     dplyr::select(-IMC) %>%
     dplyr::group_by(patient_ide, encounter_ide, start_date, provider_id, concept_cd, modifier_cd) %>%
-    dplyr::mutate(instance_num = 1:n()) %>%
+    dplyr::mutate(instance_num = seq(1, length.out = n())) %>%
     dplyr::ungroup() %>%
     add_observations(project)
 }
@@ -189,7 +191,7 @@ import_diagnostics <- function(diags, project)
                                 patient_ide %>% stringr::str_sub(2),
                                 patient_ide)) %>%
     dplyr::group_by(patient_ide, encounter_ide, start_date, provider_id, concept_cd, modifier_cd) %>%
-    dplyr::mutate(instance_num = 1:n()) %>%
+    dplyr::mutate(instance_num = seq(1, length.out = n())) %>%
     dplyr::ungroup() %>%
   add_observations(project)
 }
@@ -212,7 +214,7 @@ import_actes <- function(actes, project)
                                 patient_ide %>% stringr::str_sub(2),
                                 patient_ide)) %>%
     dplyr::group_by(patient_ide, encounter_ide, start_date, provider_id, concept_cd, modifier_cd) %>%
-    dplyr::mutate(instance_num = 1:n()) %>%
+    dplyr::mutate(instance_num = seq(1, length.out = n())) %>%
     dplyr::ungroup() %>%
   add_observations(project)
 }
@@ -257,7 +259,7 @@ import_bios <- function(bios, patients, project)
                   tval_char = "E") %>%
     dplyr::mutate(nval_num = nval_num %>% stringr::str_replace(",", ".")) %>%
     dplyr::group_by(patient_ide, encounter_ide, start_date, provider_id, concept_cd, modifier_cd) %>%
-    dplyr::mutate(instance_num = 1:n()) %>%
+    dplyr::mutate(instance_num = seq(1, length.out = n())) %>%
     dplyr::ungroup() %>%
   add_observations(project)
 }
