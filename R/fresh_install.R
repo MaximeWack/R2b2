@@ -40,7 +40,7 @@ fresh_install <- function(admin, pass, domain_id, domain_name)
   # Prepare to clone i2b2demodata
   service("pg", "restart")
 
-  add_project("CHRU", "Tous services")
+  add_project("CHRU", "CHRU - Tous services")
 
   add_user_roles("i2b2", "demouser", "maxx", "CHRU", c("MANAGER", "USER", "DATA_PROT"))
 
@@ -64,12 +64,7 @@ fresh_install <- function(admin, pass, domain_id, domain_name)
   populate_ont(readr::read_csv("../inst/bio.ont"), modi = NULL, "BIO", include_code = F)
 
   # Populate the concept/provider tables needed
-  populate_concept(readr::read_csv("../inst/cim.ont"), readr::read_csv("../inst/cim.modi"), "CIM", "CHRU")
-  populate_concept(readr::read_csv("../inst/ccam.ont"), modi = NULL, "CCAM", "CHRU")
-  populate_concept(readr::read_csv("../inst/bio.ont"), modi = NULL, "BIO", "CHRU")
-  populate_provider(readr::read_csv("../inst/struct.ont"), "STRUCT", "CHRU")
-  populate_concept(readr::read_csv("../inst/hospit.ont"), modi = NULL, "HOS", "CHRU")
-  populate_concept(readr::read_csv("../inst/patients.ont"), modi = NULL, "PAT", "CHRU")
+  add_ontologies("CHRU")
 
   # Restart wildfly
   service("jboss", "restart")
@@ -85,6 +80,8 @@ accounts_obgyn <- function()
   add_user("i2b2", "demouser", "endoc", "Endocrinologie Maternité", "", "endoc")
   add_user("i2b2", "demouser", "post", "Post-natal", "", "post")
   add_user("i2b2", "demouser", "nn", "Nouveaux-nés", "", "nn")
+
+  add_user("i2b2", "demouser", "med_amp", "Médecin AMP", "", "med_amp")
 
   add_user_roles("i2b2", "demouser", "maxx", "620", c("MANAGER", "USER", "DATA_PROT"))
   add_user_roles("i2b2", "demouser", "maxx", "6040", c("MANAGER", "USER", "DATA_PROT"))
@@ -132,24 +129,18 @@ accounts_obgyn <- function()
   add_user_roles("i2b2", "demouser", "nn", "CHRU", c("USER", "DATA_OBFSC"))
   add_user_roles("i2b2", "demouser", "nn", "620", c("USER", "DATA_AGG"))
   add_user_roles("i2b2", "demouser", "nn", "6100", c("MANAGER", "USER", "DATA_PROT"))
-}
 
+  add_user_roles("i2b2", "demouser", "med_amp", "CHRU", c("USER", "DATA_OBFSC"))
+  add_user_roles("i2b2", "demouser", "med_amp", "620", c("USER", "DATA_OBFSC"))
+  add_user_roles("i2b2", "demouser", "med_amp", "6040", c("USER", "DATA_AGG"))
+}
 
 pop_obgyn <- function()
 {
   UM <- seq(6040, 6100, 10)
 
   c(UM, 620) %>%
-    map(function(project)
-        {
-          populate_concept(readr::read_csv("../inst/cim.ont"), readr::read_csv("../inst/cim.modi"), "CIM", project)
-          populate_concept(readr::read_csv("../inst/ccam.ont"), modi = NULL, "CCAM", project)
-          populate_concept(readr::read_csv("../inst/bio.ont"), modi = NULL, "BIO", project)
-          populate_provider(readr::read_csv("../inst/struct.ont"), "STRUCT", project)
-          populate_concept(readr::read_csv("../inst/hospit.ont"), modi = NULL, "HOS", project)
-          populate_concept(readr::read_csv("../inst/patients.ont"), modi = NULL, "PAT", project)
-        }
-  )
+    map(add_ontologies)
 
 # 2016
   readr::read_csv("/manip/pims16.csv", col_types = readr::cols(.default = readr::col_character())) %>%
@@ -283,44 +274,173 @@ pop_obgyn <- function()
         })
 }
 
-
 pop_chru <- function()
 {
-  readr::read_csv("/manip/pims16.csv", col_types = readr::cols(.default = readr::col_character())) -> patients
+  # 2016
+  read_patients("/manip/pims16.csv") -> patients
 
   patients %>%
   import_patients_visits("CHRU")
 
-  readr::read_csv("/manip/diags16.csv", col_types = readr::cols(.default = readr::col_character())) %>%
-  import_diagnostics("CHRU")
+  read_diagnostics("/manip/diags16.csv") %>%
+  add_observations("CHRU")
 
-  readr::read_csv("/manip/actes16.csv", col_types = readr::cols(.default = readr::col_character())) %>%
-  import_actes("CHRU")
+  read_actes("/manip/actes16.csv") %>%
+  add_observations("CHRU")
 
-  readr::read_csv("/manip/mensurations16.csv", col_types = readr::cols(.default = readr::col_character())) %>%
+  read_mensurations("/manip/mensurations16.csv") %>%
   import_mensurations(patients, "CHRU")
 
-  readr::read_csv("/manip/bio16_1.csv", col_types = readr::cols(.default = readr::col_character())) %>%
+  read_bios("/manip/bio16_1.csv") %>%
   import_bios(patients, "CHRU")
 
-  readr::read_csv("/manip/bio16_2.csv", col_types = readr::cols(.default = readr::col_character())) %>%
+  read_bios("/manip/bio16_2.csv") %>%
   import_bios(patients, "CHRU")
 
-  readr::read_csv("/manip/pims17.csv", col_types = readr::cols(.default = readr::col_character())) -> patients
+# 2017
+  read_patients("/manip/pims16.csv") -> patients
 
   patients %>%
   import_patients_visits("CHRU")
 
-  readr::read_csv("/manip/diags17.csv", col_types = readr::cols(.default = readr::col_character())) %>%
-  import_diagnostics("CHRU")
+  read_diagnostics("/manip/diags17.csv") %>%
+  add_observations("CHRU")
 
-  readr::read_csv("/manip/actes17.csv", col_types = readr::cols(.default = readr::col_character())) %>%
-  import_actes("CHRU")
+  read_actes("/manip/actes17.csv") %>%
+  add_observations("CHRU")
 
-  readr::read_csv("/manip/mensurations17.csv", col_types = readr::cols(.default = readr::col_character())) %>%
+  read_mensurations("/manip/mensurations17.csv") %>%
   import_mensurations(patients, "CHRU")
 
-  readr::read_csv("/manip/bios17.csv", col_types = readr::cols(.default = readr::col_character())) %>%
+  read_bios("/manip/bios17.csv") %>%
   import_bios(patients, "CHRU")
 }
 
+read_patients <- function(file)
+{
+  readr::read_csv(file, col_types = readr::cols(.default = readr::col_character())) %>%
+    stats::setNames(c("patient_ide",
+                      "encounter_ide",
+                      "start_date",
+                      "end_date",
+                      "sex_cd",
+                      "birth_date",
+                      "death_date",
+                      "rum_start",
+                      "rum_end",
+                      "provider_id",
+                      "project")) %>%
+    dplyr::filter(!is.na(patient_ide)) %>%
+    dplyr::mutate(patient_ide   = sanitize_encounter(patient_ide)
+                  encounter_ide = sanitize_encounter(encounter_ide, start_date)
+                  start_date    = start_date %>% as.Date(format = "%Y/%m/%d %H:%M:%S"),
+                  end_date      = end_date   %>% as.Date(format = "%Y/%m/%d %H:%M:%S"),
+                  sex_cd        = ifelse(sex_cd == "1", "M", "F"),
+                  birth_date    = birth_date %>% as.Date(format = "%Y/%m/%d %H:%M:%S"),
+                  death_date    = death_date %>% as.Date(format = "%Y/%m/%d %H:%M:%S"),
+                  rum_start     = rum_start  %>% as.Date(format = "%Y/%m/%d %H:%M:%S"),
+                  rum_end       = rum_end    %>% as.Date(format = "%Y/%m/%d %H:%M:%S"),
+                  provider_id   = stringr::str_c("STRUCT:", provider_id))
+}
+
+# TODO: check start_date and join with patients df
+read_mensurations <- function(file)
+{
+  readr::read_csv(file, col_types = readr::cols(.default = readr::col_character())) %>%
+    stats::setNames(c("patient_ide",
+                      "encounter_ide",
+                      "poids",
+                      "taille",
+                      "IMC")) %>%
+    dplyr::filter(!is.na(patient_ide)) %>%
+    dplyr::mutate(patient_ide = sanitize_patient(patient_ide),
+                  encounter_ide = sanitize_encounter(encounter_ide, start_date))
+}
+
+read_diagnostics <- function(file)
+{
+  readr::read_csv(file, col_types = readr::cols(.default = readr::col_character())) %>%
+    stats::setNames(c("patient_ide",
+                      "encounter_ide",
+                      "start_date",
+                      "end_date",
+                      "provider_id",
+                      "concept_cd",
+                      "modifier_cd")) %>%
+    dplyr::filter(!is.na(concept_cd)) %>%
+    dplyr::mutate(encounter_ide = sanitize_encounter(encounter_ide, start_date),
+                  patient_ide   = sanitize_patient(patient_ide),
+                  start_date    = start_date %>% as.Date(format = "%Y/%m/%d %H:%M:%S"),
+                  end_date      = end_date   %>% as.Date(format = "%Y/%m/%d %H:%M:%S"),
+                  provider_id   = stringr::str_c("STRUCT:", provider_id),
+                  concept_cd    = stringr::str_c("CIM:", concept_cd),
+                  modifier_cd   = stringr::str_c("CIM:", modifier_cd))
+}
+
+read_actes <- function(file)
+{
+  readr::read_csv(file, col_types = readr::cols(.default = readr::col_character())) %>%
+    stats::setNames(c("patient_ide",
+                      "encounter_ide",
+                      "provider_id",
+                      "concept_cd",
+                      "start_date")) %>%
+  dplyr::filter(!is.na(concept_cd),
+                !is.na(start_date)) %>%
+  dplyr::mutate(encounter_ide = sanitize_encounter(encounter_ide, start_date),
+                patient_ide   = sanitize_patient(patient_ide),
+                provider_id   = stringr::str_c("STRUCT:", provider_id),
+                concept_cd    = stringr::str_c("CCAM:", concept_cd),
+                start_date    = start_date %>% as.Date(format = "%Y/%m/%d %H:%M:%S"))
+}
+
+read_bios <- function(file)
+{
+  readr::read_csv("../inst/bio.map") -> mapping
+
+  bios %>%
+    stats::setNames(c("patient_ide",
+                      "encounter_ide",
+                      "start_date",
+                      "concept_cd",
+                      "nval_num")) %>%
+    dplyr::filter(!is.na(concept_cd),
+                  !is.na(nval_num),
+                  !is.na(start_date),
+                  !concept_cd %in% c("MB_SGT_AER_CB", "MB_SGT_ANA_CB", "MB_LP_TC", "MB_SGT_PED_CB", "MB_CS_NUM_DON_RC", "MB_ANTIBIO_RC")) %>%
+    dplyr::left_join(mapping, by = c("concept_cd" = "from")) %>%
+    dplyr::mutate(encounter_ide = sanitize_encounter(encounter_ide, start_date),
+                  patient_ide   = sanitize_patient(patient_ide),
+                  start_date    = start_date %>% as.Date(format = "%Y/%m/%d %H:%M:%S"),
+                  concept_cd    = ifelse(!is.na(to), to, concept_cd),
+                  concept_cd    = stringr::str_c("BIO:", concept_cd)) %>%
+    dplyr::select(-to)
+}
+
+sanitize_encounter <- function(encounter_ide, start_date)
+{
+  start_date <- start_date %>% as.Date(format = "%Y/%m/%d %H:%M:%S")
+
+  if (encounter_ide %>% stringr::str_detect("\\."))
+    encounter_ide <- stringr::str_c(encounter_ide, lubridate::day(start_date) %>% stringr::str_pad(2, "left", "0"))
+
+  encounter_ide
+}
+
+sanitize_patient <- function(patient_ide)
+{
+  if (patient_ide %>% as.numeric > 2^32)
+    patient_ide <- patient_ide %>% stringr::str_sub(2)
+
+  patient_ide
+}
+
+add_ontologies <- function(project)
+{
+  populate_concept(readr::read_csv("../inst/cim.ont"), readr::read_csv("../inst/cim.modi"), "CIM", project)
+  populate_concept(readr::read_csv("../inst/ccam.ont"), modi = NULL, "CCAM", project)
+  populate_concept(readr::read_csv("../inst/bio.ont"), modi = NULL, "BIO", project)
+  populate_provider(readr::read_csv("../inst/struct.ont"), "STRUCT", project)
+  populate_concept(readr::read_csv("../inst/hospit.ont"), modi = NULL, "HOS", project)
+  populate_concept(readr::read_csv("../inst/patients.ont"), modi = NULL, "PAT", project)
+}
