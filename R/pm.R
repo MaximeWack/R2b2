@@ -95,7 +95,8 @@ add_project <- function(project_id, project_name, host = "", admin = "", pass = 
 
 # crc-ds.xml
   xml2::read_html("/opt/wildfly-10.0.0.Final/standalone/deployments/crc-ds.xml") %>%
-    rvest::xml_nodes("datasources") -> crc
+    rvest::xml_nodes("datasource") %>%
+    xml2::as_list() -> crc
 
   datasource <- list()
   datasource$datasource$`connection-url` <- list(stringr::str_c("jdbc:postgresql://localhost:5432/i2b2", stringr::str_to_lower(project_id), "data"))
@@ -111,12 +112,8 @@ add_project <- function(project_id, project_name, host = "", admin = "", pass = 
   attr(datasource$datasource, "pool-name") <- stringr::str_c("QueryTool", project_id, "DS")
   attr(datasource$datasource, "enabled") <- "true"
   attr(datasource$datasource, "use-ccm") <- "false"
-  datasource %>% xml2::as_xml_document() -> datasource
 
-  crc %>%
-    xml2::xml_add_child(datasource) %>%
-    rvest::xml_nodes("datasource") %>%
-    xml2::as_list() %>%
+  c(crc, datasource) %>%
     stats::setNames(rep("datasource", length(.))) -> crc
 
   new <- list(datasources = crc)
