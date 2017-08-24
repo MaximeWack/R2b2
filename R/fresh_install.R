@@ -180,97 +180,71 @@ pop_obgyn <- function()
   readr::read_csv("/manip/pims17.csv", col_types = readr::cols(.default = readr::col_character())) %>%
     stats::setNames(c("patient_ide", "encounter_ide", "start_date", "end_date", "sex_cd", "birth_date", "death_date", "rum_start", "rum_end", "provider_id", "project")) %>%
     dplyr::filter(project %in% UM) ->
+
+#pop_project(620, seq(6040, 6100, 10), "/manip/pims16.csv", "/manip/diags16.csv", "/manip/actes16.csv", "/manip/mensurations16.csv", "/manip/bios16.csv")
+#pop_project(620, seq(6040, 6100, 10), "/manip/pims17.csv", "/manip/diags17.csv", "/manip/actes17.csv", "/manip/mensurations17.csv", "/manip/bios17.csv")
+
+pop_projects <- function(top_project, projects, patients_file, diagnostics_file, actes_file, mensurations_file, bios_file)
+{
+  c(top_project, projects) %>%
+    purrr::map(add_ontologies)
+
+  read_patients(patients_file) %>%
+    dplyr::filter(project %in% projects) ->
   patients
 
   patients %>%
-    import_patients_visits(620)
+    import_patients_visits(top_project)
 
-  readr::read_csv("/manip/diags17.csv", col_types = readr::cols(.default = readr::col_character())) %>%
-    stats::setNames(c("patient_ide", "encounter_ide", "start_date", "end_date", "provider_id", "concept_cd", "modifier_cd")) %>%
+  read_diagnostics(diagnostics_file) %>%
     dplyr::semi_join(patients, by = c("patient_ide", "encounter_ide")) %>%
-    import_diagnostics(620)
+    import_diagnostics(top_project)
 
-  readr::read_csv("/manip/actes17.csv", col_types = readr::cols(.default = readr::col_character())) %>%
-    stats::setNames(c("patient_ide", "encounter_ide", "provider_id", "concept_cd", "start_date")) %>%
+  read_actes(actes_file) %>%
     dplyr::semi_join(patients, by = c("patient_ide", "encounter_ide")) %>%
-  import_actes(620)
+  import_actes(top_project)
 
-  readr::read_csv("/manip/mensurations17.csv", col_types = readr::cols(.default = readr::col_character())) %>%
-    stats::setNames(c("patient_ide", "encounter_ide", "poids", "taille", "IMC")) %>%
+  read_mensurations(mensurations_file) %>%
     dplyr::semi_join(patients, by = c("patient_ide", "encounter_ide")) %>%
-  import_mensurations(patients, 620)
+  import_mensurations(patients, top_project)
 
-  readr::read_csv("/manip/bios17.csv", col_types = readr::cols(.default = readr::col_character())) %>%
-    stats::setNames(c("patient_ide", "encounter_ide", "start_date", "concept_cd", "nval_num")) %>%
+  read_bios(bios_file, n_max = 5e6) %>%
     dplyr::semi_join(patients, by = c("patient_ide", "encounter_ide")) %>%
-  import_bios(patients, 620)
+  import_bios(patients, top_project)
 
-  UM %>%
+  read_bios(bios_file, skip = 5e6) %>%
+    dplyr::semi_join(patients, by = c("patient_ide", "encounter_ide")) %>%
+  import_bios(patients, top_project)
+
+  projects %>%
     purrr::map(function(x)
         {
-          # 2016
-          readr::read_csv("/manip/pims16.csv", col_types = readr::cols(.default = readr::col_character())) %>%
-            stats::setNames(c("patient_ide", "encounter_ide", "start_date", "end_date", "sex_cd", "birth_date", "death_date", "rum_start", "rum_end", "provider_id", "project")) %>%
+          read_patients(patients_file) %>%
             dplyr::filter(project == x) ->
               patients
 
             patients %>%
               import_patients_visits(x)
 
-            readr::read_csv("/manip/diags16.csv", col_types = readr::cols(.default = readr::col_character())) %>%
-              stats::setNames(c("patient_ide", "encounter_ide", "start_date", "end_date", "provider_id", "concept_cd", "modifier_cd")) %>%
+            read_diagnostics(diagnostics_file) %>%
               dplyr::semi_join(patients, by = c("patient_ide", "encounter_ide")) %>%
               import_diagnostics(x)
 
-            readr::read_csv("/manip/actes16.csv", col_types = readr::cols(.default = readr::col_character())) %>%
-              stats::setNames(c("patient_ide", "encounter_ide", "provider_id", "concept_cd", "start_date")) %>%
+            read_actes(actes_file) %>%
               dplyr::semi_join(patients, by = c("patient_ide", "encounter_ide")) %>%
               import_actes(x)
 
-            readr::read_csv("/manip/mensurations16.csv", col_types = readr::cols(.default = readr::col_character())) %>%
-              stats::setNames(c("patient_ide", "encounter_ide", "poids", "taille", "IMC")) %>%
+            read_mensurations(mensurations_file) %>%
               dplyr::semi_join(patients, by = c("patient_ide", "encounter_ide")) %>%
               import_mensurations(patients, x)
 
-            readr::read_csv("/manip/bio16_1.csv", col_types = readr::cols(.default = readr::col_character())) %>%
-              stats::setNames(c("patient_ide", "encounter_ide", "start_date", "concept_cd", "nval_num")) %>%
+            read_bios(bios_file, n_max = 5e6) %>%
               dplyr::semi_join(patients, by = c("patient_ide", "encounter_ide")) %>%
               import_bios(patients, x)
 
-            readr::read_csv("/manip/bio16_2.csv", col_types = readr::cols(.default = readr::col_character())) %>%
-              stats::setNames(c("patient_ide", "encounter_ide", "start_date", "concept_cd", "nval_num")) %>%
+            read_bios(bios_file, skip = 5e6) %>%
               dplyr::semi_join(patients, by = c("patient_ide", "encounter_ide")) %>%
               import_bios(patients, x)
-
-            # 2017
-            readr::read_csv("/manip/pims17.csv", col_types = readr::cols(.default = readr::col_character())) %>%
-              stats::setNames(c("patient_ide", "encounter_ide", "start_date", "end_date", "sex_cd", "birth_date", "death_date", "rum_start", "rum_end", "provider_id", "project")) %>%
-              dplyr::filter(project == x) ->
-                patients
-
-              patients %>%
-                import_patients_visits(x)
-
-              readr::read_csv("/manip/diags17.csv", col_types = readr::cols(.default = readr::col_character())) %>%
-                stats::setNames(c("patient_ide", "encounter_ide", "start_date", "end_date", "provider_id", "concept_cd", "modifier_cd")) %>%
-                dplyr::semi_join(patients, by = c("patient_ide", "encounter_ide")) %>%
-                import_diagnostics(x)
-
-              readr::read_csv("/manip/actes17.csv", col_types = readr::cols(.default = readr::col_character())) %>%
-                stats::setNames(c("patient_ide", "encounter_ide", "provider_id", "concept_cd", "start_date")) %>%
-                dplyr::semi_join(patients, by = c("patient_ide", "encounter_ide")) %>%
-                import_actes(x)
-
-              readr::read_csv("/manip/mensurations17.csv", col_types = readr::cols(.default = readr::col_character())) %>%
-                stats::setNames(c("patient_ide", "encounter_ide", "poids", "taille", "IMC")) %>%
-                dplyr::semi_join(patients, by = c("patient_ide", "encounter_ide")) %>%
-                import_mensurations(patients, x)
-
-              readr::read_csv("/manip/bios17.csv", col_types = readr::cols(.default = readr::col_character())) %>%
-                stats::setNames(c("patient_ide", "encounter_ide", "start_date", "concept_cd", "nval_num")) %>%
-                dplyr::semi_join(patients, by = c("patient_ide", "encounter_ide")) %>%
-                import_bios(patients, x)
-
         })
 }
 
