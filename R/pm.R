@@ -120,6 +120,9 @@ add_project <- function(project_id, project_name, host = "", admin = "", pass = 
   attr(new$datasources, "xmlns") <- "http://www.jboss.org/ironjacamar/schema"
 
   xml2::write_xml(new %>% xml2::as_xml_document(), "/opt/wildfly-10.0.0.Final/standalone/deployments/crc-ds.xml")
+
+  # Restart wildfly
+  service("jboss", "restart")
 }
 
 #' List projects
@@ -150,6 +153,9 @@ list_projects <- function(host = "", admin = "", pass = "")
 #' @export
 delete_project <- function(project_id, host = "", admin = "", pass = "")
 {
+  # Restart postgresql
+  service("pg", "restart")
+
   # Connect to the db
   hive <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2hive", user = admin, password = pass)
   pm <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host, dbname = "i2b2pm", user = admin, password = pass)
@@ -183,5 +189,8 @@ delete_project <- function(project_id, host = "", admin = "", pass = "")
   attr(new$datasources, "xmlns") <- "http://www.jboss.org/ironjacamar/schema"
 
   xml2::write_xml(new %>% xml2::as_xml_document(), "/opt/wildfly-10.0.0.Final/standalone/deployments/crc-ds.xml")
+
+  # Restart wildfly
+  service("jboss", "restart")
 }
 
