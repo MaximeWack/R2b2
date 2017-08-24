@@ -72,114 +72,88 @@ fresh_install <- function(admin, pass, domain_id, domain_name)
 
 accounts_obgyn <- function()
 {
-  add_user("i2b2", "demouser", "obgyn", "Gynécologie-Obstétrique", "", "obgyn")
-  add_user("i2b2", "demouser", "amp", "AMP Clinique", "", "amp")
-  add_user("i2b2", "demouser", "cancero", "Gynécologie et Cancérologie", "", "cancero")
-  add_user("i2b2", "demouser", "ortho", "Orthogénie", "", "ortho")
-  add_user("i2b2", "demouser", "ante", "Anténatal", "", "ante")
-  add_user("i2b2", "demouser", "endoc", "Endocrinologie Maternité", "", "endoc")
-  add_user("i2b2", "demouser", "post", "Post-natal", "", "post")
-  add_user("i2b2", "demouser", "nn", "Nouveaux-nés", "", "nn")
+  "CHRU" -> main
+  620 -> top_project
+  seq(6040, 6100, 10) -> projects
 
-  add_user("i2b2", "demouser", "med_amp", "Médecin AMP", "", "med_amp")
+  "maxx" -> admin
 
-  add_user_roles("i2b2", "demouser", "maxx", "620", c("MANAGER", "USER", "DATA_PROT"))
-  add_user_roles("i2b2", "demouser", "maxx", "6040", c("MANAGER", "USER", "DATA_PROT"))
-  add_user_roles("i2b2", "demouser", "maxx", "6050", c("MANAGER", "USER", "DATA_PROT"))
-  add_user_roles("i2b2", "demouser", "maxx", "6060", c("MANAGER", "USER", "DATA_PROT"))
-  add_user_roles("i2b2", "demouser", "maxx", "6070", c("MANAGER", "USER", "DATA_PROT"))
-  add_user_roles("i2b2", "demouser", "maxx", "6080", c("MANAGER", "USER", "DATA_PROT"))
-  add_user_roles("i2b2", "demouser", "maxx", "6090", c("MANAGER", "USER", "DATA_PROT"))
-  add_user_roles("i2b2", "demouser", "maxx", "6100", c("MANAGER", "USER", "DATA_PROT"))
+  "obgyn" -> top_user
+  "Gynécologie-Obstétrique" -> top_name
 
-  add_user_roles("i2b2", "demouser", "obgyn", "CHRU", c("USER", "DATA_AGG"))
-  add_user_roles("i2b2", "demouser", "obgyn", "620", c("MANAGER", "USER", "DATA_PROT"))
-  add_user_roles("i2b2", "demouser", "obgyn", "6040", c("MANAGER", "USER", "DATA_PROT"))
-  add_user_roles("i2b2", "demouser", "obgyn", "6050", c("MANAGER", "USER", "DATA_PROT"))
-  add_user_roles("i2b2", "demouser", "obgyn", "6060", c("MANAGER", "USER", "DATA_PROT"))
-  add_user_roles("i2b2", "demouser", "obgyn", "6070", c("MANAGER", "USER", "DATA_PROT"))
-  add_user_roles("i2b2", "demouser", "obgyn", "6080", c("MANAGER", "USER", "DATA_PROT"))
-  add_user_roles("i2b2", "demouser", "obgyn", "6090", c("MANAGER", "USER", "DATA_PROT"))
-  add_user_roles("i2b2", "demouser", "obgyn", "6100", c("MANAGER", "USER", "DATA_PROT"))
+  c("amp", "cancero", "ortho", "ante", "endoc", "post", "nn") -> users
+  c("AMP Clinique", "Gynécologie et Cancérologie", "Orthogénie", "Anténatal", "Endocrinologie Maternité", "Post-natal", "Nouveaux-nés") -> names
 
-  add_user_roles("i2b2", "demouser", "amp", "CHRU", c("USER", "DATA_OBFSC"))
-  add_user_roles("i2b2", "demouser", "amp", "620", c("USER", "DATA_AGG"))
-  add_user_roles("i2b2", "demouser", "amp", "6040", c("MANAGER", "USER", "DATA_PROT"))
+  "med_amp" -> bottom_user
+  "Médecin AMP" -> bottom_name
 
-  add_user_roles("i2b2", "demouser", "cancero", "CHRU", c("USER", "DATA_OBFSC"))
-  add_user_roles("i2b2", "demouser", "cancero", "620", c("USER", "DATA_AGG"))
-  add_user_roles("i2b2", "demouser", "cancero", "6050", c("MANAGER", "USER", "DATA_PROT"))
+## Admin
+# MANAGER on main
+  admin %>%
+    purrr::map(~add_user_roles("i2b2", "demouser", .x, main,  c("MANAGER", "USER", "DATA_PROT")))
 
-  add_user_roles("i2b2", "demouser", "ortho", "CHRU", c("USER", "DATA_OBFSC"))
-  add_user_roles("i2b2", "demouser", "ortho", "620", c("USER", "DATA_AGG"))
-  add_user_roles("i2b2", "demouser", "ortho", "6060", c("MANAGER", "USER", "DATA_PROT"))
+# MANAGER on top_project
+  admin %>%
+    purrr::map(~add_user_roles("i2b2", "demouser", .x, top_project, c("MANAGER", "USER", "DATA_PROT")))
 
-  add_user_roles("i2b2", "demouser", "ante", "CHRU", c("USER", "DATA_OBFSC"))
-  add_user_roles("i2b2", "demouser", "ante", "620", c("USER", "DATA_AGG"))
-  add_user_roles("i2b2", "demouser", "ante", "6070", c("MANAGER", "USER", "DATA_PROT"))
+# MANAGER on projects
+  admin %>%
+    purrr::map2(projects, ~add_user_roles("i2b2", "demouser", .x, .y, c("MANAGER", "USER", "DATA_PROT")))
 
-  add_user_roles("i2b2", "demouser", "endoc", "CHRU", c("USER", "DATA_OBFSC"))
-  add_user_roles("i2b2", "demouser", "endoc", "620", c("USER", "DATA_AGG"))
-  add_user_roles("i2b2", "demouser", "endoc", "6080", c("MANAGER", "USER", "DATA_PROT"))
 
-  add_user_roles("i2b2", "demouser", "post", "CHRU", c("USER", "DATA_OBFSC"))
-  add_user_roles("i2b2", "demouser", "post", "620", c("USER", "DATA_AGG"))
-  add_user_roles("i2b2", "demouser", "post", "6090", c("MANAGER", "USER", "DATA_PROT"))
+## Top user
+# Add top user
+  top_user %>%
+    purrr::map2(top_name, ~add_user("i2b2", "demouser", .x, .y, "", .x))
 
-  add_user_roles("i2b2", "demouser", "nn", "CHRU", c("USER", "DATA_OBFSC"))
-  add_user_roles("i2b2", "demouser", "nn", "620", c("USER", "DATA_AGG"))
-  add_user_roles("i2b2", "demouser", "nn", "6100", c("MANAGER", "USER", "DATA_PROT"))
+# DATA_AGG on main
+  top_user %>%
+    purrr::map(~add_user_roles("i2b2", "demouser", .x, main, c("USER", "DATA_AGG")))
 
-  add_user_roles("i2b2", "demouser", "med_amp", "CHRU", c("USER", "DATA_OBFSC"))
-  add_user_roles("i2b2", "demouser", "med_amp", "620", c("USER", "DATA_OBFSC"))
-  add_user_roles("i2b2", "demouser", "med_amp", "6040", c("USER", "DATA_AGG"))
+# MANAGER on top_project
+  top_user %>%
+    purrr::map(~add_user_roles("i2b2", "demouser", .x, top_project, c("MANAGER", "USER", "DATA_PROT")))
+
+# MANAGER on projects
+  top_user %>%
+    purrr::map2(projects, ~add_user_roles("i2b2", "demouser", .x, .y, c("MANAGER", "USER", "DATA_PROT")))
+
+
+## Users
+# Add users
+  users %>%
+  purrr::map2(names, ~add_user("i2b2", "demouser", .x, .y, "", .x))
+
+# DATA_OBFSC on main
+  users %>%
+    purrr::map(~add_user_roles("i2b2", "demouser", .x, main, c("USER", "DATA_OBFSC")))
+
+# DATA_AGG on top_project
+  users %>%
+    purrr::map(~add_user_roles("i2b2", "demouser", .x, top_project, c("USER", "DATA_AGG")))
+
+# MANAGER on projects
+  users %>%
+    purrr::map2(projects, ~add_user_roles("i2b2", "demouser", .x, .y, c("MANAGER", "USER", "DATA_PROT")))
+
+
+## Bottom users
+# Add user
+  bottom_user %>%
+    purrr::map2(bottom_name, ~add_user("i2b2", "demouser", .x, .y, "", .x))
+
+# DATA_OBFSC on main
+  bottom_user %>%
+    purrr::map(~add_user_roles("i2b2", "demouser", .x, main, c("USER", "DATA_OBFSC")))
+
+# DATA_OBFSC on top_project
+  bottom_user %>%
+    purrr::map(~add_user_roles("i2b2", "demouser", .x, top_project, c("USER", "DATA_OBFSC")))
+
+# DATA_AGG on project
+  bottom_user %>%
+    purrr::map2("amp", ~add_user_roles("i2b2", "demouser", .x, .y, c("USER", "DATA_AGG")))
 }
-
-pop_obgyn <- function()
-{
-  UM <- seq(6040, 6100, 10)
-
-  c(UM, 620) %>%
-    purrr::map(add_ontologies)
-
-# 2016
-  readr::read_csv("/manip/pims16.csv", col_types = readr::cols(.default = readr::col_character())) %>%
-    stats::setNames(c("patient_ide", "encounter_ide", "start_date", "end_date", "sex_cd", "birth_date", "death_date", "rum_start", "rum_end", "provider_id", "project")) %>%
-    dplyr::filter(project %in% UM) ->
-  patients
-
-  patients %>%
-    import_patients_visits(620)
-
-  readr::read_csv("/manip/diags16.csv", col_types = readr::cols(.default = readr::col_character())) %>%
-    stats::setNames(c("patient_ide", "encounter_ide", "start_date", "end_date", "provider_id", "concept_cd", "modifier_cd")) %>%
-    dplyr::semi_join(patients, by = c("patient_ide", "encounter_ide")) %>%
-    import_diagnostics(620)
-
-  readr::read_csv("/manip/actes16.csv", col_types = readr::cols(.default = readr::col_character())) %>%
-    stats::setNames(c("patient_ide", "encounter_ide", "provider_id", "concept_cd", "start_date")) %>%
-    dplyr::semi_join(patients, by = c("patient_ide", "encounter_ide")) %>%
-  import_actes(620)
-
-  readr::read_csv("/manip/mensurations16.csv", col_types = readr::cols(.default = readr::col_character())) %>%
-    stats::setNames(c("patient_ide", "encounter_ide", "poids", "taille", "IMC")) %>%
-    dplyr::semi_join(patients, by = c("patient_ide", "encounter_ide")) %>%
-  import_mensurations(patients, 620)
-
-  readr::read_csv("/manip/bio16_1.csv", col_types = readr::cols(.default = readr::col_character())) %>%
-    stats::setNames(c("patient_ide", "encounter_ide", "start_date", "concept_cd", "nval_num")) %>%
-    dplyr::semi_join(patients, by = c("patient_ide", "encounter_ide")) %>%
-  import_bios(patients, 620)
-
-  readr::read_csv("/manip/bio16_2.csv", col_types = readr::cols(.default = readr::col_character())) %>%
-    stats::setNames(c("patient_ide", "encounter_ide", "start_date", "concept_cd", "nval_num")) %>%
-    dplyr::semi_join(patients, by = c("patient_ide", "encounter_ide")) %>%
-  import_bios(patients, 620)
-
-# 2017
-  readr::read_csv("/manip/pims17.csv", col_types = readr::cols(.default = readr::col_character())) %>%
-    stats::setNames(c("patient_ide", "encounter_ide", "start_date", "end_date", "sex_cd", "birth_date", "death_date", "rum_start", "rum_end", "provider_id", "project")) %>%
-    dplyr::filter(project %in% UM) ->
 
 #pop_project(620, seq(6040, 6100, 10), "/manip/pims16.csv", "/manip/diags16.csv", "/manip/actes16.csv", "/manip/mensurations16.csv", "/manip/bios16.csv")
 #pop_project(620, seq(6040, 6100, 10), "/manip/pims17.csv", "/manip/diags17.csv", "/manip/actes17.csv", "/manip/mensurations17.csv", "/manip/bios17.csv")
