@@ -330,7 +330,7 @@ read_patients <- function(file)
                       "rum_end",
                       "provider_id",
                       "project")) %>%
-    dplyr::mutate(patient_ide   = sanitize_encounter(patient_ide),
+    dplyr::mutate(patient_ide   = sanitize_patient(patient_ide),
                   encounter_ide = sanitize_encounter(encounter_ide, start_date),
                   start_date    = start_date %>% as.Date(format = "%Y/%m/%d %H:%M:%S"),
                   end_date      = end_date   %>% as.Date(format = "%Y/%m/%d %H:%M:%S"),
@@ -423,6 +423,7 @@ read_bios <- function(file)
 
 sanitize_encounter <- function(encounter_ide, start_date)
 {
+  print(start_date)
   start_date <- start_date %>% as.Date(format = "%Y/%m/%d %H:%M:%S")
 
   if (encounter_ide %>% stringr::str_detect("\\."))
