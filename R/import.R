@@ -51,17 +51,18 @@ import_patients_visits <- function(patients, project)
 import_mensurations <- function(mensurations, patients, project)
 {
   patients %>%
-    dplyr::left_join(mensurations) %>%
-    dplyr::select(patient_ide, encounter_ide, provider_id, start_date = rum_start, end_date = rum_end, poids, taille, IMC) %>%
+    dplyr::inner_join(mensurations) %>%
+    dplyr::select(patient_ide, encounter_ide, start_date = rum_start, end_date = rum_end, provider_id, concept_cd, nval_num, modifier_cd, valtype_cd, tval_char) %>%
     add_observations(project)
 }
 
 import_bios <- function(bios, patients, project)
 {
   bios %>%
-    dplyr::left_join(patients, by = c("patient_ide", "encounter_ide")) %>%
+    dplyr::inner_join(patients, by = c("patient_ide", "encounter_ide")) %>%
+    dplyr::rename(start_date = start_date.x) %>%
     dplyr::filter(start_date >= rum_start & start_date <= rum_end) %>%
-    dplyr::select(-rum_start, -rum_end) %>%
+    dplyr::select(-rum_start, -rum_end, -start_date.y, -sex_cd, -birth_date, -death_date, -project) %>%
     dplyr::mutate(modifier_cd = "@",
                   valtype_cd = "N",
                   tval_char = "E",
