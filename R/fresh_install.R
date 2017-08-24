@@ -441,10 +441,10 @@ sanitize_patient <- function(patient_ide)
 
 add_ontologies <- function(project)
 {
-  populate_concept(readr::read_csv("../inst/cim.ont"), readr::read_csv("../inst/cim.modi"), "CIM", project)
-  populate_concept(readr::read_csv("../inst/ccam.ont"), modi = NULL, "CCAM", project)
-  populate_concept(readr::read_csv("../inst/bio.ont"), modi = NULL, "BIO", project)
-  populate_provider(readr::read_csv("../inst/struct.ont"), "STRUCT", project)
-  populate_concept(readr::read_csv("../inst/hospit.ont"), modi = NULL, "HOS", project)
-  populate_concept(readr::read_csv("../inst/patients.ont"), modi = NULL, "PAT", project)
+  populate_concept(readr::read_csv("../inst/cim.ont")     , readr::read_csv("../inst/cim.modi"), "CIM" , project)
+  populate_concept(readr::read_csv("../inst/ccam.ont")    , modi = NULL                        , "CCAM", project)
+  populate_concept(readr::read_csv("../inst/bio.ont")     , modi = NULL                        , "BIO" , project)
+  populate_provider(readr::read_csv("../inst/struct.ont") , "STRUCT"                           , project)
+  populate_concept(readr::read_csv("../inst/hospit.ont")  , modi = NULL                        , "HOS" , project)
+  populate_concept(readr::read_csv("../inst/patients.ont"), modi = NULL                        , "PAT" , project)
 }
