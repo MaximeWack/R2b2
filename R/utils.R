@@ -97,6 +97,8 @@ clear_table <- function(db, table, host = "", admin = "", pass = "")
 #' @param PK Character vector of the primary key(s)
 dbUpsert <- function(df, con, table, PK)
 {
+  options(scipen = 999)
+
   columns <- setdiff(names(df), PK)
 
   utils::write.csv(df, file = "/tmp/data.csv", row.names = F, na = "")
