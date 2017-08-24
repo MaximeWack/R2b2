@@ -401,11 +401,11 @@ read_mensurations <- function(file)
                   nval_num = nval_num %>% stringr::str_replace(",", "."))
 }
 
-read_bios <- function(file)
+read_bios <- function(file, ...)
 {
   readr::read_csv("../inst/bio.map") -> mapping
 
-  readr::read_csv(file, col_types = readr::cols(.default = readr::col_character())) %>%
+  readr::read_csv(file, col_types = readr::cols(.default = readr::col_character()), ...) %>%
     stats::setNames(c("patient_ide",
                       "encounter_ide",
                       "enc_start_date",
@@ -416,6 +416,7 @@ read_bios <- function(file)
     dplyr::mutate(encounter_ide = sanitize_encounter(encounter_ide, enc_start_date),
                   patient_ide   = sanitize_patient(patient_ide),
                   start_date    = start_date %>% as.Date(format = "%Y/%m/%d %H:%M:%S"),
+                  modifier_cd   = "@",
                   concept_cd    = ifelse(!is.na(to), to, concept_cd),
                   concept_cd    = stringr::str_c("BIO:", concept_cd)) %>%
     dplyr::select(-to, -enc_start_date)
