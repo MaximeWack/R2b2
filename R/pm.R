@@ -83,7 +83,6 @@ add_project <- function(project_id, project_name, host = "", admin = "", pass = 
   # Set the project id and name in pm_hive_data
   RPostgreSQL::dbGetQuery(pm, stringr::str_c("INSERT INTO pm_project_data (project_id, project_name, project_wiki, project_path, status_cd) VALUES ('", project_id, "', '", project_name, "', 'http://www.i2b2.org', '/", project_id, "', 'A');"))
 
-  RPostgreSQL::dbGetQuery(hive, stringr::str_c("CREATE SCHEMA i2b2", project_id, "data;"))
   RPostgreSQL::dbGetQuery(hive, stringr::str_c("CREATE DATABASE i2b2", project_id, "data WITH TEMPLATE i2b2demodata owner i2b2demodata;"))
 
   # Add the AGG_SERVICE_ACCOUNT user to the project
