@@ -274,46 +274,30 @@ pop_obgyn <- function()
         })
 }
 
-pop_chru <- function()
+#pop_chru("CHRU", "/manip/pims16.csv", "/manip/diags16.csv", "/manip/actes16.csv", "/manip/mensurations16.csv", "/manip/bios16.csv")
+#pop_chru("CHRU", "/manip/pims17.csv", "/manip/diags17.csv", "/manip/actes17.csv", "/manip/mensurations17.csv", "/manip/bios17.csv")
+
+pop_main <- function(main, patients_file, diagnostics_file, actes_file, mensurations_file, bios_file)
 {
-  # 2016
-  read_patients("/manip/pims16.csv") -> patients
+  read_patients(patients_file) -> patients
 
   patients %>%
-  import_patients_visits("CHRU")
+  import_patients_visits(main)
 
-  read_diagnostics("/manip/diags16.csv") %>%
-  add_observations("CHRU")
+  read_diagnostics(diagnostics_file) %>%
+  add_observations(main)
 
-  read_actes("/manip/actes16.csv") %>%
-  add_observations("CHRU")
+  read_actes(actes_file) %>%
+  add_observations(main)
 
-  read_mensurations("/manip/mensurations16.csv") %>%
-  import_mensurations(patients, "CHRU")
+  read_mensurations(mensurations_file) %>%
+  import_mensurations(patients, main)
 
-  read_bios("/manip/bio16_1.csv") %>%
-  import_bios(patients, "CHRU")
+  read_bios(bios_file, n_max = 5e6) %>%
+  import_bios(patients, main)
 
-  read_bios("/manip/bio16_2.csv") %>%
-  import_bios(patients, "CHRU")
-
-# 2017
-  read_patients("/manip/pims16.csv") -> patients
-
-  patients %>%
-  import_patients_visits("CHRU")
-
-  read_diagnostics("/manip/diags17.csv") %>%
-  add_observations("CHRU")
-
-  read_actes("/manip/actes17.csv") %>%
-  add_observations("CHRU")
-
-  read_mensurations("/manip/mensurations17.csv") %>%
-  import_mensurations(patients, "CHRU")
-
-  read_bios("/manip/bios17.csv") %>%
-  import_bios(patients, "CHRU")
+  read_bios(bios_file, skip = 5e6) %>%
+  import_bios(patients, main)
 }
 
 read_patients <- function(file)
