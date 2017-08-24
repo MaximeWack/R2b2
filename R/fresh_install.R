@@ -394,11 +394,11 @@ read_mensurations <- function(file)
     dplyr::select(-enc_start_date) %>%
     tidyr::gather(concept_cd, nval_num, poids, taille, IMC) %>%
     dplyr::filter(!is.na(nval_num)) %>%
-    dplyr::mutate(concept_cd = stringr::str_c("HOS:", concept_cd),
+    dplyr::mutate(concept_cd  = stringr::str_c("HOS:", concept_cd),
                   modifier_cd = "@",
-                  valtype_cd = "N",
-                  tval_char = "E",
-                  nval_num = nval_num %>% stringr::str_replace(",", "."))
+                  valtype_cd  = "N",
+                  tval_char   = "E",
+                  nval_num    = nval_num %>% stringr::str_replace(",", "."))
 }
 
 read_bios <- function(file, ...)
