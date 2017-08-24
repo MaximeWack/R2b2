@@ -29,5 +29,5 @@ The encounters dataframe must contain the following columns:
 - patient_ide: the original patient ID
 - start_date: the start date of the encounter, as Date object
 - end_date: the end date of the encounter, as Date object
-- inout: I or O if inpatient or outpatient
+- inout_cd: I or O if inpatient or outpatient
 }

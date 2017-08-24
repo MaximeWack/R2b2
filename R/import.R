@@ -19,7 +19,6 @@
 #'
 #' @param patients A formatted dataframe with correctly named columns
 #' @param project The project to add the data to
-#' @return 
 #' @export
 import_patients_visits <- function(patients, project)
 {

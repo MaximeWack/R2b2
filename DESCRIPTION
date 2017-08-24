@@ -17,5 +17,8 @@ Imports:
     RPostgreSQL,
     httr,
     rvest,
-    xml2
+    xml2,
+    lubridate,
+    tidyr,
+    readr
 RoxygenNote: 6.0.1

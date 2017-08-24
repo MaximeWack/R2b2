@@ -16,10 +16,6 @@ add_observations(observations, project, host = "", admin = "", pass = "")
 \item{admin}{The admin account for the PostgreSQL database}
 
 \item{pass}{The password for the admin account}
-
-\item{patient_mapping}{The patient mapping table}
-
-\item{encounter_mapping}{The encounter mapping table}
 }
 \description{
 Add observations to the CRC cell
