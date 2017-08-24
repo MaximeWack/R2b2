@@ -154,13 +154,19 @@ delete_project <- function(project_id, host = "", admin = "", pass = "")
   hive <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = host, dbname = "i2b2hive", user = admin, password = pass)
   pm <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host, dbname = "i2b2pm", user = admin, password = pass)
 
+  # Delete the connection lookups in i2b2hive
   c("im", "ont", "work") %>%
     purrr::walk(~RPostgreSQL::dbGetQuery(hive, stringr::str_c("DELETE FROM ", .x, "_db_lookup WHERE c_project_path = '", project_id, "/';")))
   RPostgreSQL::dbGetQuery(hive, stringr::str_c("DELETE FROM crc_db_lookup WHERE c_project_path = '/", project_id, "/';"))
 
+# Delete the project reference in pm_project_data
   RPostgreSQL::dbGetQuery(pm, stringr::str_c("DELETE FROM pm_project_data WHERE project_id = '", project_id, "';"))
 
+  # Delete the crc database
   RPostgreSQL::dbGetQuery(pm, stringr::str_c("DROP DATABASE i2b2", project_id, "data;"))
+
+# Delete user roles for this project
+  RPostgreSQL::dbGetQuery(pm, stringr::str_c("DELETE FROM pm_project_user_roles WHERE project_id = '", project_id, "';"))
 
   # Disconnect the db
   RPostgreSQL::dbDisconnect(hive)
