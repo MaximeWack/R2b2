@@ -32,7 +32,7 @@ import_patients_visits <- function(patients, project)
   patients %>%
     dplyr::select(patient_ide, encounter_ide, start_date, end_date) %>%
     dplyr::distinct() %>%
-    dplyr::mutate(inout = "I") %>%
+    dplyr::mutate(inout_cd = "I") %>%
   add_encounters(project)
 
   # Observations : Age à l'hospitalisation
@@ -53,13 +53,6 @@ import_mensurations <- function(mensurations, patients, project)
   patients %>%
     dplyr::left_join(mensurations) %>%
     dplyr::select(patient_ide, encounter_ide, provider_id, start_date = rum_start, end_date = rum_end, poids, taille, IMC) %>%
-    tidyr::gather(concept_cd, nval_num, poids, taille, IMC) %>%
-    dplyr::filter(!is.na(nval_num)) %>%
-    dplyr::mutate(concept_cd = stringr::str_c("HOS:", concept_cd),
-                  modifier_cd = "@",
-                  valtype_cd = "N",
-                  tval_char = "E",
-                  nval_num = nval_num %>% str_replace(",", ".")) %>%
     add_observations(project)
 }
 

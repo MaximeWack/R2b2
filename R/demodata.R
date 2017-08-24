@@ -294,7 +294,7 @@ add_patients_demodata <- function(patients, project, host = "", admin = "", pass
 #' - patient_ide: the original patient ID
 #' - start_date: the start date of the encounter, as Date object
 #' - end_date: the end date of the encounter, as Date object
-#' - inout: I or O if inpatient or outpatient
+#' - inout_cd: I or O if inpatient or outpatient
 #'
 #' @param encounters A dataframe of patients
 #' @param project The project to add the patients to
@@ -340,7 +340,6 @@ add_encounters <- function(encounters, project, host = "", admin = "", pass = ""
                   start_date = ifelse(is.na(start_date), NA, format(start_date, format = "%m/%d/%Y %H:%M:%S")),
                   end_date = ifelse(is.na(end_date), NA, format(end_date, format = "%m/%d/%Y %H:%M:%S")),
                   active_status_cd = ifelse(is.na(end_date), "O", "S"),
-                  inout_cd = inout,
                   patient_num = patient_ide,
                   update_date = format(Sys.Date(), "%m/%d/%Y")) %>%
     dplyr::select(encounter_num, patient_num, active_status_cd, start_date, end_date, inout_cd, length_of_stay, update_date) %>%
