@@ -376,6 +376,7 @@ read_actes <- function(file)
                 patient_ide   = sanitize_patient(patient_ide),
                 provider_id   = stringr::str_c("STRUCT:", provider_id),
                 concept_cd    = stringr::str_c("CCAM:", concept_cd),
+                modifier_cd   = "@",
                 start_date    = start_date %>% as.Date(format = "%Y/%m/%d %H:%M:%S")) %>%
   dplyr::select(-enc_start_date)
 }
