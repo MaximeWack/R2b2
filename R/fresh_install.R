@@ -405,7 +405,7 @@ read_bios <- function(file)
 {
   readr::read_csv("../inst/bio.map") -> mapping
 
-  bios %>%
+  readr::read_csv(file, col_types = readr::cols(.default = readr::col_character())) %>%
     stats::setNames(c("patient_ide",
                       "encounter_ide",
                       "enc_start_date",
@@ -423,7 +423,6 @@ read_bios <- function(file)
 
 sanitize_encounter <- function(encounter_ide, start_date)
 {
-  print(start_date)
   start_date <- start_date %>% as.Date(format = "%Y/%m/%d %H:%M:%S")
 
   if (encounter_ide %>% stringr::str_detect("\\."))
