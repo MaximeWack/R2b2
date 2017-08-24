@@ -425,18 +425,16 @@ sanitize_encounter <- function(encounter_ide, start_date)
 {
   start_date <- start_date %>% as.Date(format = "%Y/%m/%d %H:%M:%S")
 
-  if (encounter_ide %>% stringr::str_detect("\\."))
-    encounter_ide <- stringr::str_c(encounter_ide, lubridate::day(start_date) %>% stringr::str_pad(2, "left", "0"))
-
-  encounter_ide
+  ifelse(encounter_ide %>% stringr::str_detect("\\."),
+         stringr::str_c(encounter_ide, lubridate::day(start_date) %>% stringr::str_pad(2, "left", "0")),
+         encounter_ide)
 }
 
 sanitize_patient <- function(patient_ide)
 {
-  if (patient_ide %>% as.numeric > 2^32)
-    patient_ide <- patient_ide %>% stringr::str_sub(2)
-
-  patient_ide
+  ifelse(patient_ide %>% as.numeric > 2^32,
+         patient_ide %>% stringr::str_sub(2),
+         patient_ide)
 }
 
 add_ontologies <- function(project)
