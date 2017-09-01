@@ -60,7 +60,7 @@ fresh_install <- function(admin, pass, domain_id, domain_name)
   populate_ont(readr::read_csv("../inst/ccam.ont"), modi = NULL, "CCAM")
   populate_ont(readr::read_csv("../inst/patients.ont"), modi = NULL, "PAT", include_code = F)
   populate_ont(readr::read_csv("../inst/hospit.ont"), modi = NULL, "HOS", include_code = F)
-  populate_ont(readr::read_csv("../inst/struct.ont"), modi = NULL, "STRUCT")
+  populate_ont(readr::read_csv("../inst/struct.ont"), modi = NULL, "STRUCT", def_facttablecolumn = "provider_id", def_tablename = "provider_dimension", def_columnname = "provider_path")
   populate_ont(readr::read_csv("../inst/bio.ont"), modi = NULL, "BIO", include_code = F)
 
   # Populate the concept/provider tables needed
