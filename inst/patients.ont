@@ -1,7 +1,0 @@
-c_fullname, c_facttablecolumn, c_tablename, c_columnname, c_operator, c_dimcode
-sexe Sexe, patient_num, patient_dimension, sex_cd, LIKE, %
-sexe Sexe\m Masculin, patient_num, patient_dimension, sex_cd, =, M
-sexe Sexe\f Féminin, patient_num, patient_dimension, sex_cd, =, F
-statut Statut, patient_num, patient_dimension, vital_status_cd, LIKE, %
-statut Statut\v Vivant,patient_num, patient_dimension, vital_status_cd, =, N
-statut Statut\d Décédé,patient_num, patient_dimension, vital_status_cd, =, S
