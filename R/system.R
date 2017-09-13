@@ -53,7 +53,7 @@ create_admin <- function(admin = "i2b2admin", pass= NULL, pass_length = 8)
   print(stringr::str_c(admin, " system account created with password: ", pass))
 
   # Connect to the db
-  con <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL(), host = "127.0.0.1", user = "postgres", password = "demouser")
+  con <- RPostgreSQL::dbConnect(RPostgreSQL::PostgreSQL())
 
   # Create the database user and its database
   RPostgreSQL::dbGetQuery(con, stringr::str_c("create user ", admin, " with superuser createrole createdb password '", pass, "';"))
